@@ -1,12 +1,8 @@
-library(ape)
-library(picante)
+#open libraries
 library(tidyverse)
 library(phytools)
-library(caper)
-library(ggrepel)
-library(cowplot)
-library(geiger)
-library(xlsx)
+
+#read tree
 tree <- read.tree("min20Fixed516.nwk")
 tree
 plot(tree)
@@ -16,7 +12,7 @@ plotTree(tree,type="fan", ftype = "i")
 
 ## read csv file for mammals
 
-Data<-read.csv("acestree20.csv",header = TRUE,row.names=9)  
+Data<-read.csv("min20516.csv",header = TRUE,row.names=9)  
 Data<- filter(Data, is.element(Clade, c("Mammalia")))
 row.names(Data)= gsub(" ", "_", row.names(Data))
 
@@ -74,9 +70,13 @@ Mobj<-setMap(Mobj,invert=TRUE)
 m<-plot(Mobj,
      fsize=c(0.4,0.8),leg.txt="neoplasia prevalence")
 
+
+
+
+
 ## read csv file for Sauropsids
 
-Data<-read.csv("acestree20.csv",header = TRUE,row.names=9)  
+Data<-read.csv("min20516.csv",header = TRUE,row.names=9)  
 Data<- filter(Data, is.element(Clade, c("Sauropsida")))
 row.names(Data)= gsub(" ", "_", row.names(Data))
 
@@ -134,9 +134,13 @@ Sobj<-setMap(Sobj,invert=TRUE)
 s<-plot(Sobj,
            fsize=c(0.4,0.8),leg.txt="neoplasia prevalence")
 
+
+
+
+
 ## read csv file for Amphibians
 
-Data<-read.csv("acestree20.csv",header = TRUE,row.names=9)  
+Data<-read.csv("min20516.csv",header = TRUE,row.names=9)  
 Data<- filter(Data, is.element(Clade, c("Amphibia")))
 row.names(Data)= gsub(" ", "_", row.names(Data))
 
@@ -190,21 +194,7 @@ Aobj<-contMap(pruned.tree,neoplasia,plot=TRUE,res=200, type = "fan")
 ## invert color scale so red is highest trait value and blue is lowest
 Aobj<-setMap(Aobj,invert=TRUE)
 
-## plot 
-a<-plot(Aobj,
-           fsize=c(0.4,0.8),leg.txt="neoplasia prevalence")
-
-par(mfrow=c(3,1), mai= c(1,.1,.1,.1))
-plot(Mobj,
-     fsize=c(0.4,0.8),leg.txt="neoplasia prevalence")
-title("Mammals")
-plot(Sobj,
-     fsize=c(0.4,0.8),leg.txt="neoplasia prevalence")
-title("Sauropsids")
-plot(Aobj,
-     fsize=c(0.4,0.8),leg.txt="neoplasia prevalence")
-title("Amphibians")
-dev.of
+## plot multiple phylos on to one image
 
 layout(matrix(c(1,1,2,3), 2, 2, byrow = TRUE))
 par(mar=c(4, 4, 4, 4))
