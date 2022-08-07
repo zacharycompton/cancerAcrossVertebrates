@@ -1,26 +1,8 @@
-#install packages
-install.packages("ggplot2")
-install.packages("ggrepel")
-install.packages("tidyverse")
-install.packages("plotly")
-install.packages("IRdisplay")
-install.packages('rlang')
-install.packages("dplyr")
-install.packages('gapminder')
-install.packages("lemon")
-library(gapminder)
-library(patchwork)
+#open libraries
 library(gridExtra)
-#install Library
-##Walker you should do a simple test to see if all these damn packages
-##are actually needed
 library(ggplot2)
 library(ggrepel)
 library(tidyverse)
-library(plotly)
-library(IRdisplay)
-library(rlang)
-library(dplyr)
 library(cowplot)
 library(gridExtra)
 library(ggpubr)
@@ -58,7 +40,7 @@ pFinal <-p + geom_jitter(shape=16, position=position_jitter(0.2))+
 print(pFinal)
 
 
-#Malignancy
+#Malignancy Violin plot
 m <- ggplot(Data, aes(x=Clade, y=100*MalignancyPrevalence, fill=Clade)) + 
   geom_violin(adjust=1) +
   theme(
@@ -83,13 +65,13 @@ print(m)
 mFinal <-m + geom_jitter(shape=16, position=position_jitter(0.2))+
   stat_summary(fun=median, geom="crossbar", size=0.7) + 
   theme_cowplot(12)+
-  theme(legend.position="none")
+  theme(legend.position="bottom")
 print(mFinal)
 
-
+#Arrange both violins into one image
 arrange<-ggarrange(pFinal,mFinal,NULL, common.legend = TRUE,legend = "none", heights = c(10,1))
 
-
+#grab legend function
 get_only_legend <- function(plot) {
   plot_table <- ggplot_gtable(ggplot_build(plot))
   legend_plot <- which(sapply(plot_table$grobs, function(x) x$name) == "guide-box")
@@ -99,7 +81,7 @@ get_only_legend <- function(plot) {
 
 legend<-get_only_legend(mFinal)
 
-
+#Reposition legend to middle of page
 reposition_legend(arrange, legend = legend, x=.3, y=.05, just = 0)
 
 
