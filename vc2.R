@@ -20,12 +20,12 @@ p <- ggplot(Data, aes(x=Clade, y=100*NeoplasiaPrevalence, fill=Clade)) +
   ) +
   scale_fill_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ),labels=c("103 Species, N=5843", "186 Species, N=8699", "41 Species, N=3061"))+
   ggtitle("A") +
-  labs(fill = 'Clade')+
+#  labs(fill = 'Clade')+
   ylab("Neoplasia Prevalence %") +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(axis.text=element_text(size=16),
-        axis.title=element_text(size=16),
+  theme(axis.text=element_text(size=25),
+        axis.title=element_text(size=0),
   ) +
   theme(plot.caption.position = "plot",
         plot.caption = element_text(hjust = 0))
@@ -36,7 +36,13 @@ print(p)
 pFinal <-p + geom_jitter(shape=16, position=position_jitter(0.2))+
   stat_summary(fun=median, geom="crossbar", size=0.7) + 
   theme_cowplot(12)+
-  theme(legend.position = "none")
+  theme(legend.position = "none")+
+  theme(legend.text = element_text(size = 15),
+        legend.title = element_text(size=15),
+        axis.text=element_text(size=20),
+        axis.title.x=element_blank(),
+        axis.title.y=element_text(size=20),
+        title=element_text(size = 25),)
 print(pFinal)
 
 
@@ -53,8 +59,8 @@ m <- ggplot(Data, aes(x=Clade, y=100*MalignancyPrevalence, fill=Clade)) +
   ylab("Malignancy Prevalence %") +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(axis.text=element_text(size=16),
-        axis.title=element_text(size=16),
+  theme(axis.text=element_text(size=25),
+        axis.title=element_text(size=0),
   )+
   theme(plot.caption.position = "plot",
         plot.caption = element_text(hjust = 0))
@@ -65,7 +71,13 @@ print(m)
 mFinal <-m + geom_jitter(shape=16, position=position_jitter(0.2))+
   stat_summary(fun=median, geom="crossbar", size=0.7) + 
   theme_cowplot(12)+
-  theme(legend.position="bottom")
+  theme(legend.position="bottom")+
+  theme(legend.text = element_text(size = 15),
+        legend.title = element_text(size=15),
+        axis.text=element_text(size=20),
+        axis.title.x=element_blank(),
+        axis.title.y=element_text(size=20),
+        title=element_text(size = 25),)
 print(mFinal)
 
 #Arrange both violins into one image
