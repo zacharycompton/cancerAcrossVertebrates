@@ -37,8 +37,8 @@ pFinal <-p + geom_jitter(shape=16, position=position_jitter(0.2))+
   stat_summary(fun=median, geom="crossbar", size=0.7) + 
   theme_cowplot(12)+
   theme(legend.position = "none")+
-  theme(legend.text = element_text(size = 15),
-        legend.title = element_text(size=15),
+  theme(legend.text = element_text(size = 20),
+        legend.title = element_text(size=20),
         axis.text=element_text(size=20),
         axis.title.x=element_blank(),
         axis.title.y=element_text(size=20),
@@ -72,8 +72,8 @@ mFinal <-m + geom_jitter(shape=16, position=position_jitter(0.2))+
   stat_summary(fun=median, geom="crossbar", size=0.7) + 
   theme_cowplot(12)+
   theme(legend.position="bottom")+
-  theme(legend.text = element_text(size = 15),
-        legend.title = element_text(size=15),
+  theme(legend.text = element_text(size = 20),
+        legend.title = element_text(size=20),
         axis.text=element_text(size=20),
         axis.title.x=element_blank(),
         axis.title.y=element_text(size=20),
@@ -94,7 +94,7 @@ get_only_legend <- function(plot) {
 legend<-get_only_legend(mFinal)
 
 #Reposition legend to middle of page
-reposition_legend(arrange, legend = legend, x=.3, y=.05, just = 0)
+reposition_legend(arrange, legend = legend, x=.2, y=.05, just = 0)
 
 
 # get mean and range for neo and mal by clade
