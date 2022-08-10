@@ -6,6 +6,8 @@ library(ggpubr)
 library(gridGraphics)
 library(patchwork)
 library(cowplot)
+library(devtools)
+library(ggtree)
 
 ## read data and tree frosm file
 ##Mammals
@@ -13,7 +15,7 @@ library(cowplot)
 
 Data<-read.csv(file="min20516.csv")
 Data<- filter(Data, is.element(Clade, c("Mammalia")))
-Data <- Data[,c(9,10,17,13),drop=FALSE] 
+Data <- Data[,c(6,9,10,17,13),drop=FALSE] 
 tree<-read.tree(file="commontree.nwk")
 Data[Data < 0] <-NA
 Data <- na.omit(Data)
@@ -33,22 +35,22 @@ pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
 Data$Keep <- Data$common_name %in% pruned.tree$tip.label
 Data <- Data[!(Data$Keep==FALSE),]
 
+specData<-Data
 
 rownames(Data)<-Data$common_name
-Data <- Data[,c(3,4),drop=FALSE] 
+Data <- Data[,c(4,5),drop=FALSE] 
 name.check(pruned.tree,Data)
-
 
 colnames(Data) <- c('Malignancy Prevalence', 'Neoplasia Prevalence')
 
 matData<-as.matrix(Data)
 
-par(mfrow=c(3,1))
+#par(mfrow=c(3,1))
 
 ## extract scores for first two PCs
 anole.pc<-(matData)[,1:2]
 ## set background black & foreground to white for plotting
-par(fg="white",bg="black")
+par(fg="black",bg="white")
 ## compute max tree height and number of traits
 h<-max(nodeHeights(pruned.tree))
 m<-ncol(anole.pc)
@@ -58,9 +60,40 @@ cols<-c("#631879FF","#008b45ff")
 xlim<-ylim<-1.2*c(-h,h)+c(-1,1)*0.15*m*h+0.2*c(-h,h)
 ylim<-c(0,ylim[2])
 ## plot tree
+rodentia<-filter(specData, is.element(Orders, c("Rodentia")))
+artio<-filter(specData, is.element(Orders, c("Artiodactyla")))
+carnivora<-filter(specData, is.element(Orders, c("Carnivora")))
+cetacea<-filter(specData, is.element(Orders, c("Cetacea")))
+chiroptera<-filter(specData, is.element(Orders, c("Chiroptera")))
+cingulata<-filter(specData, is.element(Orders, c("Cingulata")))
+didelphimorphia<-filter(specData, is.element(Orders, c("Didelphimorphia")))
+eulipotyphla<-filter(specData, is.element(Orders, c("Eulipotyphla")))
+hyracoidea<-filter(specData, is.element(Orders, c("Hyracoidea")))
+lagomorpha<-filter(specData, is.element(Orders, c("Lagomorpha")))
+perissodactyla<-filter(specData, is.element(Orders, c("Perissodactyla")))
+primates<-filter(specData, is.element(Orders, c("Primates")))
+proboscidea<-filter(specData, is.element(Orders, c("Proboscidea")))
+diprotodontia<-filter(specData, is.element(Orders, c("Diprotodontia")))
+
 plotTree(pruned.tree,type="fan",xlim=xlim,ylim=ylim,
-         lwd=1,ftype="i",fsize=0.5,part=0.5,color="white")
-title(main = "A",col.main= "white",adj = .1, line = -1)
+         lwd=1,ftype="i",fsize=.5,part=0.5,color="black")
+arc.cladelabels(text="Rodentia",cex=1,node=findMRCA(pruned.tree, rodentia$common_name),ln.offset=1.7,lab.offset=1.75)
+arc.cladelabels(text="Artiodactyla",cex=1,node=findMRCA(pruned.tree, artio$common_name),ln.offset=1.7,lab.offset=1.75)
+arc.cladelabels(text="Carnivora",cex=1,node=findMRCA(pruned.tree, carnivora$common_name),ln.offset=1.7,lab.offset=1.75)
+arc.cladelabels(text="Cetacea",cex=1,node=findMRCA(pruned.tree, cetacea$common_name),ln.offset=1.7,lab.offset=1.75)
+arc.cladelabels(text=" Chiroptera",cex=1,node=findMRCA(pruned.tree, chiroptera$common_name),ln.offset=1.7,lab.offset=1.75)
+#arc.cladelabels(text="Didelphimorphia",cex=.5,node=findMRCA(pruned.tree, didelphimorphia$common_name),ln.offset=1.7,lab.offset=1.8, orientation = "horizontal")
+#arc.cladelabels(text="Eulipotyphla",node=which(pruned.tree$tip.label=="Four-toed_hedgehog"), orientation="horizontal",ln.offset=1.7,lab.offset=1.75)
+#arc.cladelabels(text="Hyracoidea",fsize=.4,node=65,orientation="horizontal",ln.offset=1.45,lab.offset=1.5,mark.node=FALSE)
+#arc.cladelabels(text="Lagomorpha",cex.sub=.1,node=which(pruned.tree$tip.label=="Domestic_rabbit"),orientation="horizontal",ln.offset=1.45,lab.offset=1.45, mark.node=FALSE)
+#arc.cladelabels(text="Perissodactyla",cex=1,node=which(pruned.tree$tip.label=="Grevys_zebra"),orientation="horizontal",ln.offset=1.45,lab.offset=1.5, mark.node=FALSE)
+arc.cladelabels(text="Primates",cex=1,node=findMRCA(pruned.tree, primates$common_name),ln.offset=1.7,lab.offset=1.75)
+#arc.cladelabels(text="Proboscidea",cex=1,node=which(pruned.tree$tip.label=="Asian_elephant"),orientation="horizontal",ln.offset=1.45,lab.offset=1.5, mark.node=FALSE)
+arc.cladelabels(text="Diprotodontia",cex=1,node=findMRCA(pruned.tree, diprotodontia$common_name),ln.offset=1.7,lab.offset=1.75)
+#arc.cladelabels(text="Cingulata",node=which(pruned.tree$tip.label=="Nine-banded_armadillo"),ln.offset=1.45,lab.offset=1.5,fsize=0.5, orientation = "horizontal",mark.node=FALSE)
+
+title(main = "A",col.main= "black",adj = .1, line = -1)
+
 
 ## add traits
 for(i in 1:m){
@@ -100,15 +133,14 @@ for(i in 1:m){
   }
 }
 ## create custom legend
-title(main="A", col = "white")
 xx<-rep(0.85*par()$usr[4],m)
 yy<-0.95*par()$usr[4]-1.5*1:m*strheight("W")
 text(xx,yy,colnames(anole.pc),pos=4,cex=0.8)
 #scale.bar<-sqrt(diag(anole.pca$Eval)[1:3])*0.2*h
 #xx2<-xx-scale.bar
-segments(x0=xx,y0=yy,x1=200,y1=yy,lwd=8,col=cols)
-text(x=xx,y=0.95*par()$usr[4],"Factors",
-     pos=4,cex=0.8)
+segments(x0=xx,y0=yy,x1=260,y1=yy,lwd=8,col=cols)
+text(xx-100,yy,c("Malignancy Prevalence", "Neoplasia Prevalence"),cex=.8)
+
 
 
 
@@ -118,7 +150,7 @@ text(x=xx,y=0.95*par()$usr[4],"Factors",
 
 Data<-read.csv(file="min20516.csv")
 Data<- filter(Data, is.element(Clade, c("Sauropsida")))
-Data <- Data[,c(9,10,17,13),drop=FALSE] 
+Data <- Data[,c(6,9,10,17,13),drop=FALSE] 
 tree<-read.tree(file="commontree.nwk")
 Data[Data < 0] <-NA
 Data <- na.omit(Data)
@@ -138,9 +170,13 @@ pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
 Data$Keep <- Data$common_name %in% pruned.tree$tip.label
 Data <- Data[!(Data$Keep==FALSE),]
 
+specData<-Data
+
+
+
 
 rownames(Data)<-Data$common_name
-Data <- Data[,c(3,4),drop=FALSE] 
+Data <- Data[,c(4,5),drop=FALSE] 
 name.check(pruned.tree,Data)
 
 
@@ -161,8 +197,50 @@ m<-ncol(anole.pc)
 xlim<-ylim<-1.2*c(-h,h)+c(-1,1)*0.15*m*h+0.2*c(-h,h)
 ylim<-c(0,ylim[2])
 ## plot tree
+
+accipitriformes<-filter(specData, is.element(Orders, c("Accipitriformes")))
+anseriformes<-filter(specData, is.element(Orders, c("Anseriformes")))
+bucerotiformes<-filter(specData, is.element(Orders, c("Bucerotiformes")))
+charadriiformes<-filter(specData, is.element(Orders, c("Charadriiformes")))
+caprimulgiformes<-filter(specData, is.element(Orders, c("Caprimulgiformes")))
+ciconiiformes<-filter(specData, is.element(Orders, c("Ciconiiformes")))
+columbiformes<-filter(specData, is.element(Orders, c("Columbiformes")))
+crocodilia<-filter(specData, is.element(Orders, c("Crocodilia")))
+galliformes<-filter(specData, is.element(Orders, c("Galliformes")))
+passeriformes<-filter(specData, is.element(Orders, c("Passeriformes")))
+pelecaniformes<-filter(specData, is.element(Orders, c("Pelecaniformes")))
+piciformes<-filter(specData, is.element(Orders, c("Piciformes")))
+psittaciformes<-filter(specData, is.element(Orders, c("Psittaciformes")))
+rheiformes<-filter(specData, is.element(Orders, c("Rheiformes")))
+sphenisciformes<-filter(specData, is.element(Orders, c("Sphenisciformes")))
+squamata<-filter(specData, is.element(Orders, c("Squamata")))
+strigiformes<-filter(specData, is.element(Orders, c("Strigiformes")))
+testudines<-filter(specData, is.element(Orders, c("Testudines")))
+
+
+
+
 plotTree(pruned.tree,type="fan",xlim=xlim,ylim=ylim,
          lwd=1,ftype="i",fsize=0.5,part=0.5,color="white")
+arc.cladelabels(text="Accipitriformes",cex=.5,node=findMRCA(pruned.tree, accipitriformes$common_name),ln.offset=1.7,lab.offset=1.8)
+arc.cladelabels(text="Anseriformes",cex=.5,node=findMRCA(pruned.tree, anseriformes$common_name),ln.offset=1.7,lab.offset=1.75)
+#arc.cladelabels(text="Bucerotiformes",cex=.5,node=findMRCA(pruned.tree, bucerotiformesiformes$common_name),ln.offset=1.7,lab.offset=1.75)
+#arc.cladelabels(text="Charadriiformes",cex=.5,node=findMRCA(pruned.tree, charadriiformes$common_name),ln.offset=1.7,lab.offset=1.75)
+#arc.cladelabels(text="Caprimulgiformes",cex=.5,node=findMRCA(pruned.tree, caprimulgiformes$common_name),ln.offset=1.7,lab.offset=1.75)
+arc.cladelabels(text=" Ciconiiformes",cex=.5,node=findMRCA(pruned.tree, ciconiiformes$common_name),ln.offset=1.7,lab.offset=1.75)
+arc.cladelabels(text="Columbiformes",cex=.5,node=findMRCA(pruned.tree, columbiformes$common_name),ln.offset=1.7,lab.offset=1.75)
+#arc.cladelabels(text="Crocodilia",cex=.5,node=findMRCA(pruned.tree, crocodilia$common_name),ln.offset=1.7,lab.offset=1.75)
+arc.cladelabels(text="Galliformes",cex=.5,node=findMRCA(pruned.tree, galliformes$common_name),ln.offset=1.7,lab.offset=1.75)
+arc.cladelabels(text="Passeriformes",cex=.5,node=findMRCA(pruned.tree, passeriformes$common_name),ln.offset=1.7,lab.offset=1.75)
+arc.cladelabels(text="piciformes",cex=.5,node=findMRCA(pruned.tree, piciformes$common_name),ln.offset=1.7,lab.offset=1.75)
+arc.cladelabels(text="Psittaciformes",cex=.5,node=findMRCA(pruned.tree, psittaciformes$common_name),ln.offset=1.7,lab.offset=1.75)
+#arc.cladelabels(text="Rheiformes",cex=.5,node=findMRCA(pruned.tree, rheiformes$common_name),ln.offset=1.7,lab.offset=1.75)
+arc.cladelabels(text="Sphenisciformes",cex=.5,node=findMRCA(pruned.tree, sphenisciformes$common_name),ln.offset=1.7,lab.offset=1.75)
+arc.cladelabels(text="Squamata",cex=.5,node=findMRCA(pruned.tree, squamata$common_name),ln.offset=1.7,lab.offset=1.75)
+#arc.cladelabels(text="Strigiformes",cex=.5,node=findMRCA(pruned.tree, strigiformes$common_name),ln.offset=1.7,lab.offset=1.75)
+#arc.cladelabels(text="Testudines",cex=.5,node=findMRCA(pruned.tree, testudines$common_name),ln.offset=1.7,lab.offset=1.75)
+
+
 title(main = "B",col.main= "white",adj = .1, line = -1)
 ## add traits
 for(i in 1:m){
