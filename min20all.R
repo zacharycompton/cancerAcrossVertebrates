@@ -7,6 +7,7 @@ library(tidyverse)
 library(cowplot)
 library(ggrepel)
 library(ggsci)
+library(patchwork)
 #make sure to run all of this before you get to work.
 #pgls sey base (just run all of this)
 modPgls.SEy = function (model, data, corClass = corBrownian, tree, se = NULL, 
@@ -131,7 +132,7 @@ wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=adult_weight.g.)) + sca
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
-  labs(colour="Clade", size="Total Necropsies")+
+  labs(colour="Clade", size="Total Necropsies")
 
 
 ggsave(filename='wgtneo.png', width=13, height=9, limitsize=FALSE,bg="white", units = "cm")
@@ -243,7 +244,7 @@ gestneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=Gestation.months.)) + 
   geom_abline(intercept = coef(gestation.neo)[1]*100, slope =  coef(gestation.neo)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
-  theme(axis.title = element_text(size = 18))+
+  theme(axis.title = element_text(size = 18), legend.position = "bottom")+
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Gestation (Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
@@ -254,8 +255,7 @@ gestneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=Gestation.months.)) + 
   guides(colour = guide_legend(override.aes = list(size=5))) +
   labs(title="B")
   theme(
-    plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+    plot.title = element_text(size = 20, face = "bold"))+   labs(colour="Clade", size="Total Necropsies")
 
 ggsave(filename='gestneo.png', width=13, height=10, limitsize=FALSE,bg="white")
 
