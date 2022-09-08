@@ -78,15 +78,9 @@ cutData[cutData < 0] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
 
-cutData$Species <- gsub(" ", "_", cutData$Species)
+cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
-includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
-tree$tip.label <- newtips
+includedSpecies<-cutData$Species
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -109,13 +103,13 @@ ld.v.adult.weight.neo <- signif(ld.v.adult.weight.neo[1], digits = 2)
 p.v.adult.weight.neo<-summary(adult.weight.neo)$tTable
 p.v.adult.weight.neo<-signif(p.v.adult.weight.neo[2,4], digits = 2)
 
-
-wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=adult_weight.g.)) + scale_x_continuous(trans = 'log10')+
+#Brian: First line is where you make change. log10 x value. delete scale x continous completely
+wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ),)+
   scale_y_continuous(
-    limits = c(-30,100),
-    breaks = c(0, 25,50,75,100),
-    labels = c(0, 25,50,75,100))+
+    limits = c(0,75),
+    breaks = c(0, 25,50,75),
+    labels = c(0, 25,50,75))+
   geom_abline(intercept = coef(adult.weight.neo)[1]*100, slope =  coef(adult.weight.neo)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -126,7 +120,7 @@ wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=adult_weight.g.)) + sca
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
-  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse( NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   guides(colour = guide_legend(override.aes = list(size=3))) +
   labs(title = "A")+
   theme(
@@ -147,11 +141,6 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
@@ -206,12 +195,6 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
-tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -235,7 +218,7 @@ ld.v.gestneo <- signif(ld.v.gestneo[1], digits = 2)
 p.v.gestneo<-summary(gestation.neo)$tTable
 p.v.gestneo<-signif(p.v.gestneo[2,4], digits = 3)
 
-gestneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=Gestation.months.)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=Gestation.months.)) + scale_x_continuous(trans = 'log10')+
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
   scale_y_continuous(
     limits = c(-10,100),
@@ -268,12 +251,6 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
-tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -291,18 +268,18 @@ summary(gestation.mal)
 
 r.v.gestmal <- summary(gestation.mal)$corBeta
 r.v.gestmal <- format(r.v.gestmal[2,1])
-r.v.gestmal<-signif(as.numeric(r.v.gestneo)^2, digits= 2)
+r.v.gestmal<-signif(as.numeric(r.v.gestmal)^2, digits= 2)
 ld.v.gestmal<- summary(gestation.mal)$modelStruct$corStruct
 ld.v.gestmal<- signif(ld.v.gestmal[1], digits = 2)
 p.v.gestmal<-summary(gestation.mal)$tTable
 p.v.gestmal<-signif(p.v.gestmal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=Gestation.months.)) + scale_x_continuous(trans = 'log10')+
+gestmal<-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=Gestation.months.)) + scale_x_continuous(trans = 'log10')+
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
   scale_y_continuous(
-    limits = c(-30,100),
-    breaks = c(0, 25,50,75,100),
-    labels = c(0, 25,50,75,100))+
+    limits = c(0,75),
+    breaks = c(0, 25,50,75),
+    labels = c(0, 25,50,75))+
   geom_abline(intercept = coef(gestation.mal)[1]*100, slope =  coef(gestation.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -310,16 +287,16 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=Gestation.months.)) + scale_x_
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Gestation (Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-   geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
-  labs(title = "Malignancy Prevalence vs. Gestation",  
-       subtitle =bquote(p-value:.(p.v.gestmal)~R^2:.(r.v.gestmal)~Lambda:.(ld.v.gestmal))) +
-  guides(colour = guide_legend(override.aes = list(size=5))) 
+   geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  guides(colour = guide_legend(override.aes = list(size=5)))+
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  labs(title="B")
 
 ggsave(filename='gestmal.png', width=13, height=10, limitsize=FALSE,bg="white")
 
+lityearneo/gestmal
 #litter size models 
 #litter size neo
 cutData <- Data[,c(5,9,10,11,13,33,42),drop=FALSE] 
@@ -330,11 +307,6 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
@@ -386,11 +358,6 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
@@ -445,13 +412,7 @@ view(cutData)
 
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
-includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
-tree$tip.label <- newtips
+includedSpecies<-cutData$Species
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -478,9 +439,9 @@ p.v.longneo<-signif(p.v.longneo[2,4], digits = 3)
 longneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=max_longevity.months.)) + scale_x_continuous()+
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
   scale_y_continuous(
-    limits = c(-30,100),
-    breaks = c(0, 25,50,75,100),
-    labels = c(0, 25,50,75,100))+
+    limits = c(0,75),
+    breaks = c(0, 25,50,75),
+    labels = c(0, 25,50,75))+
   geom_abline(intercept = coef(longevity.neo)[1]*100, slope =  coef(longevity.neo)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -491,7 +452,7 @@ longneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=max_longevity.months.)
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
-  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse(NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   guides(colour = guide_legend(override.aes = list(size=5))) +
   labs(title = "B")+
   theme(
@@ -499,7 +460,10 @@ longneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=max_longevity.months.)
   theme(legend.position = "bottom")+
   labs(colour="Clade", size="Total Necropsies")
 
+
 ggsave(filename='longneo.png', width=13, height=10, limitsize=FALSE,bg="white")
+
+wgtneo/longneo
 
 #longevity mal
 
@@ -513,11 +477,6 @@ view(cutData)
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
@@ -574,11 +533,6 @@ view(cutData)
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
@@ -637,11 +591,6 @@ view(cutData)
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
@@ -697,11 +646,6 @@ view(cutData)
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
@@ -757,11 +701,6 @@ view(cutData)
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
@@ -816,12 +755,6 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
-tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -847,9 +780,9 @@ p.v.lyearneo<-signif(p.v.lyearneo[2,4], digits = 3)
 lityearneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=litters_year)) + scale_x_continuous(trans = 'log10')+
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
   scale_y_continuous(
-    limits = c(-10,100),
-    breaks = c(0, 25,50,75,100),
-    labels = c(0, 25,50,75,100))+
+    limits = c(0,75),
+    breaks = c(0, 25,50,75),
+    labels = c(0, 25,50,75))+
   geom_abline(intercept = coef(lityear.neo)[1]*100, slope =  coef(lityear.neo)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -860,7 +793,7 @@ lityearneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=litters_year)) + sc
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
-  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5)+
+  geom_text_repel(aes(label=ifelse(NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5)+
   labs(title = "A")+
   guides(colour = guide_legend(override.aes=list(size=5),order = 1) ,size= guide_legend(order=2)) +
   theme(
@@ -869,6 +802,7 @@ lityearneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=litters_year)) + sc
 
 ggsave(filename='lityearneo.png', width=13, height=10, limitsize=FALSE,bg="white")
 
+lityearneo/gestmal
 #litter size mal
 cutData <- Data[,c(5,9,10,11,17,34,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
@@ -878,11 +812,6 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
@@ -935,11 +864,6 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
@@ -992,11 +916,6 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
@@ -1049,11 +968,6 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
@@ -1106,11 +1020,6 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
@@ -1163,11 +1072,6 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
@@ -1220,11 +1124,6 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
@@ -1277,11 +1176,6 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
@@ -1334,11 +1228,6 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
@@ -1394,11 +1283,6 @@ view(cutData)
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
@@ -1457,11 +1341,6 @@ view(cutData)
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
