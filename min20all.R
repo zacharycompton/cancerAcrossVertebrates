@@ -8,6 +8,7 @@ library(cowplot)
 library(ggrepel)
 library(ggsci)
 library(patchwork)
+
 #make sure to run all of this before you get to work.
 #pgls sey base (just run all of this)
 modPgls.SEy = function (model, data, corClass = corBrownian, tree, se = NULL, 
@@ -93,7 +94,7 @@ view(cutData)
 
 adult.weight.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(adult_weight.g.),data=cutData,tree=pruned.tree,se=SE,method = "ML")
 
-summary(adult.weight.neo)
+summary(adult.weight.neo) 
 
 r.v.adult.weight.neo <- summary(adult.weight.neo)$corBeta
 r.v.adult.weight.neo <- format(r.v.adult.weight.neo[2,1])
@@ -104,7 +105,7 @@ p.v.adult.weight.neo<-summary(adult.weight.neo)$tTable
 p.v.adult.weight.neo<-signif(p.v.adult.weight.neo[2,4], digits = 2)
 
 #Brian: First line is where you make change. log10 x value. delete scale x continous completely
-wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.))) +
+wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)))+
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ),)+
   scale_y_continuous(
     limits = c(0,75),
@@ -129,7 +130,7 @@ wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.))
   labs(colour="Clade", size="Total Necropsies")
 
 
-ggsave(filename='wgtneo.png', width=13, height=9, limitsize=FALSE,bg="white", units = "cm")
+#ggsave(filename='wgtneo.png', width=13, height=7, limitsize=FALSE,bg="white", units = "cm")
 
 
 #adult weight mal
@@ -141,7 +142,7 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -165,7 +166,7 @@ p.v.adult.weight.mal<-summary(adult.weight.mal)$tTable
 p.v.adult.weight.mal<-signif(p.v.adult.weight.mal[2,4], digits = 3)
 
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=adult_weight.g.)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)))+
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
   geom_abline(intercept = coef(adult.weight.mal)[1]*100, slope =  coef(adult.weight.mal)[2]*100,
               color = 'grey',size = 1.2) +
@@ -183,7 +184,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=adult_weight.g.)) + scale_x_co
   guides(size=guide_legend())+
   ylim(-10,100)
 
-ggsave(filename='wgtmal.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='wgtmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #gestation models
 #gestation neo
@@ -218,7 +219,7 @@ ld.v.gestneo <- signif(ld.v.gestneo[1], digits = 2)
 p.v.gestneo<-summary(gestation.neo)$tTable
 p.v.gestneo<-signif(p.v.gestneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=Gestation.months.)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(Gestation.months.))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
   scale_y_continuous(
     limits = c(-10,100),
@@ -234,13 +235,13 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=Gestation.months.)) + scale_x_c
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
-   geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   guides(colour = guide_legend(override.aes = list(size=5))) +
   labs(title="B")
-  theme(
-    plot.title = element_text(size = 20, face = "bold"))+   labs(colour="Clade", size="Total Necropsies")
+theme(
+  plot.title = element_text(size = 20, face = "bold"))+   labs(colour="Clade", size="Total Necropsies")
 
-ggsave(filename='gestneo.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='gestneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #gestation mal
 cutData <- Data[,c(5,9,10,11,17,30,42),drop=FALSE] 
@@ -274,7 +275,7 @@ ld.v.gestmal<- signif(ld.v.gestmal[1], digits = 2)
 p.v.gestmal<-summary(gestation.mal)$tTable
 p.v.gestmal<-signif(p.v.gestmal[2,4], digits = 3)
 
-gestmal<-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=Gestation.months.)) + scale_x_continuous(trans = 'log10')+
+gestmal<-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.months.))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
   scale_y_continuous(
     limits = c(0,75),
@@ -287,16 +288,15 @@ gestmal<-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=Gestation.months.)) +
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Gestation (Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-   geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   guides(colour = guide_legend(override.aes = list(size=5)))+
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   labs(title="B")
 
-ggsave(filename='gestmal.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='gestmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
-lityearneo/gestmal
 #litter size models 
 #litter size neo
 cutData <- Data[,c(5,9,10,11,13,33,42),drop=FALSE] 
@@ -307,7 +307,7 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -330,7 +330,7 @@ ld.v.litneo <- signif(ld.v.litneo[1], digits = 2)
 p.v.litneo<-summary(litter.neo)$tTable
 p.v.litneo<-signif(p.v.litneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=litter_size)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litter_size))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
   geom_abline(intercept = coef(litter.neo)[1]*100, slope =  coef(litter.neo)[2]*100,
               color = 'grey',size = 1.2) +
@@ -339,15 +339,15 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=litter_size)) + scale_x_continu
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Litter Size") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-   geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Neoplasia Prevalence vs. Litter Size",  
        subtitle =bquote(p-value:.(p.v.litneo)~R^2:.(r.v.litneo)~Lambda:.(ld.v.litneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
-
-ggsave(filename='litneo.png', width=13, height=10, limitsize=FALSE,bg="white")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  
+  ggsave(filename='litneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #litter size mal
 cutData <- Data[,c(5,9,10,11,17,33,42),drop=FALSE] 
@@ -358,7 +358,7 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -381,7 +381,7 @@ ld.v.litmal <- signif(ld.v.litmal[1], digits = 2)
 p.v.litmal<-summary(litter.mal)$tTable
 p.v.litmal<-signif(p.v.litmal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=litter_size)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litter_size))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
   geom_abline(intercept = coef(litter.mal)[1]*100, slope =  coef(litter.mal)[2]*100,
               color = 'grey',size = 1.2) +
@@ -390,7 +390,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=litter_size)) + scale_x_contin
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Litter Size") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-   geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Malignancy Prevalence vs. Litter Size",  
        subtitle =bquote(p-value:.(p.v.litmal)~R^2:.(r.v.litmal)~Lambda:.(ld.v.litmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -399,7 +399,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=litter_size)) + scale_x_contin
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   ylim(-10,100)
 
-ggsave(filename='litmal.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='litmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 ### Longevity model
 #longevity neo
@@ -436,7 +436,7 @@ ld.v.longneo <- signif(ld.v.longneo[1], digits = 2)
 p.v.longneo<-summary(longevity.neo)$tTable
 p.v.longneo<-signif(p.v.longneo[2,4], digits = 3)
 
-longneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=max_longevity.months.)) + scale_x_continuous()+
+longneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(max_longevity.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
   scale_y_continuous(
     limits = c(0,75),
@@ -461,9 +461,11 @@ longneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=max_longevity.months.)
   labs(colour="Clade", size="Total Necropsies")
 
 
-ggsave(filename='longneo.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='longneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
+#create weight over longevity model
 wgtneo/longneo
+ggsave(filename='wgtlong.png', width=9.5, height=18, limitsize=FALSE,bg="white")
 
 #longevity mal
 
@@ -477,7 +479,7 @@ view(cutData)
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -500,7 +502,7 @@ ld.v.longmal <- signif(ld.v.longmal[1])
 p.v.longmal<-summary(longevity.mal)$tTable
 p.v.longmal<-signif(p.v.longmal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=max_longevity.months.)) + scale_x_continuous()+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(max_longevity.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
   geom_abline(intercept = coef(longevity.mal)[1]*100, slope =  coef(longevity.mal)[2]*100,
               color = 'grey',size = 1.2) +
@@ -509,7 +511,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=max_longevity.months.)) + scal
   ylab("Malignancy Prevalence (%)") +
   xlab("Max Longevity (Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-   geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Malignancy Prevalence vs. Max Longevity",  
        subtitle =bquote(p-value:.(p.v.longmal)~R^2:.(r.v.longmal)~Lambda:.(ld.v.longmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -518,7 +520,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=max_longevity.months.)) + scal
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   ylim(-10,100)
 
-ggsave(filename='longmal.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='longmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 ##BMR models
 #bmr neo
@@ -533,7 +535,7 @@ view(cutData)
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -557,7 +559,7 @@ ld.v.bmrneo <- signif(ld.v.bmrneo[1], digits = 2)
 p.v.bmrneo<-summary(BMR.neo)$tTable
 p.v.bmrneo<-signif(p.v.bmrneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=metabolic_rate)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(metabolic_rate))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
   geom_abline(intercept = coef(BMR.neo)[1]*100, slope =  coef(BMR.neo)[2]*100,
               color = 'grey',size = 1.2) +
@@ -566,7 +568,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=metabolic_rate)) + scale_x_cont
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Basal Metabolic Rate") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-   geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Neoplasia Prevalence vs. Metabolic Rate in Mammals",  
        subtitle =bquote(p-value:.(p.v.bmrneo)~R^2:.(r.v.bmrneo)~Lambda:.(ld.v.bmrneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -574,9 +576,9 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=metabolic_rate)) + scale_x_cont
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(size="Total Necropsies")+
   guides(colour=FALSE)
-  ylim(-10,100)
+ylim(-10,100)
 
-ggsave(filename='bmrneo.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='bmrneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #bmr mal
 
@@ -591,7 +593,7 @@ view(cutData)
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -614,8 +616,7 @@ ld.v.bmrmal <- signif(ld.v.bmrmal[1], digits = 2)
 p.v.bmrmal<-summary(BMR.mal)$tTable
 p.v.bmrmal<-signif(p.v.bmrmal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=metabolic_rate)) + scale_x_continuous(trans = 'log10')+
-  scale_color_manual(values = c("Mammalia" = "#631879FF"))+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(metabolic_rate))) + 
   geom_abline(intercept = coef(BMR.mal)[1]*100, slope =  coef(BMR.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -623,7 +624,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=metabolic_rate)) + scale_x_con
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Basal Metabolic Rate") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-   geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Malignancy Prevalence vs. Metabolic Rate",  
        subtitle =bquote(p-value:.(p.v.bmrmal)~R^2:.(r.v.bmrmal)~Lambda:.(ld.v.bmrmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -632,7 +633,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=metabolic_rate)) + scale_x_con
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   ylim(-10,100)
 
-ggsave(filename='bmrmal.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='bmrmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #wxl models #weight and longevity
 #wxl neo
@@ -646,7 +647,7 @@ view(cutData)
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -670,7 +671,7 @@ ld.v.wxneo <- signif(ld.v.wxneo[1], digits = 2)
 p.v.wxneo<-summary(wxl.neo)$tTable
 p.v.wxneo<-signif(p.v.wxneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=adult_weight.g.*max_longevity.months.)) + scale_x_continuous(trans='log10')+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.*max_longevity.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
   geom_abline(intercept = coef(wxl.neo)[1]*100, slope =  coef(wxl.neo)[2]*100,
               color = 'grey',size = 1.2) +
@@ -679,7 +680,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=adult_weight.g.*max_longevity.m
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Adult Weight(g)*Longevity(Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-   geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Neoplasia Prevalence vs. Max Longevity*Weight",  
        subtitle =bquote(p-value:.(p.v.wxneo)~R^2:.(r.v.wxneo)~Lambda:.(ld.v.wxneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -688,7 +689,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=adult_weight.g.*max_longevity.m
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   ylim(-10,100)
 
-ggsave(filename='wgtlongneo.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='wgtlongneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #wxl mal
 cutData <- Data[,c(5,9,10,11,17,40,38,42),drop=FALSE] 
@@ -701,7 +702,7 @@ view(cutData)
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -725,7 +726,7 @@ ld.v.wxmal <- signif(ld.v.wxmal[1], digits = 2)
 p.v.wxmal<-summary(wxl.mal)$tTable
 p.v.wxmal<-signif(p.v.wxmal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=adult_weight.g.*max_longevity.months.)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.*max_longevity.months.))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
   geom_abline(intercept = coef(wxl.mal)[1]*100, slope =  coef(wxl.mal)[2]*100,
               color = 'grey',size = 1.2) +
@@ -734,7 +735,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=adult_weight.g.*max_longevity.
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Adult Weight(g)*Longevity(Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-   geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Malignancy Prevalence vs. Max Longevity*Weight",  
        subtitle =bquote(p-value:.(p.v.wxmal)~R^2:.(r.v.wxmal)~Lambda:.(ld.v.wxmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -743,10 +744,10 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=adult_weight.g.*max_longevity.
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   ylim(-10,100)
 
-ggsave(filename='wgtlongmal.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='wgtlongmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 
-#litter size per year neo
+#litters per year neo
 cutData <- Data[,c(5,9,10,11,13,34,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
 cutData <- na.omit(cutData)
@@ -777,7 +778,7 @@ ld.v.lyearneo <- signif(ld.v.lyearneo[1], digits = 2)
 p.v.lyearneo<-summary(lityear.neo)$tTable
 p.v.lyearneo<-signif(p.v.lyearneo[2,4], digits = 3)
 
-lityearneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=litters_year)) + scale_x_continuous(trans = 'log10')+
+lityearneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litters_year))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
   scale_y_continuous(
     limits = c(0,75),
@@ -800,10 +801,14 @@ lityearneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=litters_year)) + sc
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(size="Total Necropsies",colour="Clade")
 
-ggsave(filename='lityearneo.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='lityearneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
+
+#create lit year over gest model
 lityearneo/gestmal
-#litter size mal
+ggsave(filename='litgest.png', width=9.5, height=18, limitsize=FALSE,bg="white")
+
+#litter per year mal
 cutData <- Data[,c(5,9,10,11,17,34,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
 cutData <- na.omit(cutData)
@@ -812,7 +817,7 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -835,7 +840,7 @@ ld.v.lyearmal<- signif(ld.v.lyearmal[1], digits = 2)
 p.v.lyearmal<-summary(lityear.mal)$tTable
 p.v.lyearmal<-signif(p.v.lyearmal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=litters_year)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litters_year))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
   geom_abline(intercept = coef(lityear.mal)[1]*100, slope =  coef(lityear.mal)[2]*100,
               color = 'grey',size = 1.2) +
@@ -844,7 +849,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=litters_year)) + scale_x_conti
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Litter Size per Year") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-   geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Malignancy Prevalence vs. Litter Size per Year",  
        subtitle =bquote(p-value:.(p.v.lyearmal)~R^2:.(r.v.lyearmal)~Lambda:.(ld.v.lyearmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -853,7 +858,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=litters_year)) + scale_x_conti
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   ylim(-10,100)
 
-ggsave(filename='lityearmal.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='lityearmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 ####Female Maturity neo
 cutData <- Data[,c(5,9,10,11,13,28,42),drop=FALSE] 
@@ -864,7 +869,7 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -887,7 +892,7 @@ ld.v.fmaturityneo <- signif(ld.v.fmaturityneo[1], digits = 2)
 p.v.fmaturityneo<-summary(Fmaturity.neo)$tTable
 p.v.fmaturityneo<-signif(p.v.fmaturityneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=female_maturity.months.)) + scale_x_continuous()+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(female_maturity.months.))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff"))+
   geom_abline(intercept = coef(Fmaturity.neo)[1]*100, slope =  coef(Fmaturity.neo)[2]*100,
               color = 'grey',size = 1.2) +
@@ -896,7 +901,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=female_maturity.months.)) + sca
   ylab("Neoplasia Prevalence (%)") +
   xlab("Female Maturity (Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-   geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Neoplasia Prevalence vs. Female Maturity",  
        subtitle =bquote(p-value:.(p.v.fmaturityneo)~R^2:.(r.v.fmaturityneo)~Lambda:.(ld.v.fmaturityneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -905,7 +910,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=female_maturity.months.)) + sca
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   ylim(-10,100)
 
-ggsave(filename='femmatneo.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='femmatneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #Female Maturity Mal
 cutData <- Data[,c(5,9,10,11,17,28,42),drop=FALSE] 
@@ -916,7 +921,7 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -939,7 +944,7 @@ ld.v.fmaturitymal <- signif(ld.v.fmaturitymal[1], digits = 2)
 p.v.fmaturitymal<-summary(Fmaturity.mal)$tTable
 p.v.fmaturitymal<-signif(p.v.fmaturitymal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=female_maturity.months.)) + scale_x_continuous()+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(female_maturity.months.))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff"))+
   geom_abline(intercept = coef(Fmaturity.mal)[1]*100, slope =  coef(Fmaturity.mal)[2]*100,
               color = 'grey',size = 1.2) +
@@ -957,7 +962,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=female_maturity.months.)) + sc
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   ylim(-10,100)
 
-ggsave(filename='femmatmal.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='femmatmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 ####Male Maturity neo
 cutData <- Data[,c(5,9,10,11,13,29,42),drop=FALSE] 
@@ -968,7 +973,7 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -991,7 +996,7 @@ ld.v.Mmaturityneo <- signif(ld.v.Mmaturityneo[1], digits = 2)
 p.v.Mmaturityneo<-summary(Mmaturity.neo)$tTable
 p.v.Mmaturityneo<-signif(p.v.Mmaturityneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=male_maturity.months.)) + scale_x_continuous()+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(male_maturity.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff"))+
   geom_abline(intercept = coef(Mmaturity.neo)[1]*100, slope =  coef(Mmaturity.neo)[2]*100,
               color = 'grey',size = 1.2) +
@@ -1000,7 +1005,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=male_maturity.months.)) + scale
   ylab("Neoplasia Prevalence (%)") +
   xlab("Male Maturity (Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-   geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Neoplasia Prevalence vs. Male Maturity",  
        subtitle =bquote(p-value:.(p.v.Mmaturityneo)~R^2:.(r.v.Mmaturityneo)~Lambda:.(ld.v.Mmaturityneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -1009,7 +1014,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=male_maturity.months.)) + scale
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   ylim(-10,100)
 
-ggsave(filename='malematneo.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='malematneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #Male Maturity Mal
 cutData <- Data[,c(5,9,10,11,17,29,42),drop=FALSE] 
@@ -1020,7 +1025,7 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -1043,7 +1048,7 @@ ld.v.Mmaturitymal <- signif(ld.v.Mmaturitymal[1], digits = 2)
 p.v.Mmaturitymal<-summary(Mmaturity.mal)$tTable
 p.v.Mmaturitymal<-signif(p.v.Mmaturitymal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=male_maturity.months.)) + scale_x_continuous()+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(male_maturity.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff"))+
   geom_abline(intercept = coef(Fmaturity.mal)[1]*100, slope =  coef(Fmaturity.mal)[2]*100,
               color = 'grey',size = 1.2) +
@@ -1061,7 +1066,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=male_maturity.months.)) + scal
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   ylim(-10,100)
 
-ggsave(filename='malematmal.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='malematmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #Weaning Weight neo
 cutData <- Data[,c(5,9,10,11,13,37,42),drop=FALSE] 
@@ -1072,7 +1077,7 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -1095,7 +1100,7 @@ ld.v.weanwneo <- signif(ld.v.weanwneo[1], digits = 2)
 p.v.weanwneo<-summary(weanw.neo)$tTable
 p.v.weanwneo<-signif(p.v.weanwneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=weaning_weight.g.)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(weaning_weight.g.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff"))+
   geom_abline(intercept = coef(weanw.neo)[1]*100, slope =  coef(weanw.neo)[2]*100,
               color = 'grey',size = 1.2) +
@@ -1104,7 +1109,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=weaning_weight.g.)) + scale_x_c
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Weaning Weight (g)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
- geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Neoplasia Prevalence vs. Weaning Weight",  
        subtitle =bquote(p-value:.(p.v.weanwneo)~R^2:.(r.v.weanwneo)~Lambda:.(ld.v.weanwneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -1113,7 +1118,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=weaning_weight.g.)) + scale_x_c
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   ylim(-10,100)
 
-ggsave(filename='weanneo.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='weanneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #Weaning Weight Mal
 cutData <- Data[,c(5,9,10,11,17,37,42),drop=FALSE] 
@@ -1124,7 +1129,7 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -1147,7 +1152,7 @@ ld.v.weanwmal <- signif(ld.v.weanwmal[1], digits = 2)
 p.v.weanwmal<-summary(weanw.mal)$tTable
 p.v.weanwmal<-signif(p.v.weanwmal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=weaning_weight.g.)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(weaning_weight.g.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff"))+
   geom_abline(intercept = coef(Fmaturity.mal)[1]*100, slope =  coef(Fmaturity.mal)[2]*100,
               color = 'grey',size = 1.2) +
@@ -1165,7 +1170,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=weaning_weight.g.)) + scale_x_
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   ylim(-10,100)
 
-ggsave(filename='weanmal.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='weanmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #Growth Rate Neo
 cutData <- Data[,c(5,9,10,11,13,39,42),drop=FALSE] 
@@ -1176,7 +1181,7 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -1199,7 +1204,7 @@ ld.v.GrowthRneo <- signif(ld.v.GrowthRneo[1], digits = 2)
 p.v.GrowthRneo<-summary(GrowthR.neo)$tTable
 p.v.GrowthRneo<-signif(p.v.GrowthRneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=growth_rate.1.days.)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(growth_rate.1.days.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff"))+
   geom_abline(intercept = coef(GrowthR.neo)[1]*100, slope =  coef(GrowthR.neo)[2]*100,
               color = 'grey',size = 1.2) +
@@ -1208,7 +1213,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=growth_rate.1.days.)) + scale_x
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Growth Rate") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-   geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Neoplasia Prevalence vs. Growth Rate",  
        subtitle =bquote(p-value:.(p.v.GrowthRneo)~R^2:.(r.v.GrowthRneo)~Lambda:.(ld.v.GrowthRneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -1217,7 +1222,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=growth_rate.1.days.)) + scale_x
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   ylim(-10,100)
 
-ggsave(filename='growneo.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='growneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #Growth Rate Mal
 cutData <- Data[,c(5,9,10,11,17,39,42),drop=FALSE] 
@@ -1228,7 +1233,7 @@ tree <- read.tree("min20Fixed516.nwk")
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -1251,7 +1256,7 @@ ld.v.GrowthRmal <- signif(ld.v.GrowthRmal[1], digits = 2)
 p.v.GrowthRmal<-summary(GrowthR.mal)$tTable
 p.v.GrowthRmal<-signif(p.v.GrowthRmal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=growth_rate.1.days.)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(growth_rate.1.days.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff"))+
   geom_abline(intercept = coef(GrowthR.mal)[1]*100, slope =  coef(GrowthR.mal)[2]*100,
               color = 'grey',size = 1.2) +
@@ -1269,7 +1274,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=growth_rate.1.days.)) + scale_
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   ylim(-10,100)
 
-ggsave(filename='growmal.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='growmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #w+g
 
@@ -1283,7 +1288,7 @@ view(cutData)
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -1307,7 +1312,7 @@ ld.v.wpneo <- signif(ld.v.wpneo[1], digits = 2)
 p.v.wpneo<-summary(wpl.neo)$tTable
 p.v.wpneo<-signif(p.v.wpneo[2,4], digits = 3)
 
-  ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)+Gestation.months.)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)+log10(Gestation.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
   geom_abline(intercept = coef(wpl.neo)[1]*100, slope =  coef(wpl.neo)[2]*100,
               color = 'grey',size = 1.2) +
@@ -1316,7 +1321,7 @@ p.v.wpneo<-signif(p.v.wpneo[2,4], digits = 3)
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Adult Weight(g)+Gestation(Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-    geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Neoplasia Prevalence vs. Max Longevity+Gestation",  
        subtitle =bquote(p-value:.(p.v.wpneo)~R^2:.(r.v.wpneo)~Lambda:.(ld.v.wpneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -1325,8 +1330,8 @@ p.v.wpneo<-signif(p.v.wpneo[2,4], digits = 3)
   theme(legend.position = "bottom")+
   labs(colour="Clade", size="Total Necropsies")+
   ylim(-10,100)
-  
-  ggsave(filename='wgtgestneo.png', width=13, height=10, limitsize=FALSE,bg="white")
+
+ggsave(filename='wgtgestneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 
 #w+g mal
@@ -1341,7 +1346,7 @@ view(cutData)
 cutData$Species <- gsub(" ", "_", cutData$Species) 
 cutData$common_name<-gsub("_", "", cutData$common_name)
 includedSpecies <- cutData$Species
-tree$tip.label <- newtips
+
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -1365,7 +1370,7 @@ ld.v.wpmal <- signif(ld.v.wpmal[1], digits = 2)
 p.v.wpmal<-summary(wpl.mal)$tTable
 p.v.wpmal<-signif(p.v.wpmal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=Gestation.months.+log10(adult_weight.g.))) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.months.)+log10(adult_weight.g.))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
   geom_abline(intercept = coef(wpl.mal)[1]*100, slope =  coef(wpl.mal)[2]*100,
               color = 'grey',size = 1.2) +
@@ -1374,7 +1379,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=Gestation.months.+log10(adult_
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Adult Weight(g)+Gestation(Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Malignancy Prevalence vs. Max Longevity+Gestation",  
        subtitle =bquote(p-value:.(p.v.wpmal)~R^2:.(r.v.wpmal)~Lambda:.(ld.v.wpmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -1385,4 +1390,4 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=Gestation.months.+log10(adult_
   ylim(-10,100)
 
 
-ggsave(filename='wgtgestmal.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='wgtgestmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
