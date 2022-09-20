@@ -250,8 +250,51 @@ Sobj<-setMap(Sobj,invert=TRUE)
 
 ## plot 
 s<-plot(Sobj,
-           fsize=c(1,0.8),leg.txt="neoplasia prevalence",lwd = 2.5)
+           fsize=c(1,0.8),leg.txt="neoplasia prevalence",lwd = 2.5, ftype="off")
 title(main="B", adj = .05, line = -1)
+
+#order subset
+accipitriformes<-filter(specData, is.element(Orders, c("Accipitriformes")))
+anseriformes<-filter(specData, is.element(Orders, c("Anseriformes")))
+bucerotiformes<-filter(specData, is.element(Orders, c("Bucerotiformes")))
+charadriiformes<-filter(specData, is.element(Orders, c("Charadriiformes")))
+caprimulgiformes<-filter(specData, is.element(Orders, c("Caprimulgiformes")))
+ciconiiformes<-filter(specData, is.element(Orders, c("Ciconiiformes")))
+columbiformes<-filter(specData, is.element(Orders, c("Columbiformes")))
+crocodilia<-filter(specData, is.element(Orders, c("Crocodilia")))
+galliformes<-filter(specData, is.element(Orders, c("Galliformes")))
+passeriformes<-filter(specData, is.element(Orders, c("Passeriformes")))
+pelecaniformes<-filter(specData, is.element(Orders, c("Pelecaniformes")))
+piciformes<-filter(specData, is.element(Orders, c("Piciformes")))
+psittaciformes<-filter(specData, is.element(Orders, c("Psittaciformes")))
+rheiformes<-filter(specData, is.element(Orders, c("Rheiformes")))
+sphenisciformes<-filter(specData, is.element(Orders, c("Sphenisciformes")))
+squamata<-filter(specData, is.element(Orders, c("Squamata")))
+strigiformes<-filter(specData, is.element(Orders, c("Strigiformes")))
+testudines<-filter(specData, is.element(Orders, c("Testudines")))
+
+
+#order lines
+par(fg="#000000")
+cladelabels(text="Accipitriformes",cex = .8,node=findMRCA(pruned.tree, accipitriformes$Species ) )
+cladelabels(text="Anseriformes",cex = .8,node=findMRCA(pruned.tree, anseriformes$Species ) )
+cladelabels(text="Bucerotiformes",cex = .8,node=findMRCA(pruned.tree, bucerotiformes$Species ))
+cladelabels(text="Charadriiformes",cex = .8,node=findMRCA(pruned.tree, charadriiformes$Species ))
+cladelabels(text="Caprimulgiformes",cex = .8,node=findMRCA(pruned.tree, caprimulgiformes$Species ) )
+cladelabels(text="Ciconiiformes",cex = .8,node=findMRCA(pruned.tree, ciconiiformes$Species ) )
+cladelabels(text="Columbiformes",cex = .8,node=findMRCA(pruned.tree, columbiformes$Species ) )
+cladelabels(text="Crocodilia",cex = .8,node=findMRCA(pruned.tree, crocodilia$Species ) )
+cladelabels(text="Galliformes",cex = .8,node=findMRCA(pruned.tree, galliformes$Species ) )
+cladelabels(text="Pelecaniformes",cex = .8,node=findMRCA(pruned.tree, pelecaniformes$Species ) )
+cladelabels(text="Passeriformes",cex = .8,node=findMRCA(pruned.tree, passeriformes$Species ))
+cladelabels(text="piciformes",cex = .8,node=findMRCA(pruned.tree, piciformes$Species ) )
+cladelabels(text="Psittaciformes",cex = .8,node=findMRCA(pruned.tree, psittaciformes$Species ))
+cladelabels(text="Rheiformes",cex = .8,node=findMRCA(pruned.tree, rheiformes$Species ))
+cladelabels(text="Sphenisciformes",cex = .8,node=findMRCA(pruned.tree, sphenisciformes$Species ))
+cladelabels(text="Squamata",cex = .8,node=findMRCA(pruned.tree, squamata$Species ))
+cladelabels(text="Strigiformes",cex = .8,node=findMRCA(pruned.tree, strigiformes$Species ))
+cladelabels(text="Testudines",cex = .8,node=findMRCA(pruned.tree, testudines$Species ))
+
 
 
 
