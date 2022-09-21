@@ -78,11 +78,6 @@ tree <- read.tree("min20Fixed516.nwk")
 #prune the tree to match the data
 Data$Species <- gsub(" ", "_", Data$Species)
 includedSpecies <- Data$Species
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
 #pruning the tree
 tree$tip.label <- newtips
 pruned.tree<-drop.tip(
