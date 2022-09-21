@@ -18,18 +18,13 @@ library(plotrix)
 Data<-read.csv(file="min20516.csv")
 Data<- filter(Data, is.element(Clade, c("Mammalia")))
 Data <- Data[,c(6,9,10,17,13),drop=FALSE] 
-tree<-read.tree(file="commontree.nwk")
 Data[Data < 0] <-NA
 Data <- na.omit(Data)
 
+tree<-read.tree(file="commontree.nwk")
+
 Data$common_name <- gsub(" ", "_", Data$common_name)
 includedSpecies <- Data$common_name
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
-tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -117,15 +112,18 @@ arc.cladelabels<-function(tree=NULL,text,node,ln.offset=1.02,
 #plot with labels
 
 
-colors<-c("#1B1919FF","#3B4992FF","#EE0000FF","#008280FF","#A20056FF","#5F559BFF")
 
-names(colors)<-0:5
 
-pruned.tree<-paintSubTree(pruned.tree,node=110,state="1",anc="0")
-pruned.tree<-paintSubTree(pruned.tree,node=91,state="2")
-pruned.tree<-paintSubTree(pruned.tree,node=78,state="3")
-pruned.tree<-paintSubTree(pruned.tree,node=118,state="4")
-pruned.tree<-paintSubTree(pruned.tree,node=68,state="5")
+colors<-c("#1B1919FF","#3B4992FF","#EE0000FF","#008280FF","#BB0021FF","#A20056FF","#5F559BFF")
+
+names(colors)<-0:6
+
+pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, rodentia$common_name),state="1",anc="0")
+pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, artio$common_name),state="2")
+pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, carnivora$common_name),state="3")
+pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, chiroptera$common_name),state="4")
+pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, primates$common_name),state="5")
+pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, diprotodontia$common_name),state="6")
 
 
 plotSimmap(pruned.tree,colors,type="fan",xlim=xlim,ylim=ylim,
@@ -141,7 +139,8 @@ par(fg="#008280FF")
 arc.cladelabels(text="Carnivora",cex = .8,node=findMRCA(pruned.tree, carnivora$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE)
 
 #arc.cladelabels(text="Cetacea",cex = .8,node=findMRCA(pruned.tree, cetacea$common_name),ln.offset=1.7,lab.offset=1.75)
-#arc.cladelabels(text=" Chiroptera",cex = .8,node=findMRCA(pruned.tree, chiroptera$common_name),ln.offset=1.7,lab.offset=1.75)
+par(fg="#BB0021FF")
+arc.cladelabels(text=" Chiroptera",cex = .8,node=findMRCA(pruned.tree, chiroptera$common_name),ln.offset=1.7,lab.offset=1.75,mark.node =FALSE)
 #arc.cladelabels(text="Didelphimorphia",cex=.5,node=findMRCA(pruned.tree, didelphimorphia$common_name),ln.offset=1.7,lab.offset=1.8, orientation = "horizontal")
 #arc.cladelabels(text="Eulipotyphla",node=which(pruned.tree$tip.label=="Four-toed_hedgehog"), orientation="horizontal",ln.offset=1.7,lab.offset=1.75)
 #arc.cladelabels(text="Hyracoidea",fsize=.4,node=65,orientation="horizontal",ln.offset=1.45,lab.offset=1.5,mark.node=FALSE)
@@ -215,18 +214,13 @@ segments(x0=xx,y0=yy,x1=260,y1=yy,lwd=8,col=cols)
 Data<-read.csv(file="min20516.csv")
 Data<- filter(Data, is.element(Clade, c("Sauropsida")))
 Data <- Data[,c(6,9,10,17,13),drop=FALSE] 
-tree<-read.tree(file="commontree.nwk")
 Data[Data < 0] <-NA
 Data <- na.omit(Data)
 
+tree<-read.tree(file="commontree.nwk")
+
 Data$common_name <- gsub(" ", "_", Data$common_name)
 includedSpecies <- Data$common_name
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
-tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -235,9 +229,6 @@ Data$Keep <- Data$common_name %in% pruned.tree$tip.label
 Data <- Data[!(Data$Keep==FALSE),]
 
 specData<-Data
-
-
-
 
 rownames(Data)<-Data$common_name
 Data <- Data[,c(4,5),drop=FALSE] 
@@ -286,12 +277,12 @@ plotTree(pruned.tree,type="fan",xlim=xlim,ylim=ylim,
          lwd=1,ftype="i",fsize=1,part=0.5)
 colors<-c("#1B1919FF","#3B4992FF","#EE0000FF","#BB0021FF","#008280FF","#A20056FF","#5F559BFF")
 
-pruned.tree<-paintSubTree(pruned.tree,node=165,state="1",anc="0")
-pruned.tree<-paintSubTree(pruned.tree,node=174,state="2")
-pruned.tree<-paintSubTree(pruned.tree,node=157,state="3")
-pruned.tree<-paintSubTree(pruned.tree,node=136,state="4")
-pruned.tree<-paintSubTree(pruned.tree,node=130,state="5")
-pruned.tree<-paintSubTree(pruned.tree,node=92,state="6")
+pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, anseriformes$common_name),state="1",anc="0")
+pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, galliformes$common_name),state="2")
+pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, pelecaniformes$common_name),state="3")
+pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, passeriformes$common_name),state="4")
+pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, psittaciformes$common_name),state="5")
+pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, squamata$common_name),state="6")
 
 names(colors)<-0:6
 
@@ -379,18 +370,13 @@ for(i in 1:m){
 Data<-read.csv(file="min20516.csv")
 Data<- filter(Data, is.element(Clade, c("Amphibia")))
 Data <- Data[,c(6,9,10,17,13),drop=FALSE] 
-tree<-read.tree(file="commontree.nwk")
 Data[Data < 0] <-NA
 Data <- na.omit(Data)
 
+tree<-read.tree(file="commontree.nwk")
+
 Data$common_name <- gsub(" ", "_", Data$common_name)
 includedSpecies <- Data$common_name
-newtips<-str_remove_all(tree$tip.label,"_ott")
-newtips<-str_remove_all(newtips,".ott")
-newtips<-str_remove_all(newtips,"-ott")
-newtips<-str_remove_all(newtips,"[1234567890]")
-newtips<-sub('^([^_]+_[^_]+).*', '\\1', newtips)
-tree$tip.label <- newtips
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
@@ -442,8 +428,8 @@ gymnophiona<-filter(specData, is.element(Orders, c("Gymnophiona")))
 
 colors<-c("#1B1919FF","#3B4992FF","#EE0000FF")
 
-pruned.tree<-paintSubTree(pruned.tree,node=20,state="1",anc="0")
-pruned.tree<-paintSubTree(pruned.tree,node=17,state="2")
+pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, anura$common_name),state="1",anc="0")
+pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, caudata$common_name),state="2")
 
 names(colors)<-0:2
 

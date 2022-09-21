@@ -3,13 +3,35 @@ library(gridExtra)
 library(ggplot2)
 library(ggrepel)
 library(tidyverse)
+library(phytools)
 library(cowplot)
 library(gridExtra)
 library(ggpubr)
 library(grid)
 library(lemon)
 #load csv 
-Data <- read.csv('min20516.csv')
+Data<-read.csv(file="min20516.csv")
+nrow(Data)
+
+tree<-read.tree(file="min20Fixed516.nwk")
+length(tree$tip.label)
+
+Data$Species <- gsub(" ", "_", Data$Species)
+includedSpecies <- Data$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+length(pruned.tree$tip.label)
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+Data$Keep <- Data$Species %in% pruned.tree$tip.label
+Data <- Data[!(Data$Keep==FALSE),]
+
+write.csv(Data,"/Users/walkermellon/Documents/cav/cancerAcrossVertebrates/newPhyloCut.csv", row.names = FALSE )
+
+newcut<-read.csv(file="newPhyloCut.csv")
+nrow(newcut)
+nrow(Data)
+
 
 # Basic violin plot
 #Neoplasia
@@ -99,6 +121,18 @@ reposition_legend(arrange, legend = legend, x=.2, y=.05, just = 0)
 
 # get mean and range for neo and mal by clade
 
+#all
+
+alleanNeo<-mean(Data$NeoplasiaPrevalence)
+allRangNneo<-range(Data$NeoplasiaPrevalence)
+
+cat("All Neoplasia Mean: ", alleanNeo, "All Neoplasia Range", allRangNneo)
+
+alleanMal<- mean(Data$MalignancyPrevalence)
+mamRangeMal<-range(Data$MalignancyPrevalence)
+
+cat("All Malignancy Mean: ", alleanMal, "All Malginancy Range", mamRangeMal)
+
 
 #Mammals
 Mamm<- filter(Data, is.element(Clade, c("Mammalia")))
@@ -129,12 +163,12 @@ amph<- filter(Data, is.element(Clade, c("Amphibia")))
 amphMeanNeo<-mean(amph$NeoplasiaPrevalence)
 amphRangNneo<-range(amph$NeoplasiaPrevalence)
 
-cat("Sauropsid Neoplasia Mean: ", amphMeanNeo, " Sauropsid Neoplasia Range", amphRangNneo)
+cat("Amphibian Neoplasia Mean: ", amphMeanNeo, " Sauropsid Neoplasia Range", amphRangNneo)
 
 amphMeanMal<- mean(amph$MalignancyPrevalence)
 amphRangeMal<-range(amph$MalignancyPrevalence)
 
-cat("Sauropsid Malignancy Mean: ", amphMeanMal, " Sauropsid Malginancy Range", amphRangeMal)
+cat("Amphibian Malignancy Mean: ", amphMeanMal, " Sauropsid Malginancy Range", amphRangeMal)
 
 
 
