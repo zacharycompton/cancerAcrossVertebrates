@@ -67,7 +67,7 @@ pglsSEyPagel=function(model, data, tree, lambdaInterval=c(0,1),...){
 
 
 #read data
-Data <- read.csv("min20516.csv")
+Data <- read.csv("newPhyloCut.csv")
 View(Data)
 
 
@@ -75,7 +75,7 @@ View(Data)
 #adult weight neo
 
 cutData <- Data[,c(5,9,10,11,13,38,42),drop=FALSE] 
-cutData[cutData < 0] <-NA
+cutData[cutData$adult_weight == -1, ] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
 
@@ -92,7 +92,7 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
-adult.weight.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(adult_weight.g.),data=cutData,tree=pruned.tree,se=SE,method = "ML")
+adult.weight.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(adult_weight),data=cutData,tree=pruned.tree,se=SE,method = "ML")
 
 summary(adult.weight.neo) 
 
@@ -105,7 +105,7 @@ p.v.adult.weight.neo<-summary(adult.weight.neo)$tTable
 p.v.adult.weight.neo<-signif(p.v.adult.weight.neo[2,4], digits = 2)
 
 #Brian: First line is where you make change. log10 x value. delete scale x continous completely
-wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)))+
+wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight)))+
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ),)+
   scale_y_continuous(
     limits = c(0,75),
@@ -130,7 +130,7 @@ wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.))
   labs(colour="Clade", size="Total Necropsies")
 
 
-#ggsave(filename='wgtneo.png', width=13, height=7, limitsize=FALSE,bg="white", units = "cm")
+ggsave(filename='wgtneo.png', width=13, height=7, limitsize=FALSE,bg="white", units = "cm")
 
 
 #adult weight mal
@@ -245,7 +245,7 @@ ggsave(filename='gestneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #gestation mal
 cutData <- Data[,c(5,9,10,11,17,30,42),drop=FALSE] 
-cutData[cutData < 0] <-NA
+cutData[cutData$Gestation.months. < 0, ] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
 
@@ -332,6 +332,10 @@ p.v.litneo<-signif(p.v.litneo[2,4], digits = 3)
 
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litter_size))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
+  scale_y_continuous(
+    limits = c(-10,100),
+    breaks = c(0, 25,50,75,100),
+    labels = c(0, 25,50,75,100))+
   geom_abline(intercept = coef(litter.neo)[1]*100, slope =  coef(litter.neo)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -383,6 +387,10 @@ p.v.litmal<-signif(p.v.litmal[2,4], digits = 3)
 
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litter_size))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
+  scale_y_continuous(
+    limits = c(-10,100),
+    breaks = c(0, 25,50,75,100),
+    labels = c(0, 25,50,75,100))+
   geom_abline(intercept = coef(litter.mal)[1]*100, slope =  coef(litter.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -404,7 +412,7 @@ ggsave(filename='litmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 ### Longevity model
 #longevity neo
 cutData <- Data[,c(5,9,10,11,13,40,42),drop=FALSE] 
-cutData[cutData < 0] <-NA
+cutData[cutData$max_longevity.months. < 0,] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
 
@@ -504,6 +512,10 @@ p.v.longmal<-signif(p.v.longmal[2,4], digits = 3)
 
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(max_longevity.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
+  scale_y_continuous(
+    limits = c(-10,100),
+    breaks = c(0, 25,50,75,100),
+    labels = c(0, 25,50,75,100))+
   geom_abline(intercept = coef(longevity.mal)[1]*100, slope =  coef(longevity.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -561,6 +573,10 @@ p.v.bmrneo<-signif(p.v.bmrneo[2,4], digits = 3)
 
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(metabolic_rate))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
+  scale_y_continuous(
+    limits = c(-10,100),
+    breaks = c(0, 25,50,75,100),
+    labels = c(0, 25,50,75,100))+
   geom_abline(intercept = coef(BMR.neo)[1]*100, slope =  coef(BMR.neo)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -619,6 +635,10 @@ p.v.bmrmal<-signif(p.v.bmrmal[2,4], digits = 3)
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(metabolic_rate))) + 
   geom_abline(intercept = coef(BMR.mal)[1]*100, slope =  coef(BMR.mal)[2]*100,
               color = 'grey',size = 1.2) +
+  scale_y_continuous(
+    limits = c(-10,100),
+    breaks = c(0, 25,50,75,100),
+    labels = c(0, 25,50,75,100))+
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Malignancy Prevalence (%)") +
@@ -673,6 +693,10 @@ p.v.wxneo<-signif(p.v.wxneo[2,4], digits = 3)
 
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.*max_longevity.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
+  scale_y_continuous(
+    limits = c(-10,100),
+    breaks = c(0, 25,50,75,100),
+    labels = c(0, 25,50,75,100))+
   geom_abline(intercept = coef(wxl.neo)[1]*100, slope =  coef(wxl.neo)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -728,6 +752,10 @@ p.v.wxmal<-signif(p.v.wxmal[2,4], digits = 3)
 
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.*max_longevity.months.))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
+  scale_y_continuous(
+    limits = c(-10,100),
+    breaks = c(0, 25,50,75,100),
+    labels = c(0, 25,50,75,100))+
   geom_abline(intercept = coef(wxl.mal)[1]*100, slope =  coef(wxl.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -749,7 +777,7 @@ ggsave(filename='wgtlongmal.png', width=9.5, height=7, limitsize=FALSE,bg="white
 
 #litters per year neo
 cutData <- Data[,c(5,9,10,11,13,34,42),drop=FALSE] 
-cutData[cutData < 0] <-NA
+cutData[cutData$litters_year < 0, ] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
 
@@ -842,6 +870,10 @@ p.v.lyearmal<-signif(p.v.lyearmal[2,4], digits = 3)
 
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litters_year))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
+  scale_y_continuous(
+    limits = c(-10,100),
+    breaks = c(0, 25,50,75,100),
+    labels = c(0, 25,50,75,100))+
   geom_abline(intercept = coef(lityear.mal)[1]*100, slope =  coef(lityear.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -894,6 +926,10 @@ p.v.fmaturityneo<-signif(p.v.fmaturityneo[2,4], digits = 3)
 
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(female_maturity.months.))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff"))+
+  scale_y_continuous(
+    limits = c(-10,100),
+    breaks = c(0, 25,50,75,100),
+    labels = c(0, 25,50,75,100))+
   geom_abline(intercept = coef(Fmaturity.neo)[1]*100, slope =  coef(Fmaturity.neo)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -946,6 +982,10 @@ p.v.fmaturitymal<-signif(p.v.fmaturitymal[2,4], digits = 3)
 
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(female_maturity.months.))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff"))+
+  scale_y_continuous(
+    limits = c(-10,100),
+    breaks = c(0, 25,50,75,100),
+    labels = c(0, 25,50,75,100))+
   geom_abline(intercept = coef(Fmaturity.mal)[1]*100, slope =  coef(Fmaturity.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -998,6 +1038,10 @@ p.v.Mmaturityneo<-signif(p.v.Mmaturityneo[2,4], digits = 3)
 
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(male_maturity.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff"))+
+  scale_y_continuous(
+    limits = c(-10,100),
+    breaks = c(0, 25,50,75,100),
+    labels = c(0, 25,50,75,100))+
   geom_abline(intercept = coef(Mmaturity.neo)[1]*100, slope =  coef(Mmaturity.neo)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -1050,6 +1094,10 @@ p.v.Mmaturitymal<-signif(p.v.Mmaturitymal[2,4], digits = 3)
 
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(male_maturity.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff"))+
+  scale_y_continuous(
+    limits = c(-10,100),
+    breaks = c(0, 25,50,75,100),
+    labels = c(0, 25,50,75,100))+
   geom_abline(intercept = coef(Fmaturity.mal)[1]*100, slope =  coef(Fmaturity.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -1102,6 +1150,10 @@ p.v.weanwneo<-signif(p.v.weanwneo[2,4], digits = 3)
 
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(weaning_weight.g.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff"))+
+  scale_y_continuous(
+    limits = c(-10,100),
+    breaks = c(0, 25,50,75,100),
+    labels = c(0, 25,50,75,100))+
   geom_abline(intercept = coef(weanw.neo)[1]*100, slope =  coef(weanw.neo)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -1154,6 +1206,10 @@ p.v.weanwmal<-signif(p.v.weanwmal[2,4], digits = 3)
 
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(weaning_weight.g.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff"))+
+  scale_y_continuous(
+    limits = c(-10,100),
+    breaks = c(0, 25,50,75,100),
+    labels = c(0, 25,50,75,100))+
   geom_abline(intercept = coef(Fmaturity.mal)[1]*100, slope =  coef(Fmaturity.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -1206,6 +1262,10 @@ p.v.GrowthRneo<-signif(p.v.GrowthRneo[2,4], digits = 3)
 
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(growth_rate.1.days.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff"))+
+  scale_y_continuous(
+    limits = c(-10,100),
+    breaks = c(0, 25,50,75,100),
+    labels = c(0, 25,50,75,100))+
   geom_abline(intercept = coef(GrowthR.neo)[1]*100, slope =  coef(GrowthR.neo)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -1258,6 +1318,10 @@ p.v.GrowthRmal<-signif(p.v.GrowthRmal[2,4], digits = 3)
 
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(growth_rate.1.days.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff"))+
+  scale_y_continuous(
+    limits = c(-10,100),
+    breaks = c(0, 25,50,75,100),
+    labels = c(0, 25,50,75,100))+
   geom_abline(intercept = coef(GrowthR.mal)[1]*100, slope =  coef(GrowthR.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -1314,6 +1378,10 @@ p.v.wpneo<-signif(p.v.wpneo[2,4], digits = 3)
 
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)+log10(Gestation.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
+  scale_y_continuous(
+    limits = c(-10,100),
+    breaks = c(0, 25,50,75,100),
+    labels = c(0, 25,50,75,100))+
   geom_abline(intercept = coef(wpl.neo)[1]*100, slope =  coef(wpl.neo)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -1372,6 +1440,10 @@ p.v.wpmal<-signif(p.v.wpmal[2,4], digits = 3)
 
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.months.)+log10(adult_weight.g.))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
+  scale_y_continuous(
+    limits = c(-10,100),
+    breaks = c(0, 25,50,75,100),
+    labels = c(0, 25,50,75,100))+
   geom_abline(intercept = coef(wpl.mal)[1]*100, slope =  coef(wpl.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
