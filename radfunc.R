@@ -110,14 +110,11 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC10Gy))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
-  labs(title = "Neoplasia vs. 10Gy Radiation",
+  labs(title = "Neoplasia vs. AUC 10Gy Radiation",
         subtitle =bquote(p-value:.(p.v.AUC.10.GY)~R^2:.(r.AUC.10.GY)~Lambda:.(ld.v.AUC.10.GY)))+
   guides(col=FALSE)
 
-#ggsave(filename='anvfold721.png', width=13, height=10, limitsize=FALSE,bg="white")
-
-
-ggsave(filename='AUC10.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+ggsave(filename='RADAUC10.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #AUC 2
 
@@ -152,11 +149,11 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC2Gy))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
-  labs(title = "Neoplasia vs. 2GY Radiation",
+  labs(title = "Neoplasia vs. AUC 2GY Radiation",
         subtitle =bquote(p-value:.(p.v.AUC.2.GY)~R^2:.(r.AUC.2.GY)~Lambda:.(ld.v.AUC.2.GY)))+
   guides(col=FALSE)
 
-ggsave(filename='AUC2.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+ggsave(filename='RADAUC2.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #AUC .4
 
@@ -180,7 +177,7 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC04Gy))) +
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
-  xlab("(log 10) Cell Count AUC .4% of Untreated Control \n 0.4Gy Radiation") +
+  xlab("(log 10) Cell Count AUC of Untreated Control \n 0.4Gy Radiation") +
   geom_point(aes(colour= Keep, size = TotalRecords)) +
   geom_text_repel(aes(label=common_name))+
   scale_size(name   = "Total Necropsies",
@@ -189,8 +186,8 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC04Gy))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
-  labs(title = "Neoplasia vs. 0.4Gy Radiation",
+  labs(title = "Neoplasia vs. AUC 0.4Gy Radiation",
         subtitle =bquote(p-value:.(p.v.AUC.04.GY)~R^2:.(r.AUC.04.GY)~Lambda:.(ld.v.AUC.04.GY)))+
   guides(col=FALSE)
 
-ggsave(filename='AUC04.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+ggsave(filename='RADAUC04.png', width=9.5, height=7, limitsize=FALSE,bg="white")

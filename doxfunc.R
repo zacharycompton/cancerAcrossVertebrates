@@ -8,43 +8,43 @@ library(cowplot)
 library(ggsci)
 library(patchwork)
 
-modPgls.SEy = function (model, data, corClass = corBrownian, tree, se = NULL, 
-                        method = c("REML", "ML"), interval = c(0, 1000), corClassValue=1, sig2e=NULL, ...) 
+modPgls.SEy = function (model, data, corClass = corBrownian, tree, se = NULL,
+                        method = c("REML", "ML"), interval = c(0, 1000), corClassValue=1, sig2e=NULL, ...)
 {
   Call <- match.call()
   corfunc <- corClass
   spp <- rownames(data)
   data <- cbind(data, spp)
-  if (is.null(se)) 
+  if (is.null(se))
     se <- setNames(rep(0, Ntip(tree)), tree$tip.label)[spp]
   else se <- se[spp]
-  
+
   lk <- function(sig2e, data, tree, model, ve, corfunc, spp) {
     tree$edge.length <- tree$edge.length * sig2e
-    ii <- sapply(1:Ntip(tree), function(x, e) which(e == 
+    ii <- sapply(1:Ntip(tree), function(x, e) which(e ==
                                                       x), e = tree$edge[, 2])
     tree$edge.length[ii] <- tree$edge.length[ii] + ve[tree$tip.label]
     vf <- diag(vcv(tree))[spp]
     w <- varFixed(~vf)
     COR <- corfunc(corClassValue, tree, form = ~spp, ...)
-    fit <- gls(model, data = cbind(data, vf), correlation = COR, 
+    fit <- gls(model, data = cbind(data, vf), correlation = COR,
                method = method, weights = w)
     -logLik(fit)
   }
-  
+
   if (is.null(sig2e)) {
-    fit <- optimize(lk, interval = interval, data = data, tree = tree, 
+    fit <- optimize(lk, interval = interval, data = data, tree = tree,
                     model = model, ve = se^2, corfunc = corfunc, spp = spp)
     sig2e=fit$minimum
   }
-  
+
   tree$edge.length <- tree$edge.length * sig2e
-  ii <- sapply(1:Ntip(tree), function(x, e) which(e == x), 
+  ii <- sapply(1:Ntip(tree), function(x, e) which(e == x),
                e = tree$edge[, 2])
   tree$edge.length[ii] <- tree$edge.length[ii] + se[tree$tip.label]^2
   vf <- diag(vcv(tree))[spp]
   w <- varFixed(~vf)
-  obj <- gls(model, data = cbind(data, vf), correlation = corfunc(corClassValue, 
+  obj <- gls(model, data = cbind(data, vf), correlation = corfunc(corClassValue,
                                                                   tree, form = ~spp, ...), weights = w, method = method)
   obj$call <- Call
   obj$sig2e <- sig2e
@@ -63,8 +63,8 @@ pglsSEyPagel=function(model, data, tree, lambdaInterval=c(0,1),...){
 }
 
 ## Here I split the csv into class but do whatever you want
-Data<-read.csv(file="min50Functional.csv")
-nrow(Data)
+Data<-read.csv(file="min20DOX.csv")
+View(Data)
 
 tree<-read.tree(file="min20Fixed516.nwk")
 length(tree$tip.label)
@@ -81,7 +81,7 @@ Data <- Data[!(Data$Keep==FALSE),]
 rownames(Data)<-Data$Species
 SE<-setNames(Data$SE,Data$Species)[rownames(Data)]
 ##Model
-ANVFold72.1 <- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVAUCFold72.1), data=cutData,
+ANVFold72.1 <- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVAUCFold72.1), data=Data,
                             tree=pruned.tree,method="ML",se=SE)
 
 r.v.ANVFold72.1 <- summary(ANVFold72.1)$corBeta
@@ -103,29 +103,24 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=(ANVAUCFold72.1))) +
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log 10) AUC AnV Fold \nIncrease to 72hr") +
   geom_point(aes(colour= Keep, size = TotalRecords)) +
-  geom_text_repel(aes(label=cutData$common_name, size = 300))+
+  geom_text_repel(aes(label=Data$common_name, size = 300))+
   scale_size(name   = "Total Necropsies",
              breaks = c(55,150,250,350),
              labels =  c(55,150,250,350))+
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+ 
+  theme(legend.position = "bottom")+
+  labs(title = "Neoplasia vs. AUC 1uM Doxorubicin",
+       subtitle =bquote(p-value:.(p.v.ANVFold72.1)~R^2:.(r.v.ANVFold72.1)~Lambda:.(ld.v.ANVFold72.1)))+
+
   guides(col=FALSE)
 
 ggsave(filename='anvfold721.png', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 #fold 72.33
-cutData <- Data[,c(2,3,4,5,6,10),drop=FALSE] 
-View(cutData)
-## species labels as row names
-rownames(cutData)<-cutData$Species
-## pull out the SEs
-SE<-setNames(cutData$SE,cutData$Species)[rownames(cutData)]
-
-
 ##Model
-ANVFold72.33<- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVAUCFold72.33), data=cutData,
+ANVFold72.33<- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVAUCFold72.33), data=Data,
                             tree=pruned.tree,method="ML",se=SE)
 
 r.v.ANVFold72.33 <- summary(ANVFold72.33)$corBeta
@@ -145,27 +140,25 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=(ANVAUCFold72.33))) +
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
-  xlab("Log10 AUC AnV Fold \nIncrease to 72hr") +
+  xlab("(log 10) AUC AnV Fold \nIncrease to 72hr") +
   geom_point(aes(colour= Keep, size = TotalRecords)) +
   geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence > 0) | NeoplasiaPrevalence < 1,as.character(common_name),'')))+
-  labs(title = "Neoplasia Prevalence vs. AUC AnV Fold \nIncrease to 72hr .33uM in Mammals",  
-       subtitle = (paste("p-value:", p.v.ANVFold72.33,"  ","R^2:",r.v.ANVFold72.33,"  ","Lambda:",ld.v.ANVFold72.33))) +
-  guides(colour = guide_legend(override.aes = list(size=5))) +
+  scale_size(name   = "Total Necropsies",
+             breaks = c(55,150,250,350),
+             labels =  c(55,150,250,350))+
+   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "none")
+  theme(legend.position = "bottom") +
+  labs(title = "Neoplasia vs. AUC 0.33uM Doxorubicin",
+       subtitle =bquote(p-value:.(p.v.ANVFold72.33)~R^2:.(r.v.ANVFold72.33)~Lambda:.(ld.v.ANVFold72.33)))+
+  guides(col=FALSE)
 
-#fold 72.11
-cutData <- Data[,c(2,3,4,5,6,11),drop=FALSE] 
-View(cutData)
-## species labels as row names
-rownames(cutData)<-cutData$Species
-## pull out the SEs
-SE<-setNames(cutData$SE,cutData$Species)[rownames(cutData)]
+ggsave(filename='anvfold72.33.png', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 ##Model
-ANVFold72.11<- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVAUCFold72.11), data=cutData,
+ANVFold72.11<- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVAUCFold72.11), data=Data,
                             tree=pruned.tree,method="ML",se=SE)
 
 r.v.ANVFold72.11 <- summary(ANVFold72.11)$corBeta
@@ -180,39 +173,33 @@ p.v.ANVFold72.11<-signif(p.v.ANVFold72.11[2,4], digits = 3)
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=(ANVAUCFold72.11))) +
   scale_x_continuous(trans = 'log10')+
   scale_color_manual(values=c("#631879FF"))+
-  
+
   geom_abline(intercept = coef(ANVFold72.11)[1]*100, slope =  coef(ANVFold72.11)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
-  xlab("Log10 AUC AnV Fold \nIncrease to 72hr") +
+  xlab("(log 10) AUC AnV Fold \nIncrease to 72hr") +
   geom_point(aes(colour= Keep, size = TotalRecords)) +
-  #geom_smooth(method=lm,colour = "grey" ,se=FALSE, size=1.5, ) +
   geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence > 0) | NeoplasiaPrevalence < 1,as.character(common_name),'')))+
-  labs(title = "Neoplasia Prevalence vs. AUC AnV Fold \nIncrease to 72hr .11uM in Mammals",  
-       subtitle = (paste("p-value:", p.v.ANVFold72.11,"  ","R^2:",r.v.ANVFold72.11,"  ","Lambda:",ld.v.ANVFold72.11))) +
+  scale_size(name   = "Total Necropsies",
+             breaks = c(55,150,250,350),
+             labels =  c(55,150,250,350))+
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "none")
+  theme(legend.position = "bottom") +
+  labs(title = "Neoplasia vs. AUC 0.11uM Doxorubicin",
+       subtitle =bquote(p-value:.(p.v.ANVFold72.11)~R^2:.(r.v.ANVFold72.11)~Lambda:.(ld.v.ANVFold72.11)))+
+  guides(col=FALSE)
 
-
+ggsave(filename='anvfold72.11.png', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 
 #cell death 72.1
-
-cutData <- Data[,c(2,3,4,5,6,12),drop=FALSE] 
-View(cutData)
-## species labels as row names
-rownames(cutData)<-cutData$Species
-## pull out the SEs
-SE<-setNames(cutData$SE,cutData$Species)[rownames(cutData)]
-
-
 ##Model
-ANVDeath72.1 <- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVCellDeath72.1), data=cutData,
+ANVDeath72.1 <- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVCellDeath72.1), data=Data,
                              tree=pruned.tree,method="ML",se=SE)
 
 r.v.ANVDeath72.1 <- summary(ANVDeath72.1)$corBeta
@@ -232,29 +219,28 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=(ANVCellDeath72.1))) +
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
-  xlab("Log10 AUC AnV %Cell Death \nIncrease to 72hr") +
+  xlab("(log 10) % Cell Death at 72hr") +
   geom_point(aes(colour= Keep, size = TotalRecords)) +
-  #geom_smooth(method=lm,colour = "grey" ,se=FALSE, size=1.5, ) +
   geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence > 0) | NeoplasiaPrevalence < 1,as.character(common_name),'')))+
-  labs(title = "Neoplasia Prevalence vs. AUC AnV Cell Death \nIncrease to 72hr 1uM in Mammals",  
-       subtitle = (paste("p-value:", p.v.ANVDeath72.1,"  ","R^2:",r.v.ANVDeath72.1,"  ","Lambda:",ld.v.ANVDeath72.1))) +
+  scale_size(name   = "Total Necropsies",
+             breaks = c(55,150,250,350),
+             labels =  c(55,150,250,350))+
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "none")
+  theme(legend.position = "bottom") +
+  labs(title = "Neoplasia vs. Cell Death 1uM Doxorubicin",
+       subtitle =bquote(p-value:.(p.v.ANVDeath72.1)~R^2:.(r.v.ANVDeath72.1)~Lambda:.(ANVDeath72.1)))+
+  guides(col=FALSE)
+
+ggsave(filename='celldeath72.1.png', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 #cell death 72.33
-cutData <- Data[,c(2,3,4,5,6,13),drop=FALSE] 
-View(cutData)
-## species labels as row names
-rownames(cutData)<-cutData$Species
-## pull out the SEs
-SE<-setNames(cutData$SE,cutData$Species)[rownames(cutData)]
 
 
 ##Model
-ANVDeath72.33<- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVCellDeath72.33), data=cutData,
+ANVDeath72.33<- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVCellDeath72.33), data=Data,
                              tree=pruned.tree,method="ML",se=SE)
 
 r.v.ANVDeath72.33 <- summary(ANVDeath72.33)$corBeta
@@ -274,28 +260,26 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=(ANVCellDeath72.33))) +
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
-  xlab("Log10 AUC AnV %Cell Death \nIncrease to 72hr") +
+  xlab("(log 10) % Cell Death at 72hr") +
   geom_point(aes(colour= Keep, size = TotalRecords)) +
-  #geom_smooth(method=lm,colour = "grey" ,se=FALSE, size=1.5, ) +
   geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence > 0) | NeoplasiaPrevalence < 1,as.character(common_name),'')))+
-  labs(title = "Neoplasia Prevalence vs. AUC AnV Cell Death \nIncrease to 72hr .33uM in Mammals",  
-       subtitle = (paste("p-value:", p.v.ANVDeath72.33,"  ","R^2:",r.v.ANVDeath72.33,"  ","Lambda:",ld.v.ANVDeath72.33))) +
+  scale_size(name   = "Total Necropsies",
+             breaks = c(55,150,250,350),
+             labels =  c(55,150,250,350))+
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "none")
+  theme(legend.position = "bottom") +
+  labs(title = "Neoplasia vs. Cell Death 0.33uM Doxorubicin",
+       subtitle =bquote(p-value:.(p.v.ANVDeath72.33)~R^2:.(r.v.ANVDeath72.33)~Lambda:.(ANVDeath72.33)))+
+  guides(col=FALSE)
+
+ggsave(filename='celldeath72.33.png', width=13, height=10, limitsize=FALSE,bg="white")
 
 #cell death 72.11
-cutData <- Data[,c(2,3,4,5,6,14),drop=FALSE] 
-View(cutData)
-## species labels as row names
-rownames(cutData)<-cutData$Species
-## pull out the SEs
-SE<-setNames(cutData$SE,cutData$Species)[rownames(cutData)]
-
 
 ##Model
-ANVDeath72.11<- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVCellDeath72.11), data=cutData,
+ANVDeath72.11<- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVCellDeath72.11), data=Data,
                              tree=pruned.tree,method="ML",se=SE)
 
 r.v.ANVDeath72.11 <- summary(ANVDeath72.11)$corBeta
@@ -315,15 +299,20 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=(ANVCellDeath72.11))) +
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
-  xlab("Log10 AUC AnV %Cell Death \nIncrease to 72hr") +
+  xlab("(log 10) % Cell Death at 72hr") +
   geom_point(aes(colour= Keep, size = TotalRecords)) +
-  #geom_smooth(method=lm,colour = "grey" ,se=FALSE, size=1.5, ) +
   geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence > 0) | NeoplasiaPrevalence < 1,as.character(common_name),'')))+
-  labs(title = "Neoplasia Prevalence vs. AUC AnV Cell Death \nIncrease to 72hr .11uM in Mammals",  
-       subtitle = (paste("p-value:", p.v.ANVDeath72.11,"  ","R^2:",r.v.ANVDeath72.11,"  ","Lambda:",ld.v.ANVDeath72.11))) +
+  scale_size(name   = "Total Necropsies",
+             breaks = c(55,150,250,350),
+             labels =  c(55,150,250,350))+
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "none")
+  theme(legend.position = "bottom") +
+  labs(title = "Neoplasia vs. Cell Death 0.11uM Doxorubicin",
+       subtitle =bquote(p-value:.(p.v.ANVDeath72.11)~R^2:.(r.v.ANVDeath72.11)~Lambda:.(ANVDeath72.11)))+
+  guides(col=FALSE)
+
+ggsave(filename='celldeath72.11.png', width=13, height=10, limitsize=FALSE,bg="white")
 
 
