@@ -63,37 +63,23 @@ pglsSEyPagel=function(model, data, tree, lambdaInterval=c(0,1),...){
 }
 
 ## Here I split the csv into class but do whatever you want
-Data <- read.csv("min20RAD.csv")
-Data <- Data[-c(9), ]
-View(Data)
-Data <- mutate(Data, SE = sqrt(1/(Data$TotalRecords)))
-Data <- Data[!(Data$TotalRecords<20),]
-Data[Data==-1]<-NA
-Data[Data < 0] <-NA
-#Subset if you only want a certain Species
-#Data <- Data[ which(Species == "Mammalia"),]
+Data<-read.csv(file="min20RAD.csv")
+nrow(Data)
 
-tree <- read.tree("min20Fixed516.nwk")
+tree<-read.tree(file="min20Fixed516.nwk")
+length(tree$tip.label)
 
-
-#prune the tree to match the data
 Data$Species <- gsub(" ", "_", Data$Species)
 includedSpecies <- Data$Species
-#pruning the tree
 pruned.tree<-drop.tip(
   tree, setdiff(
     tree$tip.label, includedSpecies))
+length(pruned.tree$tip.label)
 pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
-#Removing discrepencies
 Data$Keep <- Data$Species %in% pruned.tree$tip.label
 Data <- Data[!(Data$Keep==FALSE),]
-
-## species labels as row names
 rownames(Data)<-Data$Species
-## pull out the SEs
 SE<-setNames(Data$SE,Data$Species)[rownames(Data)]
-
-
 ##Model
 AUC.10.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(AUC10Gy), data=Data,
                             tree=pruned.tree,method="ML",se=SE)
