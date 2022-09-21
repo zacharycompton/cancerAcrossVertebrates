@@ -8,7 +8,7 @@ library(cowplot)
 library(ggrepel)
 library(ggsci)
 library(patchwork)
-
+ 
 #make sure to run all of this before you get to work.
 #pgls sey base (just run all of this)
 modPgls.SEy = function (model, data, corClass = corBrownian, tree, se = NULL, 
