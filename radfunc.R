@@ -8,43 +8,43 @@ library(cowplot)
 library(ggsci)
 library(patchwork)
 
-modPgls.SEy = function (model, data, corClass = corBrownian, tree, se = NULL, 
-                        method = c("REML", "ML"), interval = c(0, 1000), corClassValue=1, sig2e=NULL, ...) 
+modPgls.SEy = function (model, data, corClass = corBrownian, tree, se = NULL,
+                        method = c("REML", "ML"), interval = c(0, 1000), corClassValue=1, sig2e=NULL, ...)
 {
   Call <- match.call()
   corfunc <- corClass
   spp <- rownames(data)
   data <- cbind(data, spp)
-  if (is.null(se)) 
+  if (is.null(se))
     se <- setNames(rep(0, Ntip(tree)), tree$tip.label)[spp]
   else se <- se[spp]
-  
+
   lk <- function(sig2e, data, tree, model, ve, corfunc, spp) {
     tree$edge.length <- tree$edge.length * sig2e
-    ii <- sapply(1:Ntip(tree), function(x, e) which(e == 
+    ii <- sapply(1:Ntip(tree), function(x, e) which(e ==
                                                       x), e = tree$edge[, 2])
     tree$edge.length[ii] <- tree$edge.length[ii] + ve[tree$tip.label]
     vf <- diag(vcv(tree))[spp]
     w <- varFixed(~vf)
     COR <- corfunc(corClassValue, tree, form = ~spp, ...)
-    fit <- gls(model, data = cbind(data, vf), correlation = COR, 
+    fit <- gls(model, data = cbind(data, vf), correlation = COR,
                method = method, weights = w)
     -logLik(fit)
   }
-  
+
   if (is.null(sig2e)) {
-    fit <- optimize(lk, interval = interval, data = data, tree = tree, 
+    fit <- optimize(lk, interval = interval, data = data, tree = tree,
                     model = model, ve = se^2, corfunc = corfunc, spp = spp)
     sig2e=fit$minimum
   }
-  
+
   tree$edge.length <- tree$edge.length * sig2e
-  ii <- sapply(1:Ntip(tree), function(x, e) which(e == x), 
+  ii <- sapply(1:Ntip(tree), function(x, e) which(e == x),
                e = tree$edge[, 2])
   tree$edge.length[ii] <- tree$edge.length[ii] + se[tree$tip.label]^2
   vf <- diag(vcv(tree))[spp]
   w <- varFixed(~vf)
-  obj <- gls(model, data = cbind(data, vf), correlation = corfunc(corClassValue, 
+  obj <- gls(model, data = cbind(data, vf), correlation = corfunc(corClassValue,
                                                                   tree, form = ~spp, ...), weights = w, method = method)
   obj$call <- Call
   obj$sig2e <- sig2e
@@ -64,10 +64,11 @@ pglsSEyPagel=function(model, data, tree, lambdaInterval=c(0,1),...){
 
 ## Here I split the csv into class but do whatever you want
 Data<-read.csv(file="min20RAD.csv")
-nrow(Data)
+View(Data)
 
 tree<-read.tree(file="min20Fixed516.nwk")
-length(tree$tip.label)
+
+
 
 Data$Species <- gsub(" ", "_", Data$Species)
 includedSpecies <- Data$Species
@@ -100,7 +101,7 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC10Gy))) +
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
-  xlab("(log 10) Cell Count AUC 10% of Untreated Control") +
+  xlab("(log 10) Cell Count AUC % of Untreated Control \n 10Gy Radiation") +
   geom_point(aes(colour= Keep, size = TotalRecords)) +
   geom_text_repel(aes(label=common_name))+
   scale_size(name   = "Total Necropsies",
@@ -109,11 +110,11 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC10Gy))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
-  labs(title = "Neoplasia vs. ",
+  labs(title = "Neoplasia vs. 10Gy Radiation",
         subtitle =bquote(p-value:.(p.v.AUC.10.GY)~R^2:.(r.AUC.10.GY)~Lambda:.(ld.v.AUC.10.GY)))+
   guides(col=FALSE)
 
-ggsave(filename='anvfold721.png', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='anvfold721.png', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 ggsave(filename='AUC10.png', width=9.5, height=7, limitsize=FALSE,bg="white")
@@ -142,7 +143,7 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC2Gy))) +
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
-  xlab("(log 10) Cell Count AUC 2% of Untreated Control") +
+  xlab("(log 10) Cell Count AUC % of Untreated Control \n 2Gy Radiation") +
   geom_point(aes(colour= Keep, size = TotalRecords)) +
   geom_text_repel(aes(label=common_name))+
   scale_size(name   = "Total Necropsies",
@@ -151,7 +152,7 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC2Gy))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
-  labs(title = "Neoplasia vs. ",
+  labs(title = "Neoplasia vs. 2GY Radiation",
         subtitle =bquote(p-value:.(p.v.AUC.2.GY)~R^2:.(r.AUC.2.GY)~Lambda:.(ld.v.AUC.2.GY)))+
   guides(col=FALSE)
 
@@ -179,7 +180,7 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC04Gy))) +
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
-  xlab("(log 10) Cell Count AUC .4% of Untreated Control") +
+  xlab("(log 10) Cell Count AUC .4% of Untreated Control \n 0.4Gy Radiation") +
   geom_point(aes(colour= Keep, size = TotalRecords)) +
   geom_text_repel(aes(label=common_name))+
   scale_size(name   = "Total Necropsies",
@@ -188,7 +189,7 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC04Gy))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
-  labs(title = "Neoplasia vs. ",
+  labs(title = "Neoplasia vs. 0.4Gy Radiation",
         subtitle =bquote(p-value:.(p.v.AUC.04.GY)~R^2:.(r.AUC.04.GY)~Lambda:.(ld.v.AUC.04.GY)))+
   guides(col=FALSE)
 
