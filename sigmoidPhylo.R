@@ -82,9 +82,9 @@ library(phytools)
 packageVersion("phytools")
 Data <- read.csv("min20516.csv")
 Data<-read.csv(file="mamPhyloCut.csv", row.names = 10)
-Data<- read.csv("mamPhylocu")
+Data<- read.csv("mamPhylocut.csv")
 Data<- filter(Data, Clade == "Mammalia")
-
+tree <- read.tree("min20Fixed516.nwk")
 
 Data$Species <- gsub(" ", "_", Data$Species)
 includedSpecies <- Data$Species
@@ -95,11 +95,10 @@ pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
 Data$Keep <- Data$Species %in% pruned.tree$tip.label
 Data <- Data[!(Data$Keep==FALSE),]
 
-write.csv(Data, "mamPhyloCut.csv")
-mamContMap$cols
+
 NeoplasiaPrevalence <- setNames(Data$NeoplasiaPrevalence, rownames(Data))
 mamContMap <- contMap(pruned.tree, NeoplasiaPrevalence, plot = F)
-mamContMap <- setMap(mamContMap, colors= pal)
+mamContMap <- setMap(mamContMap, invert = T)
 sigmoidPhylogram(pruned.tree,fsize=0.3,ftype="i",lwd=7,
                  ylim=c(-5,Ntip(pruned.tree)))
 
