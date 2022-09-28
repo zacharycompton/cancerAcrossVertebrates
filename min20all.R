@@ -8,7 +8,7 @@ library(cowplot)
 library(ggrepel)
 library(ggsci)
 library(patchwork)
- 
+
 #make sure to run all of this before you get to work.
 #pgls sey base (just run all of this)
 modPgls.SEy = function (model, data, corClass = corBrownian, tree, se = NULL, 
@@ -67,7 +67,7 @@ pglsSEyPagel=function(model, data, tree, lambdaInterval=c(0,1),...){
 
 
 #read data
-Data <- read.csv("newPhyloCut.csv")
+Data <- read.csv("min20516.csv")
 View(Data)
 
 
@@ -92,7 +92,7 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
-adult.weight.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(adult_weight),data=cutData,tree=pruned.tree,se=SE,method = "ML")
+adult.weight.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(adult_weight.g.),data=cutData,tree=pruned.tree,se=SE,method = "ML")
 
 summary(adult.weight.neo) 
 
@@ -105,7 +105,7 @@ p.v.adult.weight.neo<-summary(adult.weight.neo)$tTable
 p.v.adult.weight.neo<-signif(p.v.adult.weight.neo[2,4], digits = 2)
 
 #Brian: First line is where you make change. log10 x value. delete scale x continous completely
-wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight)))+
+wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)))+
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ),)+
   scale_y_continuous(
     limits = c(0,75),
@@ -130,7 +130,7 @@ wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight)))+
   labs(colour="Clade", size="Total Necropsies")
 
 
-ggsave(filename='wgtneo.png', width=13, height=7, limitsize=FALSE,bg="white", units = "cm")
+#ggsave(filename='wgtneo.png', width=13, height=7, limitsize=FALSE,bg="white", units = "cm")
 
 
 #adult weight mal
@@ -165,9 +165,12 @@ ld.v.adult.weight.mal <- signif(ld.v.adult.weight.mal[1], digits= 2)
 p.v.adult.weight.mal<-summary(adult.weight.mal)$tTable
 p.v.adult.weight.mal<-signif(p.v.adult.weight.mal[2,4], digits = 3)
 
-
+#remove limits from scale y continous, add last two lines with label
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)))+
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
+  scale_y_continuous(
+    breaks = c(0, 25,50,75),
+    labels = c(0, 25,50,75))+
   geom_abline(intercept = coef(adult.weight.mal)[1]*100, slope =  coef(adult.weight.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -175,16 +178,22 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)))+
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Adult Weight (g)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  scale_size(name   = "Total Necropsies",
+             breaks = c(20,100,200,300,477),
+             labels =  c(20,100,200,300,477))+
   labs(title = "Malignancy Prevalence vs. Adult Weight") +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   guides(size=guide_legend())+
-  ylim(-10,100)
+  coord_cartesian(xlim = c(log10(min(cutData$adult_weight.g.)),log10(max(cutData$adult_weight.g.))),
+                  ylim = c(0,75),clip = "off")+
+  annotate("text", x=.25, y=82.3, label = "1", size = 7)
 
-ggsave(filename='wgtmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+
+ggsave(filename='S1wgtmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #gestation models
 #gestation neo
@@ -241,7 +250,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(Gestation.months.))) +
 theme(
   plot.title = element_text(size = 20, face = "bold"))+   labs(colour="Clade", size="Total Necropsies")
 
-ggsave(filename='gestneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+ggsave(filename='S2gestneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #gestation mal
 cutData <- Data[,c(5,9,10,11,17,30,42),drop=FALSE] 
@@ -350,8 +359,8 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litter_size))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
-  
-  ggsave(filename='litneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+
+ggsave(filename='litneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #litter size mal
 cutData <- Data[,c(5,9,10,11,17,33,42),drop=FALSE] 
@@ -1161,7 +1170,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(weaning_weight.g.))) +
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Weaning Weight (g)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse(NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Neoplasia Prevalence vs. Weaning Weight",  
        subtitle =bquote(p-value:.(p.v.weanwneo)~R^2:.(r.v.weanwneo)~Lambda:.(ld.v.weanwneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -1263,7 +1272,7 @@ p.v.GrowthRneo<-signif(p.v.GrowthRneo[2,4], digits = 3)
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(growth_rate.1.days.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff"))+
   scale_y_continuous(
-    limits = c(-10,100),
+    limits = c(0,100),
     breaks = c(0, 25,50,75,100),
     labels = c(0, 25,50,75,100))+
   geom_abline(intercept = coef(GrowthR.neo)[1]*100, slope =  coef(GrowthR.neo)[2]*100,
@@ -1274,13 +1283,12 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(growth_rate.1.days.))) +
   xlab("(log10) Growth Rate") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
   geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
-  labs(title = "Neoplasia Prevalence vs. Growth Rate",  
-       subtitle =bquote(p-value:.(p.v.GrowthRneo)~R^2:.(r.v.GrowthRneo)~Lambda:.(ld.v.GrowthRneo))) +
+  #labs(title = "Neoplasia Prevalence vs. Growth Rate",  
+  #subtitle =bquote(p-value:.(p.v.GrowthRneo)~R^2:.(r.v.GrowthRneo)~Lambda:.(ld.v.GrowthRneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
-  ylim(-10,100)
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
 
 ggsave(filename='growneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
