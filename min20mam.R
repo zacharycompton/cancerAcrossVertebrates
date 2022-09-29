@@ -105,7 +105,7 @@ p.v.adult.weight.neo<-summary(adult.weight.neo)$tTable
 p.v.adult.weight.neo<-signif(p.v.adult.weight.neo[2,4], digits = 2)
 
 #Brian: First line is where you make change. log10 x value. delete scale x continous completely
-wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)))+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)))+
   scale_color_manual(values = c("Mammalia" = "#631879FF" ),)+
   scale_y_continuous(
     limits = c(0,75),
@@ -129,7 +129,15 @@ wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.))
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
-  labs(colour="Clade", size="Total Necropsies")
+  labs(colour="Clade", size="Total Necropsies")+
+  #SELIN: Add these 3 lines to the end of every model. Then change label="21" to whatever number model. 
+  coord_cartesian(xlim = c(log10(min(cutData$adult_weight.g.)),log10(max(cutData$adult_weight.g.))),
+                  ylim = c(0,75),clip = "off")+
+  annotate("text", x=.39, y=83.5, label = "21", size = 7)
+
+
+
+ggsave(filename='S21wgtneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 
 #adult weight mal
@@ -185,14 +193,13 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)))+
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
 guides(size=guide_legend())+
-  #SELIN: Add these 3 lines to the end of every model. Then change label="21" to whatever number model. 
   coord_cartesian(xlim = c(log10(min(cutData$adult_weight.g.)),log10(max(cutData$adult_weight.g.))),
                   ylim = c(0,75),clip = "off")+
-  annotate("text", x=.39, y=83.5, label = "1", size = 7)
+  annotate("text", x=.39, y=83.5, label = "22", size = 7)
 
 
 
-ggsave(filename='wgtmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+ggsave(filename='S22wgtmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #gestation models
 #gestation neo
