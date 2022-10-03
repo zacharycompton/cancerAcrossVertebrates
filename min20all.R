@@ -244,7 +244,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(Gestation.months.))) +
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
-  geom_text_repel(aes(label=ifelse( NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   guides(colour = guide_legend(override.aes = list(size=5))) +
   labs(title="Neoplasia Prevalence vs. Gestation (Mo)")+
   theme(
@@ -356,7 +356,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litter_size))) +
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Litter Size") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse( NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Neoplasia Prevalence vs. Litter Size",  
        subtitle =bquote(p-value:.(p.v.litneo)~R^2:.(r.v.litneo)~Lambda:.(ld.v.litneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -415,7 +415,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litter_size))) +
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Litter Size") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Malignancy Prevalence vs. Litter Size",  
        subtitle =bquote(p-value:.(p.v.litmal)~R^2:.(r.v.litmal)~Lambda:.(ld.v.litmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -542,7 +542,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(max_longevity.months.)))
   ylab("Malignancy Prevalence (%)") +
   xlab("Max Longevity (Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Malignancy Prevalence vs. Max Longevity",  
        subtitle =bquote(p-value:.(p.v.longmal)~R^2:.(r.v.longmal)~Lambda:.(ld.v.longmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -605,13 +605,13 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(metabolic_rate))) +
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Basal Metabolic Rate") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse( NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Neoplasia Prevalence vs. Metabolic Rate in Mammals",  
        subtitle =bquote(p-value:.(p.v.bmrneo)~R^2:.(r.v.bmrneo)~Lambda:.(ld.v.bmrneo))) +
-  guides(colour = FALSE) +
+  guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(size="Total Necropsies", colour=FALSE)+
+  theme(legend.position = "bottom")+   labs(size="Total Necropsies")+
   guides(size=guide_legend())+
   coord_cartesian(xlim = c(log10(min(cutData$metabolic_rate)),log10(max(cutData$metabolic_rate))),
                   ylim = c(0,75),clip = "off")+
@@ -658,26 +658,25 @@ p.v.bmrmal<-signif(p.v.bmrmal[2,4], digits = 3)
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(metabolic_rate))) + 
   geom_abline(intercept = coef(BMR.mal)[1]*100, slope =  coef(BMR.mal)[2]*100,
               color = 'grey',size = 1.2) +
-  scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
   scale_y_continuous(
     breaks = c(0, 25,50,75,100),
     labels = c(0, 25,50,75,100))+
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Malignancy Prevalence (%)") +
-  xlab("(log10) Basal Metabolic Rate in Mammals") +
+  xlab("(log10) Basal Metabolic Rate") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Malignancy Prevalence vs. Metabolic Rate",  
        subtitle =bquote(p-value:.(p.v.bmrmal)~R^2:.(r.v.bmrmal)~Lambda:.(ld.v.bmrmal))) +
-  guides(colour = FALSE) +
+  guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(size="Total Necropsies")+
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   guides(size=guide_legend())+
   coord_cartesian(xlim = c(log10(min(cutData$metabolic_rate)),log10(max(cutData$metabolic_rate))),
                   ylim = c(0,75),clip = "off")+
-  annotate("text", x=0.85, y=87, label = "7", size = 7)
+  annotate("text", x=0.91, y=90.35, label = "7", size = 7)
 
 ggsave(filename='bmrmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
@@ -729,7 +728,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.*max_longe
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Adult Weight(g)*Longevity(Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse( NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Neoplasia Prevalence vs. Max Longevity*Weight",  
        subtitle =bquote(p-value:.(p.v.wxneo)~R^2:.(r.v.wxneo)~Lambda:.(ld.v.wxneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -791,7 +790,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.*max_long
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Adult Weight(g)*Longevity(Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Malignancy Prevalence vs. Max Longevity*Weight",  
        subtitle =bquote(p-value:.(p.v.wxmal)~R^2:.(r.v.wxmal)~Lambda:.(ld.v.wxmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -909,7 +908,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litters_year))) +
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Litter Size per Year") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Malignancy Prevalence vs. Litter Size per Year",  
        subtitle =bquote(p-value:.(p.v.lyearmal)~R^2:.(r.v.lyearmal)~Lambda:.(ld.v.lyearmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -967,7 +966,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(female_maturity.months.))
   ylab("Neoplasia Prevalence (%)") +
   xlab("Female Maturity (Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse( NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Neoplasia Prevalence vs. Female Maturity",  
        subtitle =bquote(p-value:.(p.v.fmaturityneo)~R^2:.(r.v.fmaturityneo)~Lambda:.(ld.v.fmaturityneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -1025,7 +1024,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(female_maturity.months.)
   ylab("Malignancy Prevalence (%)") +
   xlab("Female Maturity (Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Malignancy Prevalence vs. Female Maturity",  
        subtitle =bquote(p-value:.(p.v.fmaturitymal)~R^2:.(r.v.fmaturitymal)~Lambda:.(ld.v.fmaturitymal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -1083,7 +1082,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(male_maturity.months.))) 
   ylab("Neoplasia Prevalence (%)") +
   xlab("Male Maturity (Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse( NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Neoplasia Prevalence vs. Male Maturity",  
        subtitle =bquote(p-value:.(p.v.Mmaturityneo)~R^2:.(r.v.Mmaturityneo)~Lambda:.(ld.v.Mmaturityneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -1141,7 +1140,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(male_maturity.months.)))
   ylab("Malignancy Prevalence (%)") +
   xlab("Male Maturity (Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Malignancy Prevalence vs. Male Maturity",  
        subtitle =bquote(p-value:.(p.v.Mmaturitymal)~R^2:.(r.v.Mmaturitymal)~Lambda:.(ld.v.Mmaturitymal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -1199,7 +1198,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(weaning_weight.g.))) +
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Weaning Weight (g)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse( NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Neoplasia Prevalence vs. Weaning Weight",  
        subtitle =bquote(p-value:.(p.v.weanwneo)~R^2:.(r.v.weanwneo)~Lambda:.(ld.v.weanwneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -1257,7 +1256,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(weaning_weight.g.))) +
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Weaning Weight (g)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Malignancy Prevalence vs. Weaning Weight",  
        subtitle =bquote(p-value:.(p.v.weanwmal)~R^2:.(r.v.weanwmal)~Lambda:.(ld.v.weanwmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -1315,7 +1314,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(growth_rate.1.days.))) +
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Growth Rate") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse( NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Neoplasia Prevalence vs. Growth Rate",  
        subtitle =bquote(p-value:.(p.v.GrowthRneo)~R^2:.(r.v.GrowthRneo)~Lambda:.(ld.v.GrowthRneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -1373,7 +1372,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(growth_rate.1.days.))) +
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Growth Rate") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Malignancy Prevalence vs. Growth Rate",  
        subtitle =bquote(p-value:.(p.v.GrowthRmal)~R^2:.(r.v.GrowthRmal)~Lambda:.(ld.v.GrowthRmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -1435,7 +1434,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)+log10(Ge
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Adult Weight(g)+Gestation(Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse( NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence ==0) | NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Neoplasia Prevalence vs. Max Longevity+Gestation",  
        subtitle =bquote(p-value:.(p.v.wpneo)~R^2:.(r.v.wpneo)~Lambda:.(ld.v.wpneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
@@ -1500,7 +1499,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.months.)+log10
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Adult Weight(g)+Gestation(Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  geom_text_repel(aes(label=ifelse((MalignancyPrevalence ==0) | MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Malignancy Prevalence vs. Max Longevity+Gestation",  
        subtitle =bquote(p-value:.(p.v.wpmal)~R^2:.(r.v.wpmal)~Lambda:.(ld.v.wpmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
