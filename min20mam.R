@@ -108,7 +108,7 @@ p.v.adult.weight.neo<-signif(p.v.adult.weight.neo[2,4], digits = 2)
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)))+
   scale_color_manual(values = c("Mammalia" = "#631879FF" ),)+
   scale_y_continuous(
-    limits = c(0,75),
+
     breaks = c(0, 25,50,75),
     labels = c(0, 25,50,75))+
   geom_abline(intercept = coef(adult.weight.neo)[1]*100, slope =  coef(adult.weight.neo)[2]*100,
@@ -133,11 +133,11 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)))+
   #SELIN: Add these 3 lines to the end of every model. Then change label="21" to whatever number model. 
   coord_cartesian(xlim = c(log10(min(cutData$adult_weight.g.)),log10(max(cutData$adult_weight.g.))),
                   ylim = c(0,75),clip = "off")+
-  annotate("text", x=.39, y=83.5, label = "21", size = 7)
+  annotate("text", x=.42, y=83.8, label = "21", size = 7)
 
 
 
-ggsave(filename='S21wgtneo.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+ggsave(filename='S21wgtneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 #adult weight mal
@@ -176,9 +176,10 @@ p.v.adult.weight.mal<-signif(p.v.adult.weight.mal[2,4], digits = 3)
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)))+
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
-    breaks = c(0, 25,50,75),
-    labels = c(0, 25,50,75))+
+    breaks = c(0, 25,45),
+    labels = c(0, 25,45))+
+  coord_cartesian(xlim = c(log10(min(cutData$adult_weight.g.)),log10(max(cutData$adult_weight.g.))),
+                  ylim = c(0,45),clip = "off")+
   geom_abline(intercept = coef(adult.weight.mal)[1]*100, slope =  coef(adult.weight.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -186,20 +187,21 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)))+
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Adult Weight (g)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+  labs(title = "Malignancy Prevalence vs. Adult Weight",
-                                                                                                                                               subtitle =bquote(p-value:.(p.v.adult.weight.mal)~R^2:.(r.v.adult.weight.mal)~Lambda:.(ld.v.adult.weight.mal))) +
-  guides(colour = guide_legend(override.aes = list(size=5))) +
+  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+  
+  labs(title = "Malignancy Prevalence vs. Adult Weight",
+  subtitle =bquote(p-value:.(p.v.adult.weight.mal)~R^2:.(r.v.adult.weight.mal)~Lambda:.(ld.v.adult.weight.mal))) +
+  guides(colour = FALSE) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
 guides(size=guide_legend())+
-  coord_cartesian(xlim = c(log10(min(cutData$adult_weight.g.)),log10(max(cutData$adult_weight.g.))),
-                  ylim = c(0,75),clip = "off")+
-  annotate("text", x=.39, y=83.5, label = "22", size = 7)
+    annotate("text", x=.42, y=50.2, label = "22", size = 7)
+  
 
 
 
-ggsave(filename='S22wgtmal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+
+ggsave(filename='S22wgtmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #gestation models
 #gestation neo
@@ -233,10 +235,10 @@ ld.v.gestneo <- signif(ld.v.gestneo[1], digits = 2)
 p.v.gestneo<-summary(gestation.neo)$tTable
 p.v.gestneo<-signif(p.v.gestneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=Gestation.months.)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(Gestation.months.))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
+
     breaks = c(0, 25,50,75),
     labels = c(0, 25,50,75))+
   geom_abline(intercept = coef(gestation.neo)[1]*100, slope =  coef(gestation.neo)[2]*100,
@@ -256,13 +258,13 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=Gestation.months.)) + scale_x_c
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
-  coord_cartesian(xlim = c(log10(min(cutData$adult_weight.g.)),log10(max(cutData$adult_weight.g.))),
+  coord_cartesian(xlim = c(min(log10(cutData$Gestation.months.)),max(log10(cutData$Gestation.months.))),
                   ylim = c(0,75),clip = "off")+
-  annotate("text", x=.39, y=83.5, label = "21", size = 7)
+  annotate("text", x=-.53, y=83.8, label = "23", size = 7)
 
 
 
-ggsave(filename='gestneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S23gestneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #gestation mal
 cutData <- Data[,c(5,9,10,11,17,30,42),drop=FALSE] 
@@ -295,12 +297,14 @@ ld.v.gestmal<- signif(ld.v.gestmal[1], digits = 2)
 p.v.gestmal<-summary(gestation.mal)$tTable
 p.v.gestmal<-signif(p.v.gestmal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=Gestation.months.)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
-    breaks = c(0, 25,50,75),
-    labels = c(0, 25,50,75))+
+
+    breaks = c(0, 25,45),
+    labels = c(0, 25,45))+
+  coord_cartesian(xlim = c(log10(min(cutData$Gestation.months.)),log10(max(cutData$Gestation.months.))),
+                  ylim = c(0,45),clip = "off")+
   geom_abline(intercept = coef(gestation.mal)[1]*100, slope =  coef(gestation.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -317,10 +321,11 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=Gestation.months.)) + scale_x_
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  annotate("text", x=-.53, y=50.2, label = "24", size = 7)
 
 
-ggsave(filename='gestmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S24gestmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #litter size models 
 #litter size neo
@@ -352,10 +357,10 @@ ld.v.litneo <- signif(ld.v.litneo[1], digits = 2)
 p.v.litneo<-summary(litter.neo)$tTable
 p.v.litneo<-signif(p.v.litneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=litter_size)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litter_size))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
+
     breaks = c(0, 25,50,75),
     labels = c(0, 25,50,75))+
   geom_abline(intercept = coef(litter.neo)[1]*100, slope =  coef(litter.neo)[2]*100,
@@ -374,10 +379,13 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=litter_size)) + scale_x_continu
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  coord_cartesian(xlim = c(log10(min(cutData$litter_size)),log10(max(cutData$litter_size))),
+                  ylim = c(0,75),clip = "off")+
+  annotate("text", x=-.13, y=83.8, label = "25", size = 7)
 
 
-ggsave(filename='litneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S25litneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #litter size mal
 cutData <- Data[,c(5,9,10,11,17,33,42),drop=FALSE] 
@@ -409,12 +417,14 @@ ld.v.litmal <- signif(ld.v.litmal[1], digits = 2)
 p.v.litmal<-summary(litter.mal)$tTable
 p.v.litmal<-signif(p.v.litmal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=litter_size)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litter_size))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
-    breaks = c(0, 25,50,75),
-    labels = c(0, 25,50,75))+
+
+    breaks = c(0, 25,45),
+    labels = c(0, 25,45))+
+  coord_cartesian(xlim = c(log10(min(cutData$litter_size)),log10(max(cutData$litter_size))),
+                  ylim = c(0,45),clip = "off")+
   geom_abline(intercept = coef(litter.mal)[1]*100, slope =  coef(litter.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -431,10 +441,11 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=litter_size)) + scale_x_contin
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  annotate("text", x=-.13, y=50.3, label = "26", size = 7)
 
 
-ggsave(filename='litmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S26litmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 ### Longevity model
 #longevity neo
@@ -470,12 +481,14 @@ ld.v.longneo <- signif(ld.v.longneo[1], digits = 2)
 p.v.longneo<-summary(longevity.neo)$tTable
 p.v.longneo<-signif(p.v.longneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=max_longevity.months.)) + scale_x_continuous()+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(max_longevity.months.))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
+
     breaks = c(0, 25,50,75),
     labels = c(0, 25,50,75))+
+  coord_cartesian(xlim = c(log10(min(cutData$max_longevity.months.)),log10(max(cutData$max_longevity.months.))),
+                  ylim = c(0,75),clip = "off")+
   geom_abline(intercept = coef(longevity.neo)[1]*100, slope =  coef(longevity.neo)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -489,14 +502,15 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=max_longevity.months.)) + scale
   geom_text_repel(aes(label=ifelse( NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   labs(title = "Neoplasia Prevalence vs. Max Longevity in Mammals",  
        subtitle =bquote(p-value:.(p.v.longneo)~R^2:.(r.v.longneo)~Lambda:.(ld.v.longneo))) +
-  guides(colour = guide_legend(override.aes = list(size=5))) +
+  guides(colour = FALSE) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
-  labs(colour="Clade", size="Total Necropsies")
+  labs(colour="Clade", size="Total Necropsies")+
+  annotate("text", x=1.565, y=83.8, label = "27", size = 7)
 
 
-ggsave(filename='longneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S27longneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #longevity mal
 
@@ -531,12 +545,14 @@ ld.v.longmal <- signif(ld.v.longmal[1])
 p.v.longmal<-summary(longevity.mal)$tTable
 p.v.longmal<-signif(p.v.longmal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=max_longevity.months.)) + scale_x_continuous()+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(max_longevity.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
-    breaks = c(0, 25,50,75),
-    labels = c(0, 25,50,75))+
+
+    breaks = c(0, 25,45),
+    labels = c(0, 25,45))+
+  coord_cartesian(xlim = c(log10(min(cutData$max_longevity.months.)),log10(max(cutData$max_longevity.months.))),
+                  ylim = c(0,45),clip = "off")+
   geom_abline(intercept = coef(longevity.mal)[1]*100, slope =  coef(longevity.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -553,10 +569,11 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=max_longevity.months.)) + scal
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  annotate("text", x=1.565, y=50.2, label = "28", size = 7)
 
 
-ggsave(filename='longmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S28longmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 ##BMR models
 #bmr neo
@@ -593,10 +610,10 @@ ld.v.bmrneo <- signif(ld.v.bmrneo[1], digits = 2)
 p.v.bmrneo<-summary(BMR.neo)$tTable
 p.v.bmrneo<-signif(p.v.bmrneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=metabolic_rate)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(metabolic_rate))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
+
     breaks = c(0, 25,50,75),
     labels = c(0, 25,50,75))+
   geom_abline(intercept = coef(BMR.neo)[1]*100, slope =  coef(BMR.neo)[2]*100,
@@ -615,11 +632,13 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=metabolic_rate)) + scale_x_cont
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(size="Total Necropsies")
-guides(colour=FALSE)
+  theme(legend.position = "bottom")+   labs(size="Total Necropsies")+guides(colour=FALSE)+
+  coord_cartesian(xlim = c(log10(min(cutData$metabolic_rate)),log10(max(cutData$metabolic_rate))),
+                  ylim = c(0,75),clip = "off")+
+  annotate("text", x=.9, y=83.8, label = "29", size = 7)
 
 
-ggsave(filename='bmrneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S29bmrneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #bmr mal
 
@@ -655,12 +674,14 @@ ld.v.bmrmal <- signif(ld.v.bmrmal[1], digits = 2)
 p.v.bmrmal<-summary(BMR.mal)$tTable
 p.v.bmrmal<-signif(p.v.bmrmal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=metabolic_rate)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(metabolic_rate)))+ 
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
-    breaks = c(0, 25,50,75),
-    labels = c(0, 25,50,75))+
+
+    breaks = c(0, 25,45),
+    labels = c(0, 25,45))+
+  coord_cartesian(xlim = c(log10(min(cutData$metabolic_rate)),log10(max(cutData$metabolic_rate))),
+                  ylim = c(0,45),clip = "off")+
   geom_abline(intercept = coef(BMR.mal)[1]*100, slope =  coef(BMR.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -677,10 +698,11 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=metabolic_rate)) + scale_x_con
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  annotate("text", x=.9, y=50.2, label = "30", size = 7)
 
 
-ggsave(filename='bmrmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S30bmrmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #wxl models #weight and longevity
 #wxl neo
@@ -716,12 +738,14 @@ ld.v.wxneo <- signif(ld.v.wxneo[1], digits = 2)
 p.v.wxneo<-summary(wxl.neo)$tTable
 p.v.wxneo<-signif(p.v.wxneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=adult_weight.g.*max_longevity.months.)) + scale_x_continuous(trans='log10')+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)*log10(max_longevity.months.))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
+
     breaks = c(0, 25,50,75),
     labels = c(0, 25,50,75))+
+  coord_cartesian(xlim = c((min(log10(cutData$adult_weight.g.)*log10(cutData$max_longevity.months.))),max(log10(cutData$adult_weight.g.)*log10(cutData$max_longevity.months.))),
+                  ylim = c(0,75),clip = "off")+
   geom_abline(intercept = coef(wxl.neo)[1]*100, slope =  coef(wxl.neo)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -738,10 +762,11 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=adult_weight.g.*max_longevity.m
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  annotate("text", x=.18, y=83.8, label = "31", size = 7)
 
 
-ggsave(filename='wgtlongneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S31wgtlongneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #wxl mal
 cutData <- Data[,c(5,9,10,11,17,40,38,42),drop=FALSE] 
@@ -776,12 +801,14 @@ ld.v.wxmal <- signif(ld.v.wxmal[1], digits = 2)
 p.v.wxmal<-summary(wxl.mal)$tTable
 p.v.wxmal<-signif(p.v.wxmal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=adult_weight.g.*max_longevity.months.)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)*log10(max_longevity.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
-    breaks = c(0, 25,50,75),
-    labels = c(0, 25,50,75))+
+
+    breaks = c(0, 25,45),
+    labels = c(0, 25,45))+
+  coord_cartesian(xlim = c((min(log10(cutData$adult_weight.g.)*log10(cutData$max_longevity.months.))),max(log10(cutData$adult_weight.g.)*log10(cutData$max_longevity.months.))),
+                  ylim = c(0,45),clip = "off")+
   geom_abline(intercept = coef(wxl.mal)[1]*100, slope =  coef(wxl.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -798,7 +825,11 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=adult_weight.g.*max_longevity.
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  annotate("text", x=.18, y=50.2, label = "32", size = 7)
+
+ggsave(filename='S32wxlmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
 
 
 
@@ -832,10 +863,10 @@ ld.v.lyearneo <- signif(ld.v.lyearneo[1], digits = 2)
 p.v.lyearneo<-summary(lityear.neo)$tTable
 p.v.lyearneo<-signif(p.v.lyearneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=litters_year)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litters_year))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
+
     breaks = c(0, 25,50,75),
     labels = c(0, 25,50,75))+
   geom_abline(intercept = coef(lityear.neo)[1]*100, slope =  coef(lityear.neo)[2]*100,
@@ -855,9 +886,12 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=litters_year)) + scale_x_contin
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(size="Total Necropsies",colour="Clade")+
+  coord_cartesian(xlim = c(log10(min(cutData$litters_year)),log10(max(cutData$litters_year))),
+                  ylim = c(0,75),clip = "off")+
+  annotate("text", x=-.8, y=83.8, label = "33", size = 7)
   
   
-  ggsave(filename='lityearneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+  ggsave(filename='S33lityearneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #litter size mal
 cutData <- Data[,c(5,9,10,11,17,34,42),drop=FALSE] 
@@ -889,12 +923,14 @@ ld.v.lyearmal<- signif(ld.v.lyearmal[1], digits = 2)
 p.v.lyearmal<-summary(lityear.mal)$tTable
 p.v.lyearmal<-signif(p.v.lyearmal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=litters_year)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litters_year))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
-    breaks = c(0, 25,50,75),
-    labels = c(0, 25,50,75))+
+
+    breaks = c(0, 25,45),
+    labels = c(0, 25,45))+
+  coord_cartesian(xlim = c(log10(min(cutData$litters_year)),log10(max(cutData$litters_year))),
+                  ylim = c(0,45),clip = "off")+
   geom_abline(intercept = coef(lityear.mal)[1]*100, slope =  coef(lityear.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -911,10 +947,11 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=litters_year)) + scale_x_conti
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  annotate("text", x=-.8, y=50.2, label = "34", size = 7)
 
 
-ggsave(filename='lityearmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S34lityearmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 ####Female Maturity neo
 cutData <- Data[,c(5,9,10,11,13,28,42),drop=FALSE] 
@@ -946,10 +983,10 @@ ld.v.fmaturityneo <- signif(ld.v.fmaturityneo[1], digits = 2)
 p.v.fmaturityneo<-summary(Fmaturity.neo)$tTable
 p.v.fmaturityneo<-signif(p.v.fmaturityneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=female_maturity.months.)) + scale_x_continuous()+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(female_maturity.months.))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
+
     breaks = c(0, 25,50,75),
     labels = c(0, 25,50,75))+
   geom_abline(intercept = coef(Fmaturity.neo)[1]*100, slope =  coef(Fmaturity.neo)[2]*100,
@@ -968,10 +1005,13 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=female_maturity.months.)) + sca
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  coord_cartesian(xlim = c(log10(min(cutData$female_maturity.months.)),log10(max(cutData$female_maturity.months.))),
+                  ylim = c(0,75),clip = "off")+
+  annotate("text", x=-.08, y=83.8, label = "35", size = 7)
 
 
-ggsave(filename='femmatneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S35femmatneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Female Maturity Mal
 cutData <- Data[,c(5,9,10,11,17,28,42),drop=FALSE] 
@@ -1003,12 +1043,14 @@ ld.v.fmaturitymal <- signif(ld.v.fmaturitymal[1], digits = 2)
 p.v.fmaturitymal<-summary(Fmaturity.mal)$tTable
 p.v.fmaturitymal<-signif(p.v.fmaturitymal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=female_maturity.months.)) + scale_x_continuous()+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(female_maturity.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
-    breaks = c(0, 25,50,75),
-    labels = c(0, 25,50,75))+
+
+    breaks = c(0, 25,45),
+    labels = c(0, 25,45))+
+  coord_cartesian(xlim = c(log10(min(cutData$female_maturity.months.)),log10(max(cutData$female_maturity.months.))),
+                  ylim = c(0,45),clip = "off")+
   geom_abline(intercept = coef(Fmaturity.mal)[1]*100, slope =  coef(Fmaturity.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -1024,10 +1066,11 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=female_maturity.months.)) + sc
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  annotate("text", x=-.08, y=50.2, label = "36", size = 7)
 
 
-ggsave(filename='femmatmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S36femmatmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 ####Male Maturity neo
 cutData <- Data[,c(5,9,10,11,13,29,42),drop=FALSE] 
@@ -1059,10 +1102,10 @@ ld.v.Mmaturityneo <- signif(ld.v.Mmaturityneo[1], digits = 2)
 p.v.Mmaturityneo<-summary(Mmaturity.neo)$tTable
 p.v.Mmaturityneo<-signif(p.v.Mmaturityneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=male_maturity.months.)) + scale_x_continuous()+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(male_maturity.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
+
     breaks = c(0, 25,50,75),
     labels = c(0, 25,50,75))+
   geom_abline(intercept = coef(Mmaturity.neo)[1]*100, slope =  coef(Mmaturity.neo)[2]*100,
@@ -1081,10 +1124,13 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=male_maturity.months.)) + scale
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  coord_cartesian(xlim = c(log10(min(cutData$male_maturity.months.)),log10(max(cutData$male_maturity.months.))),
+                  ylim = c(0,75),clip = "off")+
+  annotate("text", x=-.08, y=83.8, label = "37", size = 7)
 
 
-ggsave(filename='malematneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S37malematneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Male Maturity Mal
 cutData <- Data[,c(5,9,10,11,17,29,42),drop=FALSE] 
@@ -1116,12 +1162,14 @@ ld.v.Mmaturitymal <- signif(ld.v.Mmaturitymal[1], digits = 2)
 p.v.Mmaturitymal<-summary(Mmaturity.mal)$tTable
 p.v.Mmaturitymal<-signif(p.v.Mmaturitymal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=male_maturity.months.)) + scale_x_continuous()+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(male_maturity.months.))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
-    breaks = c(0, 25,50,75),
-    labels = c(0, 25,50,75))+
+
+    breaks = c(0, 25,45),
+    labels = c(0, 25,45))+
+  coord_cartesian(xlim = c(log10(min(cutData$male_maturity.months.)),log10(max(cutData$male_maturity.months.))),
+                  ylim = c(0,45),clip = "off")+
   geom_abline(intercept = coef(Fmaturity.mal)[1]*100, slope =  coef(Fmaturity.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -1138,10 +1186,11 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=male_maturity.months.)) + scal
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  annotate("text", x=-.08, y=50.2, label = "38", size = 7)
 
 
-ggsave(filename='malematmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S38malematmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Weaning Weight neo
 cutData <- Data[,c(5,9,10,11,13,37,42),drop=FALSE] 
@@ -1173,10 +1222,10 @@ ld.v.weanwneo <- signif(ld.v.weanwneo[1], digits = 2)
 p.v.weanwneo<-summary(weanw.neo)$tTable
 p.v.weanwneo<-signif(p.v.weanwneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=weaning_weight.g.)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(weaning_weight.g.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
+
     breaks = c(0, 25,50,75),
     labels = c(0, 25,50,75))+
   geom_abline(intercept = coef(weanw.neo)[1]*100, slope =  coef(weanw.neo)[2]*100,
@@ -1195,10 +1244,13 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=weaning_weight.g.)) + scale_x_c
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  coord_cartesian(xlim = c(log10(min(cutData$weaning_weight.g.)),log10(max(cutData$weaning_weight.g.))),
+                  ylim = c(0,75),clip = "off")+
+  annotate("text", x=.42, y=83.8, label = "39", size = 7)
 
 
-ggsave(filename='weanneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S39weanneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Weaning Weight Mal
 cutData <- Data[,c(5,9,10,11,17,37,42),drop=FALSE] 
@@ -1230,12 +1282,14 @@ ld.v.weanwmal <- signif(ld.v.weanwmal[1], digits = 2)
 p.v.weanwmal<-summary(weanw.mal)$tTable
 p.v.weanwmal<-signif(p.v.weanwmal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=weaning_weight.g.)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(weaning_weight.g.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
-    breaks = c(0, 25,50,75),
-    labels = c(0, 25,50,75))+
+
+    breaks = c(0, 25,45),
+    labels = c(0, 25,45))+
+  coord_cartesian(xlim = c(log10(min(cutData$weaning_weight.g.)),log10(max(cutData$weaning_weight.g.))),
+                  ylim = c(0,45),clip = "off")+
   geom_abline(intercept = coef(Fmaturity.mal)[1]*100, slope =  coef(Fmaturity.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -1252,10 +1306,11 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=weaning_weight.g.)) + scale_x_
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  annotate("text", x=.42, y=50.2, label = "40", size = 7)
 
 
-ggsave(filename='weanmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S40weanmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Growth Rate Neo
 cutData <- Data[,c(5,9,10,11,13,39,42),drop=FALSE] 
@@ -1287,10 +1342,10 @@ ld.v.GrowthRneo <- signif(ld.v.GrowthRneo[1], digits = 2)
 p.v.GrowthRneo<-summary(GrowthR.neo)$tTable
 p.v.GrowthRneo<-signif(p.v.GrowthRneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=growth_rate.1.days.)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(growth_rate.1.days.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
+
     breaks = c(0, 25,50,75),
     labels = c(0, 25,50,75))+
   geom_abline(intercept = coef(GrowthR.neo)[1]*100, slope =  coef(GrowthR.neo)[2]*100,
@@ -1309,10 +1364,13 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=growth_rate.1.days.)) + scale_x
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  coord_cartesian(xlim = c(log10(min(cutData$growth_rate.1.days.)),log10(max(cutData$growth_rate.1.days.))),
+                  ylim = c(0,75),clip = "off")+
+  annotate("text", x=-3.29, y=83.8, label = "41", size = 7)
 
 
-ggsave(filename='growneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S41growneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Growth Rate Mal
 cutData <- Data[,c(5,9,10,11,17,39,42),drop=FALSE] 
@@ -1344,12 +1402,14 @@ ld.v.GrowthRmal <- signif(ld.v.GrowthRmal[1], digits = 2)
 p.v.GrowthRmal<-summary(GrowthR.mal)$tTable
 p.v.GrowthRmal<-signif(p.v.GrowthRmal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=growth_rate.1.days.)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(growth_rate.1.days.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
-    breaks = c(0, 25,50,75),
-    labels = c(0, 25,50,75))+
+
+    breaks = c(0, 25,45),
+    labels = c(0, 25,45))+
+  coord_cartesian(xlim = c(log10(min(cutData$growth_rate.1.days.)),log10(max(cutData$growth_rate.1.days.))),
+                  ylim = c(0,45),clip = "off")+
   geom_abline(intercept = coef(GrowthR.mal)[1]*100, slope =  coef(GrowthR.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -1366,10 +1426,11 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=growth_rate.1.days.)) + scale_
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  annotate("text", x=-3.29, y=50.2, label = "42", size = 7)
 
 
-ggsave(filename='growmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S42growmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #w+g
 
@@ -1405,10 +1466,10 @@ ld.v.wpneo <- signif(ld.v.wpneo[1], digits = 2)
 p.v.wpneo<-summary(wpl.neo)$tTable
 p.v.wpneo<-signif(p.v.wpneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)+Gestation.months.)) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)+Gestation.months.)) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
+
     breaks = c(0, 25,50,75),
     labels = c(0, 25,50,75))+
   geom_abline(intercept = coef(wpl.neo)[1]*100, slope =  coef(wpl.neo)[2]*100,
@@ -1428,10 +1489,13 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)+Gestatio
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
-  labs(colour="Clade", size="Total Necropsies")
+  labs(colour="Clade", size="Total Necropsies")+
+  coord_cartesian(xlim = c((min(log10(cutData$adult_weight.g.)+cutData$Gestation.months.)),max(log10(cutData$adult_weight.g.)+cutData$Gestation.months.)),
+                  ylim = c(0,75),clip = "off")+
+  annotate("text", x=-.4, y=83.8, label = "43", size = 7)
 
 
-ggsave(filename='wgtgestneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S43wgtgestneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 #w+g mal
@@ -1468,12 +1532,14 @@ ld.v.wpmal <- signif(ld.v.wpmal[1], digits = 2)
 p.v.wpmal<-summary(wpl.mal)$tTable
 p.v.wpmal<-signif(p.v.wpmal[2,4], digits = 3)
 
-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=Gestation.months.+log10(adult_weight.g.))) + scale_x_continuous(trans = 'log10')+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=Gestation.months.+log10(adult_weight.g.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
-    limits = c(0,75),
-    breaks = c(0, 25,50,75),
-    labels = c(0, 25,50,75))+
+
+    breaks = c(0, 25,45),
+    labels = c(0, 25,45))+
+  coord_cartesian(xlim = c((min(log10(cutData$adult_weight.g.)+cutData$Gestation.months.)),max(log10(cutData$adult_weight.g.)+cutData$Gestation.months.)),
+                  ylim = c(0,45),clip = "off")+
   geom_abline(intercept = coef(wpl.mal)[1]*100, slope =  coef(wpl.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -1490,8 +1556,9 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=Gestation.months.+log10(adult_
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
-  labs(colour="Clade", size="Total Necropsies")
+  labs(colour="Clade", size="Total Necropsies")+
+  annotate("text", x=-.4, y=50.2, label = "44", size = 7)
 
 
 
-ggsave(filename='wgtgestmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S44wgtgestmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
