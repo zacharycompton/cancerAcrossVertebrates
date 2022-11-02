@@ -130,8 +130,7 @@ wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.))
   labs(colour="Clade", size="Total Necropsies")
 
 
-#ggsave(filename='wgtneo.pdf', width=13, height=7, limitsize=FALSE,bg="white", units = "cm")
-
+ggsave(filename='wgtneol.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #adult weight mal
 cutData <- Data[,c(5,9,10,11,17,38,42),drop=FALSE] 
@@ -807,6 +806,7 @@ ggsave(filename='S9wgtlongmal.pdf', width=13, height=10, limitsize=FALSE,bg="whi
 
 #litters per year neo
 cutData <- Data[,c(5,9,10,11,13,34,42),drop=FALSE] 
+cutData <- cutData[!(cutData$common_name %in% c("Dwarf caimen","Agassiz's desert tortoise","Egyptian snouted cobra","Mangrove snake","Tiger rat snake","Madagscar tree boa")),]
 cutData[cutData$litters_year < 0, ] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
@@ -868,6 +868,7 @@ ggsave(filename='litgest.pdf', width=9.5, height=18, limitsize=FALSE,bg="white")
 
 #litter per year mal
 cutData <- Data[,c(5,9,10,11,17,34,42),drop=FALSE] 
+cutData <- cutData[!(cutData$common_name %in% c("Dwarf caimen","Agassiz's desert tortoise","Egyptian snouted cobra","Mangrove snake","Tiger rat snake","Madagscar tree boa")),]
 cutData[cutData < 0] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
