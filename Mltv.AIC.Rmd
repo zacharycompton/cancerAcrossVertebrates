@@ -1,0 +1,362 @@
+---
+title: "Multivariant AIC Selection 05.19.22"
+author: "Zach Compton"
+date: "5/19/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, warning=F, message=FALSE}
+library(nlme)
+library(broom.mixed)
+library(huxtable)
+library(tidymodels)
+library(stringr)
+library(rms)
+library(phytools)
+library(geiger)
+library(caper)
+library(tidyverse)
+library(poolr)
+```
+
+```{r, echo=F, warning=F, message=F}
+modPgls.SEy = function (model, data, corClass = corBrownian, tree, se = NULL, 
+                        method = c("REML", "ML"), interval = c(0, 1000), corClassValue=1, sig2e=NULL, ...) 
+{
+  Call <- match.call()
+  corfunc <- corClass
+  spp <- rownames(data)
+  data <- cbind(data, spp)
+  if (is.null(se)) 
+    se <- setNames(rep(0, Ntip(tree)), tree$tip.label)[spp]
+  else se <- se[spp]
+  
+  lk <- function(sig2e, data, tree, model, ve, corfunc, spp) {
+    tree$edge.length <- tree$edge.length * sig2e
+    ii <- sapply(1:Ntip(tree), function(x, e) which(e == 
+                                                      x), e = tree$edge[, 2])
+    tree$edge.length[ii] <- tree$edge.length[ii] + ve[tree$tip.label]
+    vf <- diag(vcv(tree))[spp]
+    w <- varFixed(~vf)
+    COR <- corfunc(corClassValue, tree, form = ~spp, ...)
+    fit <- gls(model, data = cbind(data, vf), correlation = COR, 
+               method = method, weights = w)
+    -logLik(fit)
+  }
+  
+  if (is.null(sig2e)) {
+    fit <- optimize(lk, interval = interval, data = data, tree = tree, 
+                    model = model, ve = se^2, corfunc = corfunc, spp = spp)
+    sig2e=fit$minimum
+  }
+  
+  tree$edge.length <- tree$edge.length * sig2e
+  ii <- sapply(1:Ntip(tree), function(x, e) which(e == x), 
+               e = tree$edge[, 2])
+  tree$edge.length[ii] <- tree$edge.length[ii] + se[tree$tip.label]^2
+  vf <- diag(vcv(tree))[spp]
+  w <- varFixed(~vf)
+  obj <- gls(model, data = cbind(data, vf), correlation = corfunc(corClassValue, 
+                                                                  tree, form = ~spp, ...), weights = w, method = method)
+  obj$call <- Call
+  obj$sig2e <- sig2e
+  obj
+}
+
+#Internal function
+pglsSEyPagelToOptimizeLambda=function(lambda,model,data,tree,...) {
+  -logLik(modPgls.SEy(model=model,data=data,tree=tree,corClassValue=lambda,corClass=corPagel,fixed=T,...)) #Returns -logLikelihood of the pgls.SEy model with lambda fixed to the value of the lambda argument. sig2e will be optimized within modPgls.SEy unless given as an argument here
+}
+
+#Function intended for users
+pglsSEyPagel=function(model, data, tree, lambdaInterval=c(0,1),...){
+  optimizedModel=optimize(pglsSEyPagelToOptimizeLambda,lambdaInterval,model=model,data=data,tree=tree,...) #Optimizes lambda in the lambdaInterval using the pglsSEyPagelToOptimizeLambda function
+  return(modPgls.SEy(model=model,data=data,tree=tree,corClass=corPagel,fixed=T,corClassValue=optimizedModel$minimum,...)) #Returns the final model fit
+}
+
+
+```
+
+### Data & Trees
+```{r}
+Data <- read.csv("min20516.csv")
+tree <- read.tree("min20Fixed516.nwk")
+```
+
+Cut in the variables that we need for the complete multivariant regression that includes all sigificant variables. Significant variables include Gestation length, adult weight, litter size, and longevity. Pre-remove all NAs. 
+```{r}
+cutData <- Data[,c(5,9,10,11,13,30,34,38,40,42),drop=FALSE]
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+head(cutData)
+```
+
+Prune the phylogeny to match species.
+```{r}
+cutData$Species <- gsub(" ", "_", cutData$Species)
+includedSpecies <- cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+cat(nrow(cutData),"Species")
+
+```
+Set row names as Species name and extract Standard Error as a vector
+```{r}
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+```
+All significant variable regression
+```{r}
+mltv1.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(adult_weight.g.)+ log10(max_longevity.months.)+
+                          log10(litters_year) 
+                        ,data=cutData,tree=pruned.tree,se=SE,method = "ML")
+
+```
+
+```{r, echo = F}
+mod1 <- tidy(mltv1.neo)
+tab1 <-huxtable(mod1)
+print(tab1)
+```
+Grab R^2 for each life history var
+```{r}
+r.v.mltv1.neo <- summary(mltv1.neo)$corBeta
+r.v.wgt <- format(r.v.mltv1.neo[2,1])
+r.v.wgt <-signif(as.numeric(r.v.wgt )^2, digits= 2)
+cat("Weight:",r.v.wgt)
+r.v.long <- format(r.v.mltv1.neo[3,1])
+r.v.long<-signif(as.numeric(r.v.long)^2, digits= 2)
+cat("Longevity:",r.v.long)
+r.v.litter <- format(r.v.mltv1.neo[4,1])
+r.v.litter<-signif(as.numeric(r.v.litter)^2, digits= 2)
+cat("Litters per Year:",r.v.litter)
+
+```
+Combine p values
+```{r}
+p.v.mltv<-summary(mltv1.neo)$tTable
+p.v.mltvwgt<-signif(p.v.mltv[2,4], digits = 2)
+p.v.mltvlong<-signif(p.v.mltv[3,4], digits = 2)
+p.v.mltvlit<-signif(p.v.mltv[4,4], digits = 2)
+
+pvalues<-c(p.v.mltvwgt,p.v.mltvlong,p.v.mltvlit)
+
+combop<-fisher(pvalues)
+
+
+cat("Overall P-Value: ", as.numeric(combop[1]))
+
+```
+Lambda
+```{r}
+ld.v.mltv<- summary(mltv1.neo)$modelStruct$corStruct
+ld.v.mltv<- signif(ld.v.mltv[1], digits = 2)
+cat("Lambda:",ld.v.mltv)
+
+```
+
+
+
+
+
+Cut for weight and litters
+```{r}
+cutData <- Data[,c(5,9,10,11,13,30,34,38,42),drop=FALSE]
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+head(cutData)
+
+cutData$Species <- gsub(" ", "_", cutData$Species)
+includedSpecies <- cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+cat(nrow(cutData),"Species")
+
+```
+
+Weight + Litters per year
+```{r}
+wgtlit<-pglsSEyPagel(NeoplasiaPrevalence~log10(adult_weight.g.)+
+                          log10(litters_year),data=cutData,tree=pruned.tree,se=SE,method = "ML")
+```
+
+```{r,echo=F}
+mod2 <- tidy(wgtlit)
+tab2 <-huxtable(mod2)
+print(tab2)
+```
+Grab R^2 for each life history var
+```{r}
+r.v.wgtlit <- summary(wgtlit)$corBeta 
+r.v.wgt <- format(r.v.wgtlit[2,1])
+r.v.wgt <-signif(as.numeric(r.v.wgt )^2, digits= 2)
+cat("Weight:",r.v.wgt)
+r.v.litter <- format(r.v.wgtlit[3,1])
+r.v.litter<-signif(as.numeric(r.v.litter)^2, digits= 2)
+cat("Litter per Year:",r.v.litter)
+
+```
+Combine p values
+```{r}
+p.v.wgtlit<-summary(wgtlit)$tTable
+p.v.wgtlitwgt<-signif(p.v.wgtlit[2,4], digits = 2)
+p.v.wgtlitlit<-signif(p.v.wgtlit[3,4], digits = 2)
+
+
+pvalues<-c(p.v.wgtlitwgt,p.v.wgtlitlit)
+
+combopwgtlit<-fisher(pvalues)
+
+
+cat("Overall P-Value: ", as.numeric(combopwgtlit[1]))
+
+```
+
+Lambda
+```{r}
+ld.v.wgtlit<- summary(wgtlit)$modelStruct$corStruct
+ld.v.wgtlit<- signif(ld.v.wgtlit[1], digits = 2)
+cat("Lambda:",ld.v.wgtlit)
+
+```
+
+Recut Data for adult weight +long
+```{r}
+cutData <- Data[,c(5,9,10,11,13,38,40,42),drop=FALSE]
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+head(cutData)
+
+cutData$Species <- gsub(" ", "_", cutData$Species)
+includedSpecies <- cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+cat(nrow(cutData),"Species")
+```
+
+wgt+long
+```{r}
+wgtlong<-pglsSEyPagel(NeoplasiaPrevalence~log10(adult_weight.g.)+log10(max_longevity.months.)
+,data=cutData,tree=pruned.tree,se=SE,method = "ML")
+```
+
+```{r, echo = F}
+mod4 <- tidy(wgtlong)
+tab4 <-huxtable(mod4)
+print(tab4)
+```
+Grab R^2 for each life history var
+```{r}
+r.v.wgtlong <- summary(wgtlong)$corBeta 
+r.v.wgt <- format(r.v.wgtlong[2,1])
+r.v.wgt <-signif(as.numeric(r.v.wgt )^2, digits= 2)
+cat("Weight:",r.v.wgt)
+r.v.long <- format(r.v.wgtlong[3,1])
+r.v.long<-signif(as.numeric(r.v.long)^2, digits= 2)
+cat("Maximum Longevity:",r.v.long)
+
+```
+Combine p values
+```{r}
+p.v.wgtlong<-summary(wgtlong)$tTable
+p.v.wgtlongwgt<-signif(p.v.wgtlong[2,4], digits = 2)
+p.v.wgtlonglong<-signif(p.v.wgtlong[3,4], digits = 2)
+
+
+pvalues<-c(p.v.wgtlongwgt,p.v.wgtlonglong)
+
+combopwgtlong<-fisher(pvalues)
+
+
+cat("Overall P-Value: ", as.numeric(combopwgtlong[1]))
+
+```
+
+Lambda
+```{r}
+ld.v.wgtlong<- summary(wgtlong)$modelStruct$corStruct
+ld.v.wgtlong<- signif(ld.v.wgtlong[1], digits = 2)
+cat("Lambda:",ld.v.wgtlong)
+
+```
+
+Recut Data for adult weight
+```{r}
+cutData <- Data[,c(5,9,10,11,13,38,42),drop=FALSE]
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+head(cutData)
+
+cutData$Species <- gsub(" ", "_", cutData$Species)
+includedSpecies <- cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+cat(nrow(cutData),"Species")
+```
+
+
+Weight
+```{r}
+wgt<-pglsSEyPagel(NeoplasiaPrevalence~log10(adult_weight.g.)
+,data=cutData,tree=pruned.tree,se=SE,method = "ML")
+```
+
+```{r, echo = F}
+mod4 <- tidy(wgt)
+tab4 <-huxtable(mod4)
+print(tab4)
+```
+Grab R^2 
+
+```{r}
+r.v.wgt <- summary(wgt)$corBeta 
+r.v.wgt <- format(r.v.wgt[2,1])
+r.v.wgt <-signif(as.numeric(r.v.wgt )^2, digits= 2)
+cat("Weight:",r.v.wgt)
+```
+
+Lambda
+```{r}
+ld.v.wgtlong<- summary(wgtlong)$modelStruct$corStruct
+ld.v.wgtlong<- signif(ld.v.wgtlong[1], digits = 2)
+cat("Lambda:",ld.v.wgtlong)
+
+```
+
+## AIC
+```{r}
+aicScores <- data.frame("All Variables" = AIC(mltv1.neo), "Adult weight + Litters per Year"=AIC(wgtlit), 
+            "Adult weight + Longevity" =AIC(wgtlong), 
+              "Adult weight" = AIC(wgt))
+aicScores
+```
+
