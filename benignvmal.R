@@ -8,7 +8,7 @@ library(cowplot)
 cleanPath <- read.csv("cleanPath.min20.062822.csv")
 min20Data <- read.csv("min20516.csv")
 view(min20Data)
-malben<-lm(MalignancyPrevalence~BenignPrevalence,data = min20Data)
+malben<-lm(MalignancyPrevalence~BenignPrevalence,data = min20Data) 
 summary(malben)
 summary(malben)$r.squared
 summary(malben)$coefficients 
