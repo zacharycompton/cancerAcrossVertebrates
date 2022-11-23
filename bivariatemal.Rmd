@@ -1,0 +1,730 @@
+---
+title: "bivarmal"
+author: "Walker Mellon"
+date: "2022-10-17"
+output: html_document
+---
+
+
+```{r}
+library(nlme)
+library(rms)
+library(phytools)
+library(geiger)
+library(caper)
+library(tidyverse)
+library(cowplot)
+library(ggrepel)
+library(ggsci)
+library(patchwork)
+
+#make sure to run all of this before you get to work.
+#pgls sey base (just run all of this)
+modPgls.SEy = function (model, data, corClass = corBrownian, tree, se = NULL, 
+                        method = c("REML", "ML"), interval = c(0, 1000), corClassValue=1, sig2e=NULL, ...) 
+{
+  Call <- match.call()
+  corfunc <- corClass
+  spp <- rownames(data)
+  data <- cbind(data, spp)
+  if (is.null(se)) 
+    se <- setNames(rep(0, Ntip(tree)), tree$tip.label)[spp]
+  else se <- se[spp]
+  
+  lk <- function(sig2e, data, tree, model, ve, corfunc, spp) {
+    tree$edge.length <- tree$edge.length * sig2e
+    ii <- sapply(1:Ntip(tree), function(x, e) which(e == 
+                                                      x), e = tree$edge[, 2])
+    tree$edge.length[ii] <- tree$edge.length[ii] + ve[tree$tip.label]
+    vf <- diag(vcv(tree))[spp]
+    w <- varFixed(~vf)
+    COR <- corfunc(corClassValue, tree, form = ~spp, ...)
+    fit <- gls(model, data = cbind(data, vf), correlation = COR, 
+               method = method, weights = w)
+    -logLik(fit)
+  }
+  
+  if (is.null(sig2e)) {
+    fit <- optimize(lk, interval = interval, data = data, tree = tree, 
+                    model = model, ve = se^2, corfunc = corfunc, spp = spp)
+    sig2e=fit$minimum
+  }
+  
+  tree$edge.length <- tree$edge.length * sig2e
+  ii <- sapply(1:Ntip(tree), function(x, e) which(e == x), 
+               e = tree$edge[, 2])
+  tree$edge.length[ii] <- tree$edge.length[ii] + se[tree$tip.label]^2
+  vf <- diag(vcv(tree))[spp]
+  w <- varFixed(~vf)
+  obj <- gls(model, data = cbind(data, vf), correlation = corfunc(corClassValue, 
+                                                                  tree, form = ~spp, ...), weights = w, method = method)
+  obj$call <- Call
+  obj$sig2e <- sig2e
+  obj
+}
+
+#Internal function
+pglsSEyPagelToOptimizeLambda=function(lambda,model,data,tree,...) {
+  -logLik(modPgls.SEy(model=model,data=data,tree=tree,corClassValue=lambda,corClass=corPagel,fixed=T,...)) #Returns -logLikelihood of the pgls.SEy model with lambda fixed to the value of the lambda argument. sig2e will be optimized within modPgls.SEy unless given as an argument here
+}
+
+#Function intended for users
+pglsSEyPagel=function(model, data, tree, lambdaInterval=c(0,1),...){
+  optimizedModel=optimize(pglsSEyPagelToOptimizeLambda,lambdaInterval,model=model,data=data,tree=tree,...) #Optimizes lambda in the lambdaInterval using the pglsSEyPagelToOptimizeLambda function
+  return(modPgls.SEy(model=model,data=data,tree=tree,corClass=corPagel,fixed=T,corClassValue=optimizedModel$minimum,...)) #Returns the final model fit
+}
+
+setwd("/Users/walkermellon/Documents/cav/cancerAcrossVertebrates")
+#read data
+Data <- read.csv("min20516.csv")
+View(Data)
+```
+
+Weight x Longevity mal
+```{r}
+#wxl mal
+#ignore all these setwd, just a quick fix for r markdown knitting error
+setwd("/Users/walkermellon/Documents/cav/cancerAcrossVertebrates")
+cutData <- Data[,c(5,9,10,11,17,40,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies <- cutData$Species
+
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+
+wxl.mal<-pglsSEyPagel(MalignancyPrevalence~log10(max_longevity.months.*adult_weight.g.),data=cutData,
+                      tree=pruned.tree,method="ML",se=SE)
+
+summary(wxl.mal)
+
+r.v.wxmal <- summary(wxl.mal)$corBeta
+r.v.wxmal <- format(r.v.wxmal[2,1])
+r.v.wxmal <-signif(as.numeric(r.v.wxmal)^2, digits= 2)
+ld.v.wxmal<- summary(wxl.mal)$modelStruct$corStruct
+ld.v.wxmal <- signif(ld.v.wxmal[1], digits = 2)
+p.v.wxmal<-summary(wxl.mal)$tTable
+p.v.wxmal<-signif(p.v.wxmal[2,4], digits = 3)
+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.*max_longevity.months.))) + 
+  scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
+  scale_y_continuous(
+    breaks = c(0, 25,50,75),
+    labels = c(0, 25,50,75))+
+  geom_abline(intercept = coef(wxl.mal)[1]*100, slope =  coef(wxl.mal)[2]*100,
+              color = 'grey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Malignancy Prevalence (%)") +
+  xlab("(log10) Adult Weight(g)*Longevity(Mo)") +
+  geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
+  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  labs(title = "Malignancy Prevalence vs. Max Longevity*Weight") +
+  guides(colour = guide_legend(override.aes = list(size=5))) +
+  theme(
+    plot.title = element_text(size = 20, face = "bold")) +
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  guides(size=guide_legend())+
+  coord_cartesian(xlim = c((min(log10(cutData$adult_weight.g.*cutData$max_longevity.months.))),max(log10(cutData$adult_weight.g.*cutData$max_longevity.months.))),
+                  ylim = c(0,75),clip = "off")
+
+ggsave(filename='wgtlongmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+```
+
+Weight x Longevity mal
+```{r}
+#wxl mal
+setwd("/Users/walkermellon/Documents/cav/cancerAcrossVertebrates")
+
+cutData <- Data[,c(5,9,10,11,17,40,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies <- cutData$Species
+
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+
+wxl.mal<-pglsSEyPagel(MalignancyPrevalence~log10(max_longevity.months.*adult_weight.g.),data=cutData,
+                      tree=pruned.tree,method="ML",se=SE)
+
+summary(wxl.mal)
+
+r.v.wxmal <- summary(wxl.mal)$corBeta
+r.v.wxmal <- format(r.v.wxmal[2,1])
+r.v.wxmal <-signif(as.numeric(r.v.wxmal)^2, digits= 2)
+ld.v.wxmal<- summary(wxl.mal)$modelStruct$corStruct
+ld.v.wxmal <- signif(ld.v.wxmal[1], digits = 2)
+p.v.wxmal<-summary(wxl.mal)$tTable
+p.v.wxmal<-signif(p.v.wxmal[2,4], digits = 3)
+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.*max_longevity.months.))) +
+  scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
+  scale_y_continuous(
+    breaks = c(0, 25,45),
+    labels = c(0, 25,45))+
+  coord_cartesian(xlim = c((min(log10(cutData$adult_weight.g.*cutData$max_longevity.months.))),max(log10(cutData$adult_weight.g.*cutData$max_longevity.months.))),
+                  ylim = c(0,45),clip = "off")+
+  geom_abline(intercept = coef(wxl.mal)[1]*100, slope =  coef(wxl.mal)[2]*100,
+              color = 'grey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Malignancy Prevalence (%)") +
+  xlab("(log10) Adult Weight(g)*Longevity(Mo)") +
+  geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
+  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  labs(title = "Malignancy Prevalence vs. Max Longevity*Weight") +
+  guides(colour = guide_legend(override.aes = list(size=5))) +
+  theme(
+    plot.title = element_text(size = 20, face = "bold")) +
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+
+ggsave(filename='wgtlongmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+```
+
+Long + Gestation
+```{r}
+#w+g
+setwd("/Users/walkermellon/Documents/cav/cancerAcrossVertebrates")
+
+
+cutData <- Data[,c(5,9,10,11,17,38,30,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies <- cutData$Species
+
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+
+wpl.mal<-pglsSEyPagel(MalignancyPrevalence~log10(Gestation.months.)+log10(adult_weight.g.),data=cutData,
+                      tree=pruned.tree,method="ML",se=SE)
+
+summary(wpl.mal)
+
+r.v.wpmal <- summary(wpl.mal)$corBeta
+r.v.wpmal <- format(r.v.wpmal[2,1])
+r.v.wpmal <-signif(as.numeric(r.v.wpmal)^2, digits= 2)
+ld.v.wpmal<- summary(wpl.mal)$modelStruct$corStruct
+ld.v.wpmal <- signif(ld.v.wpmal[1], digits = 2)
+p.v.wpmal<-summary(wpl.mal)$tTable
+p.v.wpmal<-signif(p.v.wpmal[2,4], digits = 3)
+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)+log10(Gestation.months.))) + 
+  scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
+  scale_y_continuous(
+    breaks = c(0, 25,50,75),
+    labels = c(0, 25,50,75))+
+  geom_abline(intercept = coef(wpl.mal)[1]*100, slope =  coef(wpl.mal)[2]*100,
+              color = 'grey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Malignancy Prevalence (%)") +
+  xlab("(log10) Adult Weight(g)+Gestation(Mo)") +
+  geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
+  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  labs(title = "Malignancy Prevalence vs. Max Longevity+Gestation") +
+  guides(colour = guide_legend(override.aes = list(size=5))) +
+  theme(
+    plot.title = element_text(size = 20, face = "bold")) +
+  theme(legend.position = "bottom")+
+  labs(colour="Clade", size="Total Necropsies")+
+  guides(size=guide_legend())+
+  coord_cartesian(xlim = c((min(log10(cutData$adult_weight.g.)+log10(cutData$Gestation.months.))),max(log10(cutData$adult_weight.g.)+log10(cutData$Gestation.months.))),
+                  ylim = c(0,75),clip = "off")
+
+ggsave(filename='gplongmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+```
+
+
+Long + Gestation Mal
+```{r}
+#w+g mal
+setwd("/Users/walkermellon/Documents/cav/cancerAcrossVertebrates")
+
+cutData <- Data[,c(5,9,10,11,17,38,30,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies <- cutData$Species
+
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+
+wpl.mal<-pglsSEyPagel(MalignancyPrevalence~Gestation.months.+log10(adult_weight.g.),data=cutData,
+                      tree=pruned.tree,method="ML",se=SE)
+
+summary(wpl.mal)
+
+r.v.wpmal <- summary(wpl.mal)$corBeta
+r.v.wpmal <- format(r.v.wpmal[2,1])
+r.v.wpmal <-signif(as.numeric(r.v.wpmal)^2, digits= 2)
+ld.v.wpmal<- summary(wpl.mal)$modelStruct$corStruct
+ld.v.wpmal <- signif(ld.v.wpmal[1], digits = 2)
+p.v.wpmal<-summary(wpl.mal)$tTable
+p.v.wpmal<-signif(p.v.wpmal[2,4], digits = 3)
+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.months.)+log10(adult_weight.g.))) +
+  scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
+  scale_y_continuous(
+    breaks = c(0, 25,45),
+    labels = c(0, 25,45))+
+  coord_cartesian(xlim = c((min(log10(cutData$adult_weight.g.)+log10(cutData$Gestation.months.))),max(log10(cutData$adult_weight.g.)+log10(cutData$Gestation.months.))),
+                  ylim = c(0,45),clip = "off")+
+  geom_abline(intercept = coef(wpl.mal)[1]*100, slope =  coef(wpl.mal)[2]*100,
+              color = 'grey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Malignancy Prevalence (%)") +
+  xlab("(log10) Adult Weight(g)+Gestation(Mo)") +
+  geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
+  geom_text_repel(aes(label=ifelse( MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  labs(title = "Malignancy Prevalence vs. Max Longevity+Gestation") +
+  guides(colour = guide_legend(override.aes = list(size=5))) +
+  theme(
+    plot.title = element_text(size = 20, face = "bold")) +
+  theme(legend.position = "bottom")+
+  labs(colour="Clade", size="Total Necropsies")
+
+ggsave(filename='gplongmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+
+```
+Litter Size + Gestattion
+```{r}
+#gestm + litter size
+setwd("/Users/walkermellon/Documents/cav/cancerAcrossVertebrates")
+
+cutData <- Data[,c(5,9,10,11,17,30,33,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies <- cutData$Species
+
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+
+lpg.mal<-pglsSEyPagel(MalignancyPrevalence~log10(Gestation.months.)+log10(litter_size),data=cutData,
+                      tree=pruned.tree,method="ML",se=SE)
+
+summary(lpg.mal)
+
+r.v.lpgmal <- summary(lpg.mal)$corBeta
+r.v.lpgmal <- format(r.v.lpgmal[2,1])
+r.v.lpgmal <-signif(as.numeric(r.v.lpgmal)^2, digits= 2)
+ld.v.lpgmal<- summary(lpg.mal)$modelStruct$corStruct
+ld.v.lpgmal <- signif(ld.v.lpgmal[1], digits = 2)
+p.v.lpgmal<-summary(lpg.mal)$tTable
+p.v.lpgmal<-signif(p.v.lpgmal[2,4], digits = 3)
+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litter_size)+log10(Gestation.months.))) + 
+  scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
+  scale_y_continuous(
+    breaks = c(0, 25,50,75),
+    labels = c(0, 25,50,75))+
+  geom_abline(intercept = coef(lpg.mal)[1]*100, slope =  coef(lpg.mal)[2]*100,
+              color = 'grey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Malignancy Prevalence (%)") +
+  xlab("(log10) Litter Size+Gestation(Mo)") +
+  geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
+  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  labs(title = "Malignancy Prevalence +. Litter Size+Gestation") +
+  guides(colour = guide_legend(override.aes = list(size=5))) +
+  theme(
+    plot.title = element_text(size = 20, face = "bold")) +
+  theme(legend.position = "bottom")+
+  labs(colour="Clade", size="Total Necropsies")+
+  guides(size=guide_legend())+
+  coord_cartesian(xlim = c((min(log10(cutData$litter_size)+log10(cutData$Gestation.months.))),max(log10(cutData$litter_size)+log10(cutData$Gestation.months.))),
+                  ylim = c(0,75),clip = "off")
+
+ggsave(filename='gplitmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+```
+Litter Size + Gestation mal
+```{r}
+#lit+g mal
+setwd("/Users/walkermellon/Documents/cav/cancerAcrossVertebrates")
+
+cutData <- Data[,c(5,9,10,11,17,30,33,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies <- cutData$Species
+
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+
+wpl.mal<-pglsSEyPagel(MalignancyPrevalence~log10(Gestation.months.)+log10(litter_size),data=cutData,
+                      tree=pruned.tree,method="ML",se=SE)
+
+summary(wpl.mal)
+
+r.v.wpmal <- summary(wpl.mal)$corBeta
+r.v.wpmal <- format(r.v.wpmal[2,1])
+r.v.wpmal <-signif(as.numeric(r.v.wpmal)^2, digits= 2)
+ld.v.wpmal<- summary(wpl.mal)$modelStruct$corStruct
+ld.v.wpmal <- signif(ld.v.wpmal[1], digits = 2)
+p.v.wpmal<-summary(wpl.mal)$tTable
+p.v.wpmal<-signif(p.v.wpmal[2,4], digits = 3)
+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.months.)+log10(litter_size))) +
+  scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
+  scale_y_continuous(
+    breaks = c(0, 25,45),
+    labels = c(0, 25,45))+
+  coord_cartesian(xlim = c((min(log10(cutData$litter_size)+log10(cutData$Gestation.months.))),max(log10(cutData$litter_size)+log10(cutData$Gestation.months.))),
+                  ylim = c(0,45),clip = "off")+
+  geom_abline(intercept = coef(wpl.mal)[1]*100, slope =  coef(wpl.mal)[2]*100,
+              color = 'grey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Malignancy Prevalence (%)") +
+  xlab("(log10) Litter Size+Gestation(Mo)") +
+  geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
+  geom_text_repel(aes(label=ifelse( MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  labs(title = "Malignancy Prevalence vs. Litter Sizey+Gestation") +
+  guides(colour = guide_legend(override.aes = list(size=5))) +
+  theme(
+    plot.title = element_text(size = 20, face = "bold")) +
+  theme(legend.position = "bottom")+
+  labs(colour="Clade", size="Total Necropsies")
+
+
+ggsave(filename='gplitmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+
+```
+
+Weight + Long mal
+```{r}
+#wpl mal
+setwd("/Users/walkermellon/Documents/cav/cancerAcrossVertebrates")
+
+cutData <- Data[,c(5,9,10,11,17,40,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies <- cutData$Species
+
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+
+wpl.mal<-pglsSEyPagel(MalignancyPrevalence~log10(adult_weight.g.)+log10(max_longevity.months.),data=cutData,
+                      tree=pruned.tree,method="ML",se=SE)
+
+summary(wpl.mal)
+
+r.v.wplmal <- summary(wpl.mal)$corBeta
+r.v.wplmal <- format(r.v.wplmal[2,1])
+r.v.wplmal <-signif(as.numeric(r.v.wplmal)^2, digits= 2)
+ld.v.wplmal<- summary(wpl.mal)$modelStruct$corStruct
+ld.v.wplmal <- signif(ld.v.wplmal[1], digits = 2)
+p.v.wplmal<-summary(wpl.mal)$tTable
+p.v.wplmal<-signif(p.v.wplmal[2,4], digits = 3)
+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)+log10(max_longevity.months.))) + 
+  scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
+  scale_y_continuous(
+    breaks = c(0, 25,50,75),
+    labels = c(0, 25,50,75))+
+  geom_abline(intercept = coef(wpl.mal)[1]*100, slope =  coef(wpl.mal)[2]*100,
+              color = 'grey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Malignancy Prevalence (%)") +
+  xlab("(log10) Adult Weight(g)+Longevity(Mo)") +
+  geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
+  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  labs(title = "Malignancy Prevalence vs. Max Longevity+Weight") +
+  guides(colour = guide_legend(override.aes = list(size=5))) +
+  theme(
+    plot.title = element_text(size = 20, face = "bold")) +
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  guides(size=guide_legend())+
+  coord_cartesian(xlim = c((min(log10(cutData$adult_weight.g.)+log10(cutData$max_longevity.months.))),max(log10(cutData$adult_weight.g.)+log10(cutData$max_longevity.months.))),
+                  ylim = c(0,75),clip = "off")
+
+ggsave(filename='wplongmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+```
+Weight + Long mal
+```{r}
+#wpl mal
+setwd("/Users/walkermellon/Documents/cav/cancerAcrossVertebrates")
+
+cutData <- Data[,c(5,9,10,11,17,40,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies <- cutData$Species
+
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+
+wpl.mal<-pglsSEyPagel(MalignancyPrevalence~log10(adult_weight.g.)+log10(max_longevity.months.),data=cutData,
+                      tree=pruned.tree,method="ML",se=SE)
+
+summary(wpl.mal)
+
+r.v.wplmal <- summary(wpl.mal)$corBeta
+r.v.wplmal <- format(r.v.wplmal[2,1])
+r.v.wplmal <-signif(as.numeric(r.v.wplmal)^2, digits= 2)
+ld.v.wplmal<- summary(wpl.mal)$modelStruct$corStruct
+ld.v.wplmal <- signif(ld.v.wplmal[1], digits = 2)
+p.v.wplmal<-summary(wpl.mal)$tTable
+p.v.wplmal<-signif(p.v.wplmal[2,4], digits = 3)
+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)+log10(max_longevity.months.))) +
+  scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
+  scale_y_continuous(
+    breaks = c(0, 25,45),
+    labels = c(0, 25,45))+
+  coord_cartesian(xlim = c((min(log10(cutData$adult_weight.g.)+log10(cutData$max_longevity.months.))),max(log10(cutData$adult_weight.g.)+log10(cutData$max_longevity.months.))),
+                  ylim = c(0,45),clip = "off")+
+  geom_abline(intercept = coef(wpl.mal)[1]*100, slope =  coef(wpl.mal)[2]*100,
+              color = 'grey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Malignancy Prevalence (%)") +
+  xlab("(log10) Adult Weight(g)+Longevity(Mo)") +
+  geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
+  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  labs(title = "Malignancy Prevalence vs. Max Longevity+Weight") +
+  guides(colour = guide_legend(override.aes = list(size=5))) +
+  theme(
+    plot.title = element_text(size = 20, face = "bold")) +
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+
+ggsave(filename='wplongmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+```
+Weight + Litter Size mal
+```{r}
+#wplit mal
+setwd("/Users/walkermellon/Documents/cav/cancerAcrossVertebrates")
+
+cutData <- Data[,c(5,9,10,11,17,33,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies <- cutData$Species
+
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+
+wpl.mal<-pglsSEyPagel(MalignancyPrevalence~log10(litter_size)+log10(adult_weight.g.),data=cutData,
+                      tree=pruned.tree,method="ML",se=SE)
+
+summary(wpl.mal)
+
+r.v.wplitmal <- summary(wpl.mal)$corBeta
+r.v.wplitmal <- format(r.v.wplitmal[2,1])
+r.v.wplitmal <-signif(as.numeric(r.v.wplitmal)^2, digits= 2)
+ld.v.wplitmal<- summary(wpl.mal)$modelStruct$corStruct
+ld.v.wplitmal <- signif(ld.v.wplitmal[1], digits = 2)
+p.v.wplitmal<-summary(wpl.mal)$tTable
+p.v.wplitmal<-signif(p.v.wplitmal[2,4], digits = 3)
+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litter_size)+log10(adult_weight.g.))) + 
+  scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
+  scale_y_continuous(
+    breaks = c(0, 25,50,75),
+    labels = c(0, 25,50,75))+
+  geom_abline(intercept = coef(wpl.mal)[1]*100, slope =  coef(wpl.mal)[2]*100,
+              color = 'grey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Malignancy Prevalence (%)") +
+  xlab("(log10) Adult Weight(g)+Litter Size") +
+  geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
+  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  labs(title = "Malignancy Prevalence vs. Litter Size+Weight") +
+  guides(colour = guide_legend(override.aes = list(size=5))) +
+  theme(
+    plot.title = element_text(size = 20, face = "bold")) +
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
+  guides(size=guide_legend())+
+  coord_cartesian(xlim = c((min(log10(cutData$litter_size)+log10(cutData$adult_weight.g.))),max(log10(cutData$litter_size)+log10(cutData$adult_weight.g.))),
+                  ylim = c(0,75),clip = "off")
+
+ggsave(filename='wplitmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+```
+Weight + Litter Size mal
+```{r}
+#wplit mal
+setwd("/Users/walkermellon/Documents/cav/cancerAcrossVertebrates")
+
+cutData <- Data[,c(5,9,10,11,17,33,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies <- cutData$Species
+
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+
+wpl.mal<-pglsSEyPagel(MalignancyPrevalence~log10(litter_size)+log10(adult_weight.g.),data=cutData,
+                      tree=pruned.tree,method="ML",se=SE)
+
+summary(wpl.mal)
+
+r.v.wplitmal <- summary(wpl.mal)$corBeta
+r.v.wplitmal <- format(r.v.wplitmal[2,1])
+r.v.wplitmal <-signif(as.numeric(r.v.wplitmal)^2, digits= 2)
+ld.v.wplitmal<- summary(wpl.mal)$modelStruct$corStruct
+ld.v.wplitmal <- signif(ld.v.wplitmal[1], digits = 2)
+p.v.wplitmal<-summary(wpl.mal)$tTable
+p.v.wplitmal<-signif(p.v.wplitmal[2,4], digits = 3)
+
+ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litter_size)+log10(adult_weight.g.))) +
+  scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
+  scale_y_continuous(
+    breaks = c(0, 25,45),
+    labels = c(0, 25,45))+
+  coord_cartesian(xlim = c((min(log10(cutData$litter_size)+log10(cutData$adult_weight.g.))),max(log10(cutData$litter_size)+log10(cutData$adult_weight.g.))),
+                  ylim = c(0,45),clip = "off")+
+  geom_abline(intercept = coef(wpl.mal)[1]*100, slope =  coef(wpl.mal)[2]*100,
+              color = 'grey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Malignancy Prevalence (%)") +
+  xlab("(log10) Litter Size+Adult Weight(g)") +
+  geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
+  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  labs(title = "Malignancy Prevalence vs. Litter Size+Weight") +
+  guides(colour = guide_legend(override.aes = list(size=5))) +
+  theme(
+    plot.title = element_text(size = 20, face = "bold")) +
+  theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")
+
+ggsave(filename='wplitmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+```

@@ -63,10 +63,10 @@ pglsSEyPagel=function(model, data, tree, lambdaInterval=c(0,1),...){
 }
 
 ## Here I split the csv into class but do whatever you want
-Data<-read.csv(file="min20RAD.csv")
+Data<-read.csv(file="min20RAD_UPDATE.csv")
 View(Data)
 
-tree<-read.tree(file="min20Fixed516.nwk")
+tree<-read.tree(file="min10radtree.nwk")
 
 
 
@@ -81,9 +81,13 @@ Data$Keep <- Data$Species %in% pruned.tree$tip.label
 Data <- Data[!(Data$Keep==FALSE),]
 rownames(Data)<-Data$Species
 SE<-setNames(Data$SE,Data$Species)[rownames(Data)]
+Data<-na.omit(Data)
 ##Model
 AUC.10.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(AUC10Gy), data=Data,
                             tree=pruned.tree,method="ML",se=SE)
+summary(AUC.10.GY)
+auc<-lm(NeoplasiaPrevalence~log10(AUC10Gy), data=Data)
+summary(auc)$r.squared
 
 r.AUC.10.GY <- summary(AUC.10.GY)$corBeta
 r.AUC.10.GY <- format(r.AUC.10.GY[2,1])
@@ -92,6 +96,7 @@ ld.v.AUC.10.GY<- summary(AUC.10.GY)$modelStruct$corStruct
 ld.v.AUC.10.GY <- signif(ld.v.AUC.10.GY[1], digits =2)
 p.v.AUC.10.GY<-summary(AUC.10.GY)$tTable
 p.v.AUC.10.GY<-signif(p.v.AUC.10.GY[2,4], digits = 2)
+
 
 
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC10Gy))) +
@@ -191,3 +196,235 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC04Gy))) +
   guides(col=FALSE)
 
 ggsave(filename='RADAUC04.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+
+##CHANGE 
+
+
+#10GY Change
+Change.10.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(Change10Gy), data=Data,
+                          tree=pruned.tree,method="ML",se=SE)
+
+r.Change.10.GY <- summary(Change.10.GY)$corBeta
+r.Change.10.GY <- format(r.Change.10.GY[2,1])
+r.Change.10.GY <-signif(as.numeric(r.Change.10.GY)^2, digits = 2)
+ld.v.Change.10.GY<- summary(Change.10.GY)$modelStruct$corStruct
+ld.v.Change.10.GY <- signif(ld.v.Change.10.GY[1], digits =2)
+p.v.Change.10.GY<-summary(Change.10.GY)$tTable
+p.v.Change.10.GY<-signif(p.v.Change.10.GY[2,4], digits = 2)
+
+
+ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(Change10Gy))) +
+  scale_color_manual(values=c("#631879FF"))+
+  geom_abline(intercept = coef(Change.10.GY)[1]*100, slope =  coef(Change.10.GY)[2]*100,
+              color = 'grey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Neoplasia Prevalence (%)") +
+  xlab("AUC Cell Count % Area Change from UT 10 Gy Radiation") +
+  geom_point(aes(colour= Keep, size = TotalRecords)) +
+  geom_text_repel(aes(label=common_name))+
+  scale_size(name   = "Total Necropsies",
+             breaks = c(20,150,250,394),
+             labels =  c(20,150,250,394))+
+  theme(
+    plot.title = element_text(size = 20, face = "bold")) +
+  theme(legend.position = "bottom")+
+  labs(title = "Neoplasia vs. AUC Area Change From UT 10Gy Radiation",
+       subtitle =bquote(p-value:.(p.v.Change.10.GY)~R^2:.(r.Change.10.GY)~Lambda:.(ld.v.Change.10.GY)))+
+  guides(col=FALSE)
+
+ggsave(filename='RADChange10.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+
+#Change 2
+
+
+
+##Model
+Change.2.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(Change2Gy), data=Data,
+                         tree=pruned.tree,method="ML",se=SE)
+
+r.Change.2.GY <- summary(Change.2.GY)$corBeta
+r.Change.2.GY <- format(r.Change.2.GY[2,1])
+r.Change.2.GY <-signif(as.numeric(r.Change.2.GY)^2, digits = 2)
+ld.v.Change.2.GY<- summary(Change.2.GY)$modelStruct$corStruct
+ld.v.Change.2.GY <- signif(ld.v.Change.2.GY[1], digits = 2)
+p.v.Change.2.GY<-summary(Change.2.GY)$tTable
+p.v.Change.2.GY<-signif(p.v.Change.2.GY[2,4], digits = 2)
+
+
+ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(Change2Gy))) +
+  scale_color_manual(values=c("#631879FF"))+
+  geom_abline(intercept = coef(Change.2.GY)[1]*100, slope =  coef(Change.2.GY)[2]*100,
+              color = 'grey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Neoplasia Prevalence (%)") +
+  xlab("AUC Cell Count % Area Change from UT 2 Gy Radiation") +
+  geom_point(aes(colour= Keep, size = TotalRecords)) +
+  geom_text_repel(aes(label=common_name))+
+  scale_size(name   = "Total Necropsies",
+             breaks = c(20,150,250,394),
+             labels =  c(20,150,250,394))+
+  theme(
+    plot.title = element_text(size = 20, face = "bold")) +
+  theme(legend.position = "bottom")+
+  labs(title = "Neoplasia vs. AUC Area Change From UT 2Gy Radiation",
+       subtitle =bquote(p-value:.(p.v.Change.2.GY)~R^2:.(r.Change.2.GY)~Lambda:.(ld.v.Change.2.GY)))+
+  guides(col=FALSE)
+
+ggsave(filename='RADChange2.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+
+#Change .4
+
+##Model
+Change.04.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(Change04Gy), data=Data,
+                          tree=pruned.tree,method="ML",se=SE)
+
+r.Change.04.GY <- summary(Change.04.GY)$corBeta
+r.Change.04.GY <- format(r.Change.04.GY[2,1])
+r.Change.04.GY <-signif(as.numeric(r.Change.04.GY)^2, digits = 3)
+ld.v.Change.04.GY<- summary(Change.04.GY)$modelStruct$corStruct
+ld.v.Change.04.GY <- signif(ld.v.Change.04.GY[1], digits = 2)
+p.v.Change.04.GY<-summary(Change.04.GY)$tTable
+p.v.Change.04.GY<-signif(p.v.Change.04.GY[2,4], digits = 2)
+
+
+ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(Change04Gy))) +
+  scale_color_manual(values=c("#631879FF"))+
+  geom_abline(intercept = coef(Change.04.GY)[1]*100, slope =  coef(Change.04.GY)[2]*100,
+              color = 'grey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Neoplasia Prevalence (%)") +
+  xlab("AUC Cell Count % Area Change from UT .4 Gy Radiation") +
+  geom_point(aes(colour= Keep, size = TotalRecords)) +
+  geom_text_repel(aes(label=common_name))+
+  scale_size(name   = "Total Necropsies",
+             breaks = c(20,150,250,394),
+             labels =  c(20,150,250,394))+
+  theme(
+    plot.title = element_text(size = 20, face = "bold")) +
+  theme(legend.position = "bottom")+
+  labs(title = "Neoplasia vs. AUC Area Change From UT .4Gy Radiation",
+       subtitle =bquote(p-value:.(p.v.Change.04.GY)~R^2:.(r.Change.04.GY)~Lambda:.(ld.v.Change.04.GY)))+
+  guides(col=FALSE)
+
+ggsave(filename='RADChange04.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+
+
+
+
+
+#malignancy
+
+
+#10GY Change
+Change.10.GY.mal <- pglsSEyPagel(MalignancyPrevalence~log10(Change10Gy), data=Data,
+                             tree=pruned.tree,method="ML",se=SE)
+
+r.Change.10.GY.mal <- summary(Change.10.GY.mal)$corBeta
+r.Change.10.GY.mal <- format(r.Change.10.GY.mal[2,1])
+r.Change.10.GY.mal <-signif(as.numeric(r.Change.10.GY.mal)^2, digits = 2)
+ld.v.Change.10.GY.mal<- summary(Change.10.GY.mal)$modelStruct$corStruct
+ld.v.Change.10.GY.mal <- signif(ld.v.Change.10.GY.mal[1], digits =2)
+p.v.Change.10.GY.mal<-summary(Change.10.GY.mal)$tTable
+p.v.Change.10.GY.mal<-signif(p.v.Change.10.GY.mal[2,4], digits = 2)
+
+
+ggplot(Data, aes(y=MalignancyPrevalence*100, x=log10(Change10Gy))) +
+  scale_color_manual(values=c("#631879FF"))+
+  geom_abline(intercept = coef(Change.10.GY.mal)[1]*100, slope =  coef(Change.10.GY.mal)[2]*100,
+              color = 'grey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Malignancy Prevalence (%)") +
+  xlab("AUC Cell Count % Area Change from UT 10 Gy Radiation") +
+  geom_point(aes(colour= Keep, size = TotalRecords)) +
+  geom_text_repel(aes(label=common_name))+
+  scale_size(name   = "Total Necropsies",
+             breaks = c(20,150,250,394),
+             labels =  c(20,150,250,394))+
+  theme(
+    plot.title = element_text(size = 20, face = "bold")) +
+  theme(legend.position = "bottom")+
+  labs(title = "Malignancy vs. AUC Area Change From UT 10Gy Radiation",
+       subtitle =bquote(p-value:.(p.v.Change.10.GY.mal)~R^2:.(r.Change.10.GY.mal)~Lambda:.(ld.v.Change.10.GY.mal)))+
+  guides(col=FALSE)
+
+ggsave(filename='RADChange10mal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+
+#Change 2
+
+
+
+##Model
+Change.2.GY.mal <- pglsSEyPagel(MalignancyPrevalence~log10(Change2Gy), data=Data,
+                            tree=pruned.tree,method="ML",se=SE)
+
+r.Change.2.GY.mal <- summary(Change.2.GY.mal)$corBeta
+r.Change.2.GY.mal <- format(r.Change.2.GY.mal[2,1])
+r.Change.2.GY.mal <-signif(as.numeric(r.Change.2.GY.mal)^2, digits = 2)
+ld.v.Change.2.GY.mal<- summary(Change.2.GY.mal)$modelStruct$corStruct
+ld.v.Change.2.GY.mal <- signif(ld.v.Change.2.GY.mal[1], digits = 2)
+p.v.Change.2.GY.mal<-summary(Change.2.GY.mal)$tTable
+p.v.Change.2.GY.mal<-signif(p.v.Change.2.GY.mal[2,4], digits = 2)
+
+
+ggplot(Data, aes(y=MalignancyPrevalence*100, x=log10(Change2Gy))) +
+  scale_color_manual(values=c("#631879FF"))+
+  geom_abline(intercept = coef(Change.2.GY.mal)[1]*100, slope =  coef(Change.2.GY.mal)[2]*100,
+              color = 'grey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Malignancy Prevalence (%)") +
+  xlab("AUC Cell Count % Area Change from UT 2 Gy Radiation") +
+  geom_point(aes(colour= Keep, size = TotalRecords)) +
+  geom_text_repel(aes(label=common_name))+
+  scale_size(name   = "Total Necropsies",
+             breaks = c(20,150,250,394),
+             labels =  c(20,150,250,394))+
+  theme(
+    plot.title = element_text(size = 20, face = "bold")) +
+  theme(legend.position = "bottom")+
+  labs(title = "Malignancy vs. AUC Area Change From UT 2Gy Radiation",
+       subtitle =bquote(p-value:.(p.v.Change.2.GY.mal)~R^2:.(r.Change.2.GY.mal)~Lambda:.(ld.v.Change.2.GY.mal)))+
+  guides(col=FALSE)
+
+ggsave(filename='RADChange2mal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+
+#Change .4
+
+##Model
+Change.04.GY.mal <- pglsSEyPagel(MalignancyPrevalence~log10(Change04Gy), data=Data,
+                             tree=pruned.tree,method="ML",se=SE)
+
+r.Change.04.GY.mal <- summary(Change.04.GY.mal)$corBeta
+r.Change.04.GY.mal <- format(r.Change.04.GY.mal[2,1])
+r.Change.04.GY.mal <-signif(as.numeric(r.Change.04.GY.mal)^2, digits = 2)
+ld.v.Change.04.GY.mal<- summary(Change.04.GY.mal)$modelStruct$corStruct
+ld.v.Change.04.GY.mal <- signif(ld.v.Change.04.GY.mal[1], digits = 2)
+p.v.Change.04.GY.mal<-summary(Change.04.GY.mal)$tTable
+p.v.Change.04.GY.mal<-signif(p.v.Change.04.GY.mal[2,4], digits = 2)
+
+
+ggplot(Data, aes(y=MalignancyPrevalence*100, x=log10(Change04Gy))) +
+  scale_color_manual(values=c("#631879FF"))+
+  geom_abline(intercept = coef(Change.04.GY.mal)[1]*100, slope =  coef(Change.04.GY.mal)[2]*100,
+              color = 'grey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Malignancy Prevalence (%)") +
+  xlab("AUC Cell Count % Area Change from UT .4 Gy Radiation") +
+  geom_point(aes(colour= Keep, size = TotalRecords)) +
+  geom_text_repel(aes(label=common_name))+
+  scale_size(name   = "Total Necropsies",
+             breaks = c(20,150,250,394),
+             labels =  c(20,150,250,394))+
+  theme(
+    plot.title = element_text(size = 20, face = "bold")) +
+  theme(legend.position = "bottom")+
+  labs(title = "Malignancy vs. AUC Area Change From UT .4Gy Radiation",
+       subtitle =bquote(p-value:.(p.v.Change.04.GY.mal)~R^2:.(r.Change.04.GY.mal)~Lambda:.(ld.v.Change.04.GY.mal)))+
+  guides(col=FALSE)
+
+ggsave(filename='RADChange04mal.png', width=9.5, height=7, limitsize=FALSE,bg="white")

@@ -9,9 +9,11 @@ library(gridExtra)
 library(ggpubr)
 library(grid)
 library(lemon)
+library(sqldf)
 #load csv 
 Data<-read.csv(file="min20516.csv")
 nrow(Data)
+oldD<-Data
 
 tree<-read.tree(file="min20Fixed516.nwk")
 length(tree$tip.label)
@@ -26,17 +28,35 @@ pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
 Data$Keep <- Data$Species %in% pruned.tree$tip.label
 Data <- Data[!(Data$Keep==FALSE),]
 
-write.csv(Data,"/Users/walkermellon/Documents/cav/cancerAcrossVertebrates/newPhyloCut.csv", row.names = FALSE )
+#write.csv(Data,"/Users/walkermellon/Documents/cav/cancerAcrossVertebrates/newPhyloCut.csv", row.names = FALSE )
 
-newcut<-read.csv(file="newPhyloCut.csv")
-nrow(newcut)
-nrow(Data)
+#newcut<-read.csv(file="newPhyloCut.csv")
+#nrow(newcut)
+#nrow(Data)
+
+#oldD$Species <- gsub(" ", "_", oldD$Species)
+
+#oldD<- oldD[,c(5,6,7,8,9),drop=FALSE] 
+
+#Data<-Data[,c(5,6,7,8,9),drop=FALSE] 
+
+
+
+#missed<-setdiff(oldD,Data)
+
+#view(missed)
+
+#write.csv(missed,"/Users/walkermellon/Documents/cav/cancerAcrossVertebrates/missedSpecies.csv",row.names = FALSE ) 
+
+
 
 
 # Basic violin plot
 #Neoplasia
 p <- ggplot(Data, aes(x=Clade, y=100*NeoplasiaPrevalence, fill=Clade)) + 
   geom_violin(adjust=1) +
+  scale_y_continuous(
+    limits = c(0,65))+
   theme(
     legend.text = element_text(size = 10),
   ) +
@@ -71,11 +91,13 @@ print(pFinal)
 #Malignancy Violin plot
 m <- ggplot(Data, aes(x=Clade, y=100*MalignancyPrevalence, fill=Clade)) + 
   geom_violin(adjust=1) +
+  scale_y_continuous(
+    limits = c(0,65))+
   theme(
     legend.title = element_text(size = 21, face = "bold"),
     legend.text = element_text(size = 20)
   ) +
-  scale_fill_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ),labels=c("103 Species, N=5843", "184 Species, N=8632", "41 Species, N=3061"))+
+  scale_fill_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ),labels=c("98 Species, N=5684", "153 Species, N=7304", "41 Species, N=3061"))+
   ggtitle("B") +
   labs(fill = 'Clade')+
   ylab("Malignancy Prevalence %") +

@@ -183,13 +183,14 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)))+
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
-  labs(title = "Malignancy Prevalence vs. Adult Weight") +
+  labs(title = "Malignancy Prevalence vs. Adult Weight",
+       subtitle =bquote(p-value:.(p.v.adult.weight.mal)~R^2:.(r.v.adult.weight.mal)~Lambda:.(ld.v.adult.weight.mal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   guides(size=guide_legend())+
-  annotate("text", x=.42, y=48.7, label = "1", size = 7)
+  annotate("text", x=.42, y=50.3, label = "1", size = 7)
 
 
 
@@ -228,34 +229,27 @@ ld.v.gestneo <- signif(ld.v.gestneo[1], digits = 2)
 p.v.gestneo<-summary(gestation.neo)$tTable
 p.v.gestneo<-signif(p.v.gestneo[2,4], digits = 3)
 
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(Gestation.months.))) +
+gestneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(Gestation.months.))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
   scale_y_continuous(
-    breaks = c(0, 25,50,75),
-    labels = c(0, 25,50,75))+
+    limits = c(0,75),
+    breaks = c(0, 25,45,75),
+    labels = c(0, 25,45,75))+
   geom_abline(intercept = coef(gestation.neo)[1]*100, slope =  coef(gestation.neo)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
-  theme(axis.title = element_text(size = 18), legend.position = "bottom")+
+  theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
-  xlab("(log10) Gestation (Mo)") +
+  xlab("(log10) Gestation") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
-  scale_size(name   = "Total Necropsies",
-             breaks = c(20,100,200,300,477),
-             labels =  c(20,100,200,300,477))+
   geom_text_repel(aes(label=ifelse(NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
-  guides(colour = guide_legend(override.aes = list(size=5))) +
-  labs(title="Neoplasia Prevalence vs. Gestation",
-       subtitle =bquote(p-value:.(p.v.gestneo)~R^2:.(r.v.gestneo)~Lambda:.(ld.v.gestneo))) +
+  guides(colour = guide_legend(override.aes = list(size=5)))+
   theme(
-    plot.title = element_text(size = 20, face = "bold"))+   labs(colour="Clade", size="Total Necropsies")+
+    plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
-  guides(size=guide_legend())+
-  coord_cartesian(xlim = c(log10(min(cutData$Gestation.months.)),log10(max(cutData$Gestation.months.))),
-                  ylim = c(0,75),clip = "off")+
-  annotate("text", x=-0.53, y=83.8, label = "2", size = 7)
+  labs(title="A")
 
-ggsave(filename='S2gestneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S2gestneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #gestation mal
 cutData <- Data[,c(5,9,10,11,17,30,42),drop=FALSE] 
@@ -293,8 +287,8 @@ gestmal<-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.month
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
   scale_y_continuous(
     limits = c(0,75),
-    breaks = c(0, 25,45),
-    labels = c(0, 25,45))+
+    breaks = c(0, 25,45,75),
+    labels = c(0, 25,45,75))+
   geom_abline(intercept = coef(gestation.mal)[1]*100, slope =  coef(gestation.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -309,7 +303,10 @@ gestmal<-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.month
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   labs(title="B")
 
-ggsave(filename='gestmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='gestmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+gestneo/gestmal
+ggsave(filename='gestneomal.pdf', width=9.5, height=18, limitsize=FALSE,bg="white")
+
 
 #litter size models 
 #litter size neo
@@ -1415,15 +1412,23 @@ view(cutData)
 wpl.neo<-pglsSEyPagel(NeoplasiaPrevalence~Gestation.months.+log10(adult_weight.g.),data=cutData,
                       tree=pruned.tree,method="ML",se=SE)
 
+coef(wpl.neo)
+
 summary(wpl.neo)
 
 r.v.wpneo <- summary(wpl.neo)$corBeta
-r.v.wpneo <- format(r.v.wpneo[2,1])
+r.v.wpneo <- format(r.v.wpneo[3,1])
 r.v.wpneo <-signif(as.numeric(r.v.wpneo)^2, digits= 2)
 ld.v.wpneo<- summary(wpl.neo)$modelStruct$corStruct
 ld.v.wpneo <- signif(ld.v.wpneo[1], digits = 2)
 p.v.wpneo<-summary(wpl.neo)$tTable
-p.v.wpneo<-signif(p.v.wpneo[2,4], digits = 3)
+p.v.wpneogest<-signif(p.v.wpneo[2,4], digits = 3)
+p.v.wpneowgt<-signif(p.v.wpneo[3,4], digits = 2)
+
+
+pvalues<-c(p.v.wpneogest,p.v.wpneowgt)
+
+combopwpneo<-fisher(pvalues)
 
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)+log10(Gestation.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
@@ -1515,3 +1520,89 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.months.)+log10
 
 
 ggsave(filename='S20wgtgestmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+#g+l
+
+cutData <- Data[,c(5,9,10,11,13,40,30,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+view(cutData)
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies <- cutData$Species
+
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+view(cutData)
+
+wppl.neo<-pglsSEyPagel(NeoplasiaPrevalence~Gestation.months.+log10(max_longevity.months.),data=cutData,
+                      tree=pruned.tree,method="ML",se=SE)
+
+summary(wppl.neo)
+coef(wppl.neo)
+
+r.v.wpplneo <- summary(wppl.neo)$corBeta
+r.v.wpplneo <- format(r.v.wpplneo[2,1])
+r.v.wpplneo <-signif(as.numeric(r.v.wpplneo)^2, digits= 2)
+ld.v.wpplneo<- summary(wppl.neo)$modelStruct$corStruct
+ld.v.wpplneo <- signif(ld.v.wpplneo[1], digits = 2)
+p.v.wpplneo<-summary(wppl.neo)$tTable
+p.v.wpplneogest<-signif(p.v.wpplneo[2,4], digits = 3)
+p.v.wpplneolong<-signif(p.v.wpplneo[3,4], digits = 2)
+c.wpplneogest<-coef(wppl.neo)[2]
+c.wpplneolong<-coef(wppl.neo)[3]
+
+
+pvalues<-c(p.v.wpplneogest,p.v.wpplneolong)
+
+combopwpplneo<-fisher(pvalues)
+
+
+#g+l mal
+
+cutData <- Data[,c(5,9,10,11,17,40,30,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+view(cutData)
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies <- cutData$Species
+
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+view(cutData)
+
+wppl.mal<-pglsSEyPagel(MalignancyPrevalence~Gestation.months.+log10(max_longevity.months.),data=cutData,
+                      tree=pruned.tree,method="ML",se=SE)
+
+summary(wppl.mal)
+
+r.v.wpplmal <- summary(wppl.mal)$corBeta
+r.v.wpplmal <- format(r.v.wpplmal[2,1])
+r.v.wpplmal <-signif(as.numeric(r.v.wpplmal)^2, digits= 2)
+ld.v.wpplmal<- summary(wppl.mal)$modelStruct$corStruct
+ld.v.wpplmal <- signif(ld.v.wpplmal[1], digits = 2)
+p.v.wpplmal<-summary(wppl.mal)$tTable
+p.v.wpplmal<-signif(p.v.wpplmal[2,4], digits = 3)
+
+
+
+
