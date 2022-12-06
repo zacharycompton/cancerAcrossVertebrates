@@ -65,7 +65,7 @@ pglsSEyPagel=function(model, data, tree, lambdaInterval=c(0,1),...){
 ## Here I split the csv into class but do whatever you want
 Data<-read.csv(file="min20RAD_UPDATE.csv")
 View(Data)
-
+Data<-na.omit(Data)
 tree<-read.tree(file="min10radtree.nwk")
 
 
@@ -81,7 +81,6 @@ Data$Keep <- Data$Species %in% pruned.tree$tip.label
 Data <- Data[!(Data$Keep==FALSE),]
 rownames(Data)<-Data$Species
 SE<-setNames(Data$SE,Data$Species)[rownames(Data)]
-Data<-na.omit(Data)
 ##Model
 AUC.10.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(AUC10Gy), data=Data,
                             tree=pruned.tree,method="ML",se=SE)
@@ -101,6 +100,11 @@ p.v.AUC.10.GY<-signif(p.v.AUC.10.GY[2,4], digits = 2)
 
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC10Gy))) +
   scale_color_manual(values=c("#631879FF"))+
+  scale_x_continuous(
+    limits = c(1.3,2),
+    breaks = c(1.3,1.6,1.8,1.90309,2),
+    labels = c(20,40,60,80,100)
+  )+
   geom_abline(intercept = coef(AUC.10.GY)[1]*100, slope =  coef(AUC.10.GY)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -140,6 +144,11 @@ p.v.AUC.2.GY<-signif(p.v.AUC.2.GY[2,4], digits = 2)
 
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC2Gy))) +
   scale_color_manual(values=c("#631879FF"))+
+  scale_x_continuous(
+    limits = c(1.69897,2.04),
+    breaks = c(1.69897,1.90309,2.04),
+    labels = c(50,80,110)
+  )+
   geom_abline(intercept = coef(AUC.2.GY)[1]*100, slope =  coef(AUC.2.GY)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -177,6 +186,11 @@ p.v.AUC.04.GY<-signif(p.v.AUC.04.GY[2,4], digits = 2)
 
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC04Gy))) +
   scale_color_manual(values=c("#631879FF"))+
+  scale_x_continuous(
+    limits = c(1.87506,2.04),
+    breaks = c(1.8750,1.95424,2.04),
+    labels = c(75,90,110)
+  )+
   geom_abline(intercept = coef(AUC.04.GY)[1]*100, slope =  coef(AUC.04.GY)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -199,6 +213,25 @@ ggsave(filename='RADAUC04.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 ##CHANGE 
 
+Data<-read.csv(file="min20RAD_UPDATE.csv")
+View(Data)
+
+tree<-read.tree(file="min10radtree.nwk")
+
+
+
+Data$Species <- gsub(" ", "_", Data$Species)
+includedSpecies <- Data$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+length(pruned.tree$tip.label)
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+Data$Keep <- Data$Species %in% pruned.tree$tip.label
+Data <- Data[!(Data$Keep==FALSE),]
+rownames(Data)<-Data$Species
+SE<-setNames(Data$SE,Data$Species)[rownames(Data)]
+
 
 #10GY Change
 Change.10.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(Change10Gy), data=Data,
@@ -215,13 +248,19 @@ p.v.Change.10.GY<-signif(p.v.Change.10.GY[2,4], digits = 2)
 
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(Change10Gy))) +
   scale_color_manual(values=c("#631879FF"))+
+  scale_x_continuous(
+    limits = c(1.3,2),
+    breaks = c(1.3,1.6,1.8,1.90309,2),
+    labels = c(20,40,60,80,100)
+  )+
   geom_abline(intercept = coef(Change.10.GY)[1]*100, slope =  coef(Change.10.GY)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
-  xlab("AUC Cell Count % Area Change from UT 10 Gy Radiation") +
+  xlab("% Cell Growth Over Time [AUC] Relative to Untreated at 10 Gy of Radiation") +
   geom_point(aes(colour= Keep, size = TotalRecords)) +
+  labs(title = "A")+
   geom_text_repel(aes(label=common_name))+
   scale_size(name   = "Total Necropsies",
              breaks = c(20,150,250,394),
@@ -229,11 +268,10 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(Change10Gy))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
-  labs(title = "Neoplasia vs. AUC Area Change From UT 10Gy Radiation",
-       subtitle =bquote(p-value:.(p.v.Change.10.GY)~R^2:.(r.Change.10.GY)~Lambda:.(ld.v.Change.10.GY)))+
+  ##labs(title = "Neoplasia vs. AUC Area Change From UT 10Gy Radiation")+
   guides(col=FALSE)
 
-ggsave(filename='RADChange10.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+ggsave(filename='RADChange10.pdf', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #Change 2
 
@@ -254,12 +292,17 @@ p.v.Change.2.GY<-signif(p.v.Change.2.GY[2,4], digits = 2)
 
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(Change2Gy))) +
   scale_color_manual(values=c("#631879FF"))+
+  scale_x_continuous(
+    limits = c(1.69897,2.04),
+    breaks = c(1.69897,1.90309,2.04),
+    labels = c(50,80,110)
+  )+
   geom_abline(intercept = coef(Change.2.GY)[1]*100, slope =  coef(Change.2.GY)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
-  xlab("AUC Cell Count % Area Change from UT 2 Gy Radiation") +
+  xlab("% Cell Growth Over Time [AUC] Relative to Untreated at 2 Gy of Radiation") +
   geom_point(aes(colour= Keep, size = TotalRecords)) +
   geom_text_repel(aes(label=common_name))+
   scale_size(name   = "Total Necropsies",
@@ -291,12 +334,17 @@ p.v.Change.04.GY<-signif(p.v.Change.04.GY[2,4], digits = 2)
 
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(Change04Gy))) +
   scale_color_manual(values=c("#631879FF"))+
+  scale_x_continuous(
+    limits = c(1.87506,2.04),
+    breaks = c(1.8750,1.95424,2.04),
+    labels = c(75,90,110)
+  )+
   geom_abline(intercept = coef(Change.04.GY)[1]*100, slope =  coef(Change.04.GY)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
-  xlab("AUC Cell Count % Area Change from UT .4 Gy Radiation") +
+  xlab("% Cell Growth Over Time [AUC] Relative to Untreated at 0.4 Gy of Radiation") +
   geom_point(aes(colour= Keep, size = TotalRecords)) +
   geom_text_repel(aes(label=common_name))+
   scale_size(name   = "Total Necropsies",
@@ -333,12 +381,17 @@ p.v.Change.10.GY.mal<-signif(p.v.Change.10.GY.mal[2,4], digits = 2)
 
 ggplot(Data, aes(y=MalignancyPrevalence*100, x=log10(Change10Gy))) +
   scale_color_manual(values=c("#631879FF"))+
+  scale_x_continuous(
+    limits = c(1.3,2),
+    breaks = c(1.3,1.6,1.8,1.90309,2),
+    labels = c(20,40,60,80,100)
+  )+
   geom_abline(intercept = coef(Change.10.GY.mal)[1]*100, slope =  coef(Change.10.GY.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Malignancy Prevalence (%)") +
-  xlab("AUC Cell Count % Area Change from UT 10 Gy Radiation") +
+  xlab("% Cell Growth Over Time [AUC] Relative to Untreated at 10 Gy of Radiation") +
   geom_point(aes(colour= Keep, size = TotalRecords)) +
   geom_text_repel(aes(label=common_name))+
   scale_size(name   = "Total Necropsies",
@@ -372,12 +425,17 @@ p.v.Change.2.GY.mal<-signif(p.v.Change.2.GY.mal[2,4], digits = 2)
 
 ggplot(Data, aes(y=MalignancyPrevalence*100, x=log10(Change2Gy))) +
   scale_color_manual(values=c("#631879FF"))+
+  scale_x_continuous(
+    limits = c(1.69897,2.04),
+    breaks = c(1.69897,1.90309,2.04),
+    labels = c(50,80,110)
+  )+
   geom_abline(intercept = coef(Change.2.GY.mal)[1]*100, slope =  coef(Change.2.GY.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Malignancy Prevalence (%)") +
-  xlab("AUC Cell Count % Area Change from UT 2 Gy Radiation") +
+  xlab("% Cell Growth Over Time [AUC] Relative to Untreated at 2 Gy of Radiation") +
   geom_point(aes(colour= Keep, size = TotalRecords)) +
   geom_text_repel(aes(label=common_name))+
   scale_size(name   = "Total Necropsies",
@@ -409,12 +467,17 @@ p.v.Change.04.GY.mal<-signif(p.v.Change.04.GY.mal[2,4], digits = 2)
 
 ggplot(Data, aes(y=MalignancyPrevalence*100, x=log10(Change04Gy))) +
   scale_color_manual(values=c("#631879FF"))+
+  scale_x_continuous(
+    limits = c(1.87506,2.04),
+    breaks = c(1.8750,1.95424,2.04),
+    labels = c(75,90,110)
+  )+
   geom_abline(intercept = coef(Change.04.GY.mal)[1]*100, slope =  coef(Change.04.GY.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Malignancy Prevalence (%)") +
-  xlab("AUC Cell Count % Area Change from UT .4 Gy Radiation") +
+  xlab("% Cell Growth Over Time [AUC] Relative to Untreated at 0.4 Gy of Radiation") +
   geom_point(aes(colour= Keep, size = TotalRecords)) +
   geom_text_repel(aes(label=common_name))+
   scale_size(name   = "Total Necropsies",

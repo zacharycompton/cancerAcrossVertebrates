@@ -93,8 +93,12 @@ p.v.ANVFold72.1<-summary(ANVFold72.1)$tTable
 p.v.ANVFold72.1<-signif(p.v.ANVFold72.1[2,4], digits = 3)
 
 
-ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=(ANVAUCFold72.1))) +
-  scale_x_continuous(trans = 'log10')+
+ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(ANVAUCFold72.1))) +
+  scale_x_continuous(
+    limits = c(-.01,1.397),
+    breaks = c(-.01,1,1.397),
+    labels = c(0.97,10,25)
+  )+
   scale_color_manual(values=c("#631879FF"))+
   geom_abline(intercept = coef(ANVFold72.1)[1]*100, slope =  coef(ANVFold72.1)[2]*100,
               color = 'grey',size = 1.2) +
@@ -132,15 +136,19 @@ p.v.ANVFold72.33<-summary(ANVFold72.33)$tTable
 p.v.ANVFold72.33<-signif(p.v.ANVFold72.33[2,4], digits = 3)
 
 
-ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=(ANVAUCFold72.33))) +
-  scale_x_continuous(trans = 'log10')+
+ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(ANVAUCFold72.33))) +
+  scale_x_continuous(
+    limits = c(-.3,1),
+    breaks = c(-.3,.69897,1),
+    labels = c(0.5,5,10)
+  )+
   scale_color_manual(values=c("#631879FF"))+
   geom_abline(intercept = coef(ANVFold72.33)[1]*100, slope =  coef(ANVFold72.33)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
-  xlab("(log 10) AUC AnV Fold \nIncrease to 72hr") +
+  xlab("(log 10) AUC AnV Fold \n % Increase to 72hr") +
   geom_point(aes(colour= Keep, size = TotalRecords)) +
   geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence > 0) | NeoplasiaPrevalence < 1,as.character(common_name),'')))+
   scale_size(name   = "Total Necropsies",
@@ -170,8 +178,12 @@ p.v.ANVFold72.11<-summary(ANVFold72.11)$tTable
 p.v.ANVFold72.11<-signif(p.v.ANVFold72.11[2,4], digits = 3)
 
 
-ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=(ANVAUCFold72.11))) +
-  scale_x_continuous(trans = 'log10')+
+ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(ANVAUCFold72.11))) +
+  scale_x_continuous(
+    limits = c(-.02,.69897),
+    breaks = c(-.02,.69897),
+    labels = c(0.95,5)
+  )+
   scale_color_manual(values=c("#631879FF"))+
 
   geom_abline(intercept = coef(ANVFold72.11)[1]*100, slope =  coef(ANVFold72.11)[2]*100,
@@ -211,8 +223,12 @@ p.v.ANVDeath72.1<-summary(ANVDeath72.1)$tTable
 p.v.ANVDeath72.1<-signif(p.v.ANVDeath72.1[2,4], digits = 3)
 
 
-ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=(ANVCellDeath72.1))) +
-  scale_x_continuous(trans = 'log10')+
+ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(ANVCellDeath72.1))) +
+  scale_x_continuous(
+    limits = c(-.4,1.74),
+    breaks = c(-.4,1,1.47712,1.74),
+    labels = c(0.4,10,30,60)
+  )+
   scale_color_manual(values=c("#631879FF"))+
   geom_abline(intercept = coef(ANVDeath72.1)[1]*100, slope =  coef(ANVDeath72.1)[2]*100,
               color = 'grey',size = 1.2) +
@@ -252,15 +268,19 @@ p.v.ANVDeath72.33<-summary(ANVDeath72.33)$tTable
 p.v.ANVDeath72.33<-signif(p.v.ANVDeath72.33[2,4], digits = 3)
 
 
-ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=(ANVCellDeath72.33))) +
-  scale_x_continuous(trans = 'log10')+
+ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(ANVCellDeath72.33))) +
+  scale_x_continuous(
+    limits = c(-.8,1.74),
+    breaks = c(-.8,1,1.47712,1.74),
+    labels = c(.16,10,30,60)
+  )+
   scale_color_manual(values=c("#631879FF"))+
   geom_abline(intercept = coef(ANVDeath72.33)[1]*100, slope =  coef(ANVDeath72.33)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
-  xlab("(log 10) % Cell Death at 72hr") +
+  xlab("% Cell Death at 72hr") +
   geom_point(aes(colour= Keep, size = TotalRecords)) +
   geom_text_repel(aes(label=ifelse((NeoplasiaPrevalence > 0) | NeoplasiaPrevalence < 1,as.character(common_name),'')))+
   scale_size(name   = "Total Necropsies",
@@ -291,8 +311,12 @@ p.v.ANVDeath72.11<-summary(ANVDeath72.11)$tTable
 p.v.ANVDeath72.11<-signif(p.v.ANVDeath72.11[2,4], digits = 3)
 
 
-ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=(ANVCellDeath72.11))) +
-  scale_x_continuous(trans = 'log10')+
+ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(ANVCellDeath72.11))) +
+  scale_x_continuous(
+    limits = c(-.8,1.47712),
+    breaks = c(-.8,1,1.47712),
+    labels = c(.16,10,30)
+  )+
   scale_color_manual(values=c("#631879FF"))+
   geom_abline(intercept = coef(ANVDeath72.11)[1]*100, slope =  coef(ANVDeath72.11)[2]*100,
               color = 'grey',size = 1.2) +
