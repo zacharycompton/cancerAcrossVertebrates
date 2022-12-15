@@ -62,6 +62,10 @@ m<-plot(Mobj,
      fsize=c(1,0.8),leg.txt="neoplasia prevalence",lwd= 2.5,ftype="off")
 title(main="A", adj = .05, line = -1)
 
+plot(Mobj,
+     fsize=c(.4,0.2),leg.txt="neoplasia prevalence",lwd= 2.5)
+title(main="A", adj = .05, line = -1)
+
 specData$Species <- gsub(" ", "_", specData$Species)
 
 #order subsets
@@ -254,6 +258,11 @@ Sobj<-setMap(Sobj,invert=TRUE)
 ## plot 
 s<-plot(Sobj,
            fsize=c(1,0.8),leg.txt="neoplasia prevalence",lwd = 2.5, ftype="off")
+title(main="B", adj = .05, line = -1)
+
+
+plot(Sobj,
+     fsize=c(.4,0.2),leg.txt="neoplasia prevalence",lwd= 2.5)
 title(main="B", adj = .05, line = -1)
 
 #order subset
@@ -474,6 +483,14 @@ Aobj<-setMap(Aobj,invert=TRUE)
 s<-plot(Aobj,
         fsize=c(1,0.8),leg.txt="neoplasia prevalence",lwd = 2.5,margin = 20, ftype="off")
 title(main="C", adj = .05, line = -1)
+
+
+
+plot(Aobj,
+     fsize=c(.4,0.2),leg.txt="neoplasia prevalence",lwd= 2.5)
+title(main="C", adj = .05, line = -1)
+
+
 
 #subset orders
 anura<-filter(specData, is.element(Orders, c("Anura")))

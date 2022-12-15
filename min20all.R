@@ -69,6 +69,10 @@ pglsSEyPagel=function(model, data, tree, lambdaInterval=c(0,1),...){
 #read data
 Data <- read.csv("min20516.csv")
 View(Data)
+pvals <- data.frame(matrix(ncol = 2, nrow = 0))
+x <- c("Test", "pvalue")
+colnames(pvals) <- x
+
 
 
 #adult weight models
@@ -130,8 +134,9 @@ wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.))
   labs(colour="Clade", size="Total Necropsies")
 
 
-ggsave(filename='wgtneol.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='wgtneol.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
+pvals[nrow(pvals) + 1,] = c("wgtneo",p.v.adult.weight.neo)
 #adult weight mal
 cutData <- Data[,c(5,9,10,11,17,38,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
@@ -194,8 +199,9 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)))+
 
 
 
-ggsave(filename='S1wgtmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S1wgtmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
+pvals[nrow(pvals) + 1,] = c("wgtmal",p.v.adult.weight.mal)
 #gestation models
 #gestation neo
 cutData <- Data[,c(5,9,10,11,13,30,42),drop=FALSE] 
@@ -249,8 +255,8 @@ gestneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(Gestation.months
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   labs(title="A")
 
-#ggsave(filename='S2gestneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
-
+##ggsave(filename='S2gestneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+pvals[nrow(pvals) + 1,] = c("gestneo",p.v.gestneo)
 #gestation mal
 cutData <- Data[,c(5,9,10,11,17,30,42),drop=FALSE] 
 cutData[cutData$Gestation.months. < 0, ] <-NA
@@ -303,9 +309,10 @@ gestmal<-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.month
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   labs(title="B")
 
-#ggsave(filename='gestmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+##ggsave(filename='gestmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+pvals[nrow(pvals) + 1,] = c("gestmal",p.v.gestmal)
 gestneo/gestmal
-ggsave(filename='gestneomal.pdf', width=9.5, height=18, limitsize=FALSE,bg="white")
+#ggsave(filename='gestneomal.pdf', width=9.5, height=18, limitsize=FALSE,bg="white")
 
 
 #litter size models 
@@ -366,7 +373,9 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litter_size))) +
   annotate("text", x=-0.35, y=83.8, label = "3", size = 7)
 
 
-ggsave(filename='S3litneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S3litneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+pvals[nrow(pvals) + 1,] = c("littersizeneo",p.v.litneo)
 
 #litter size mal
 cutData <- Data[,c(5,9,10,11,17,33,42),drop=FALSE] 
@@ -424,7 +433,9 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litter_size))) +
   guides(size=guide_legend())+
   annotate("text", x=-0.35, y=50.3, label = "4", size = 7)
 
-ggsave(filename='S4litmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S4litmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+pvals[nrow(pvals) + 1,] = c("littersizemal",p.v.litmal)
 
 ### Longevity model
 #longevity neo
@@ -486,11 +497,13 @@ longneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(max_longevity.mo
   labs(colour="Clade", size="Total Necropsies")
 
 
-ggsave(filename='longneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='longneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+pvals[nrow(pvals) + 1,] = c("longneo",p.v.longneo)
 
 #create weight over longevity model
 wgtneo/longneo
-ggsave(filename='wgtlong.pdf', width=9.5, height=18, limitsize=FALSE,bg="white")
+#ggsave(filename='wgtlong.pdf', width=9.5, height=18, limitsize=FALSE,bg="white")
 
 #longevity mal
 
@@ -551,7 +564,10 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(max_longevity.months.)))
   guides(size=guide_legend())+
   annotate("text", x=1.07, y=50.3, label = "5", size = 7)
 
-ggsave(filename='S5longmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S5longmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+pvals[nrow(pvals) + 1,] = c("longneo",p.v.longmal)
+
 
 ##BMR models
 #bmr neo
@@ -614,7 +630,9 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(metabolic_rate))) +
                   ylim = c(0,75),clip = "off")+
   annotate("text", x=.9, y=83.8, label = "6", size = 7)
 
-ggsave(filename='S6bmrneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S6bmrneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+pvals[nrow(pvals) + 1,] = c("bmrneo",p.v.bmrneo)
 
 #bmr mal
 
@@ -676,7 +694,9 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(metabolic_rate))) +
   guides(size=guide_legend())+
   annotate("text", x=.9, y=50.3, label = "7", size = 7)
 
-ggsave(filename='S7bmrmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S7bmrmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+pvals[nrow(pvals) + 1,] = c("bmrmal",p.v.bmrmal)
 
 #wxl models #weight and longevity
 #wxl neo
@@ -738,7 +758,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.*max_longe
                   ylim = c(0,75),clip = "off")+
   annotate("text", x=2, y=83.8, label = "8", size = 7)
 
-ggsave(filename='S8wgtlongneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S8wgtlongneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #wxl mal
 cutData <- Data[,c(5,9,10,11,17,40,38,42),drop=FALSE] 
@@ -798,7 +818,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.*max_long
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   annotate("text", x=2, y=50.3, label = "9", size = 7)
 
-ggsave(filename='S9wgtlongmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S9wgtlongmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 #litters per year neo
@@ -856,12 +876,14 @@ lityearneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litters_year)
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(size="Total Necropsies",colour="Clade")
 
-ggsave(filename='lityearneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='lityearneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+pvals[nrow(pvals) + 1,] = c("litpyearneo",p.v.lyearneo)
 
 
 #create lit year over gest model
 lityearneo/gestmal
-ggsave(filename='litgest.pdf', width=9.5, height=18, limitsize=FALSE,bg="white")
+#ggsave(filename='litgest.pdf', width=9.5, height=18, limitsize=FALSE,bg="white")
 
 #litter per year mal
 cutData <- Data[,c(5,9,10,11,17,34,42),drop=FALSE] 
@@ -920,7 +942,9 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litters_year))) +
   guides(size=guide_legend())+
   annotate("text",  x=-.85, y=50.3, label = "10", size = 7)
 
-ggsave(filename='S10lityearmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S10lityearmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+pvals[nrow(pvals) + 1,] = c("litpyearmal",p.v.lyearmal)
 
 ####Female Maturity neo
 cutData <- Data[,c(5,9,10,11,13,28,42),drop=FALSE] 
@@ -978,7 +1002,9 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(female_maturity.months.))
                   ylim = c(0,75),clip = "off")+
   annotate("text", x=-.09, y=83.9, label = "11", size = 7)
 
-ggsave(filename='S11femmatneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S11femmatneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+pvals[nrow(pvals) + 1,] = c("femmatneo",p.v.fmaturityneo)
 
 #Female Maturity Mal
 cutData <- Data[,c(5,9,10,11,17,28,42),drop=FALSE] 
@@ -1036,7 +1062,9 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(female_maturity.months.)
   guides(size=guide_legend())+
   annotate("text", x=-.09, y=50.3, label = "12", size = 7)
 
-ggsave(filename='S12femmatmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S12femmatmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+pvals[nrow(pvals) + 1,] = c("femmatmal",p.v.fmaturitymal)
 
 ####Male Maturity neo
 cutData <- Data[,c(5,9,10,11,13,29,42),drop=FALSE] 
@@ -1094,7 +1122,8 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(male_maturity.months.))) 
                   ylim = c(0,75),clip = "off")+
   annotate("text", x=-0.74, y=83.8, label = "13", size = 7)
 
-ggsave(filename='S13malematneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S13malematneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+pvals[nrow(pvals) + 1,] = c("malematneo",p.v.Mmaturityneo)
 
 #Male Maturity Mal
 cutData <- Data[,c(5,9,10,11,17,29,42),drop=FALSE] 
@@ -1152,7 +1181,9 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(male_maturity.months.)))
   guides(size=guide_legend())+
   annotate("text", x=-.74, y=50.3, label = "14", size = 7)
 
-ggsave(filename='S14malematmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S14malematmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+pvals[nrow(pvals) + 1,] = c("malematmal",p.v.Mmaturitymal)
 
 #Weaning Weight neo
 cutData <- Data[,c(5,9,10,11,13,37,42),drop=FALSE] 
@@ -1210,7 +1241,9 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(weaning_weight.g.))) +
                   ylim = c(0,75),clip = "off")+
   annotate("text",  x=-.64, y=83.8, label = "15", size = 7)
 
-ggsave(filename='S15weanneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S15weanneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+pvals[nrow(pvals) + 1,] = c("weanweightneo",p.v.weanwneo)
 
 #Weaning Weight Mal
 cutData <- Data[,c(5,9,10,11,17,37,42),drop=FALSE] 
@@ -1268,7 +1301,9 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(weaning_weight.g.))) +
   guides(size=guide_legend())+
   annotate("text", x=-.64, y=50.3, label = "16", size = 7)
 
-ggsave(filename='S16weanmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S16weanmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+pvals[nrow(pvals) + 1,] = c("weanweightmal",p.v.weanwmal)
 
 #Growth Rate Neo
 cutData <- Data[,c(5,9,10,11,13,39,42),drop=FALSE] 
@@ -1326,7 +1361,9 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(growth_rate.1.days.))) +
                   ylim = c(0,75),clip = "off")+
   annotate("text",x=-3.36, y=83.8, label = "17", size = 7)
 
-ggsave(filename='S17growneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S17growneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+pvals[nrow(pvals) + 1,] = c("growthtneo",p.v.GrowthRneo)
 
 #Growth Rate Mal
 cutData <- Data[,c(5,9,10,11,17,39,42),drop=FALSE] 
@@ -1384,7 +1421,9 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(growth_rate.1.days.))) +
   guides(size=guide_legend())+
   annotate("text", x=-3.35, y=50.3, label = "18", size = 7)
 
-ggsave(filename='S18growmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S18growmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+pvals[nrow(pvals) + 1,] = c("growthtmal",p.v.GrowthRmal)
 
 #w+g
 
@@ -1409,7 +1448,7 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
-wpl.neo<-pglsSEyPagel(NeoplasiaPrevalence~Gestation.months.+log10(adult_weight.g.),data=cutData,
+wpl.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(Gestation.months.)+log10(adult_weight.g.),data=cutData,
                       tree=pruned.tree,method="ML",se=SE)
 
 coef(wpl.neo)
@@ -1424,11 +1463,17 @@ ld.v.wpneo <- signif(ld.v.wpneo[1], digits = 2)
 p.v.wpneo<-summary(wpl.neo)$tTable
 p.v.wpneogest<-signif(p.v.wpneo[2,4], digits = 3)
 p.v.wpneowgt<-signif(p.v.wpneo[3,4], digits = 2)
+p.v.wpgneogest<-signif(p.v.wpneo[2,4], digits = 3)
+p.v.wpgneolong<-signif(p.v.wpneo[3,4], digits = 2)
+c.wpplneogest<-coef(wpl.neo)[2]
+c.wpplneolong<-coef(wpl.neo)[3]
 
 
-pvalues<-c(p.v.wpneogest,p.v.wpneowgt)
 
-combopwpneo<-fisher(pvalues)
+pvalues<-c(p.v.wpgneogest,p.v.wpgneolong)
+
+combopwpgneo<-fisher(pvalues)
+
 
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)+log10(Gestation.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
@@ -1455,7 +1500,10 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)+log10(Ge
                   ylim = c(0,75),clip = "off")+
   annotate("text", x=.13, y=83.8, label = "19", size = 7)
 
-ggsave(filename='S19wgtgestneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S19wgtgestneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+
+pvals[nrow(pvals) + 1,] = c("wgt+gestneo",combopwpgneo)
 
 
 #w+g mal
@@ -1481,7 +1529,7 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
-wpl.mal<-pglsSEyPagel(MalignancyPrevalence~Gestation.months.+log10(adult_weight.g.),data=cutData,
+wpl.mal<-pglsSEyPagel(MalignancyPrevalence~log10(Gestation.months.)+log10(adult_weight.g.),data=cutData,
                       tree=pruned.tree,method="ML",se=SE)
 
 summary(wpl.mal)
@@ -1492,7 +1540,16 @@ r.v.wpmal <-signif(as.numeric(r.v.wpmal)^2, digits= 2)
 ld.v.wpmal<- summary(wpl.mal)$modelStruct$corStruct
 ld.v.wpmal <- signif(ld.v.wpmal[1], digits = 2)
 p.v.wpmal<-summary(wpl.mal)$tTable
-p.v.wpmal<-signif(p.v.wpmal[2,4], digits = 3)
+p.v.wpgmalgest<-signif(p.v.wpmal[2,4], digits = 3)
+p.v.wpgmallong<-signif(p.v.wpmal[3,4], digits = 2)
+c.wpplmalgest<-coef(wpl.mal)[2]
+c.wpplmallong<-coef(wpl.mal)[3]
+
+
+
+pvalues<-c(p.v.wpgmalgest,p.v.wpgmallong)
+
+combopwpgmal<-fisher(pvalues)
 
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.months.)+log10(adult_weight.g.))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff"))+
@@ -1518,8 +1575,10 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.months.)+log10
   labs(colour="Clade", size="Total Necropsies")+
   annotate("text", x=.13, y=50.3, label = "20", size = 7)
 
+pvals[nrow(pvals) + 1,] = c("wgt+gestmal",combopwpgmal)
 
-ggsave(filename='S20wgtgestmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+
+#ggsave(filename='S20wgtgestmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #g+l
 
@@ -1544,7 +1603,7 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
-wppl.neo<-pglsSEyPagel(NeoplasiaPrevalence~Gestation.months.+log10(max_longevity.months.),data=cutData,
+wppl.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(Gestation.months.)+log10(max_longevity.months.),data=cutData,
                       tree=pruned.tree,method="ML",se=SE)
 
 summary(wppl.neo)
@@ -1562,9 +1621,12 @@ c.wpplneogest<-coef(wppl.neo)[2]
 c.wpplneolong<-coef(wppl.neo)[3]
 
 
+
 pvalues<-c(p.v.wpplneogest,p.v.wpplneolong)
 
 combopwpplneo<-fisher(pvalues)
+
+pvals[nrow(pvals) + 1,] = c("wgt+gestmal",combopwpplneo)
 
 
 #g+l mal
@@ -1590,7 +1652,7 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
-wppl.mal<-pglsSEyPagel(MalignancyPrevalence~Gestation.months.+log10(max_longevity.months.),data=cutData,
+wppl.mal<-pglsSEyPagel(MalignancyPrevalence~log10(Gestation.months.)+log10(max_longevity.months.),data=cutData,
                       tree=pruned.tree,method="ML",se=SE)
 
 summary(wppl.mal)
@@ -1601,8 +1663,21 @@ r.v.wpplmal <-signif(as.numeric(r.v.wpplmal)^2, digits= 2)
 ld.v.wpplmal<- summary(wppl.mal)$modelStruct$corStruct
 ld.v.wpplmal <- signif(ld.v.wpplmal[1], digits = 2)
 p.v.wpplmal<-summary(wppl.mal)$tTable
-p.v.wpplmal<-signif(p.v.wpplmal[2,4], digits = 3)
+p.v.wpplmalgest<-signif(p.v.wpplmal[2,4], digits = 3)
+p.v.wpplmallong<-signif(p.v.wpplmal[3,4], digits = 2)
+c.wpplmalgest<-coef(wppl.mal)[2]
+c.wpplmallong<-coef(wppl.mal)[3]
 
+
+
+pvalues<-c(p.v.wpplmalgest,p.v.wpplmallong)
+
+combopwpplmal<-fisher(pvalues)
+
+
+pvals[nrow(pvals) + 1,] = c("wgt+gestmal",combopwpplmal)
+
+write.csv(pvals,"/Users/walkermellon/Documents/pvalues.csv", row.names = FALSE)
 
 
 

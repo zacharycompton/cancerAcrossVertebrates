@@ -303,6 +303,75 @@ cat("Lambda:",ld.v.wgtlong)
 
 ```
 
+Recut Data for adult weight +long mal
+```{r}
+cutData <- Data[,c(5,9,10,11,17,38,40,42),drop=FALSE]
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+head(cutData)
+
+cutData$Species <- gsub(" ", "_", cutData$Species)
+includedSpecies <- cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+cat(nrow(cutData),"Species")
+```
+
+wgt+long
+```{r}
+wgtlong<-pglsSEyPagel(MalignancyPrevalence~log10(adult_weight.g.)+log10(max_longevity.months.)
+,data=cutData,tree=pruned.tree,se=SE,method = "ML")
+coef(wgtlong)
+```
+
+```{r, echo = F}
+mod4 <- tidy(wgtlong)
+tab4 <-huxtable(mod4)
+print(tab4)
+```
+Grab R^2 for each life history var
+```{r}
+r.v.wgtlong <- summary(wgtlong)$corBeta 
+r.v.wgt <- format(r.v.wgtlong[2,1])
+r.v.wgt <-signif(as.numeric(r.v.wgt )^2, digits= 2)
+cat("Weight:",r.v.wgt)
+r.v.long <- format(r.v.wgtlong[3,1])
+r.v.long<-signif(as.numeric(r.v.long)^2, digits= 2)
+cat("Maximum Longevity:",r.v.long)
+
+```
+Combine p values
+```{r}
+p.v.wgtlong<-summary(wgtlong)$tTable
+p.v.wgtlongwgt<-signif(p.v.wgtlong[2,4], digits = 2)
+p.v.wgtlonglong<-signif(p.v.wgtlong[3,4], digits = 2)
+
+
+pvalues<-c(p.v.wgtlongwgt,p.v.wgtlonglong)
+
+combopwgtlong<-fisher(pvalues)
+
+
+cat("Overall P-Value: ", as.numeric(combopwgtlong[1]))
+
+```
+
+Lambda
+```{r}
+ld.v.wgtlong<- summary(wgtlong)$modelStruct$corStruct
+ld.v.wgtlong<- signif(ld.v.wgtlong[1], digits = 2)
+cat("Lambda:",ld.v.wgtlong)
+
+```
+
+
 Recut Data for adult weight
 ```{r}
 cutData <- Data[,c(5,9,10,11,13,38,42),drop=FALSE]
