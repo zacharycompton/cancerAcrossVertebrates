@@ -23,7 +23,7 @@ This file creates the large bar graph tree you see in the Cancer Across Vertebra
 This file creates the Ancestral State Reconstructed Phylogeny. This file outputs trees for each clade, then creates labels for them.
 
 ## combined_distributions.R
-This file creates the density age plots.
+This file creates age density plots.
 
 ## fastvslowdensity.R 
 This file creates density plots for multiple groupings of fast and slow life history species.
