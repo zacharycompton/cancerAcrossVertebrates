@@ -62,14 +62,14 @@ pglsSEyPagel=function(model, data, tree, lambdaInterval=c(0,1),...){
   return(modPgls.SEy(model=model,data=data,tree=tree,corClass=corPagel,fixed=T,corClassValue=optimizedModel$minimum,...)) #Returns the final model fit
 }
 
-## Here I split the csv into class but do whatever you want
+#read and clean up csv
 Data<-read.csv(file="min20RAD_UPDATE.csv")
 View(Data)
 Data<-na.omit(Data)
+#read tree
 tree<-read.tree(file="min10radtree.nwk")
 
-
-
+#cut tree and data 
 Data$Species <- gsub(" ", "_", Data$Species)
 includedSpecies <- Data$Species
 pruned.tree<-drop.tip(
@@ -81,6 +81,8 @@ Data$Keep <- Data$Species %in% pruned.tree$tip.label
 Data <- Data[!(Data$Keep==FALSE),]
 rownames(Data)<-Data$Species
 SE<-setNames(Data$SE,Data$Species)[rownames(Data)]
+
+
 ##Model
 AUC.10.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(AUC10Gy), data=Data,
                             tree=pruned.tree,method="ML",se=SE)
@@ -88,6 +90,8 @@ summary(AUC.10.GY)
 auc<-lm(NeoplasiaPrevalence~log10(AUC10Gy), data=Data)
 summary(auc)$r.squared
 
+
+#grab r squared, p value, and lambda from summary 
 r.AUC.10.GY <- summary(AUC.10.GY)$corBeta
 r.AUC.10.GY <- format(r.AUC.10.GY[2,1])
 r.AUC.10.GY <-signif(as.numeric(r.AUC.10.GY)^2, digits = 2)
@@ -97,7 +101,7 @@ p.v.AUC.10.GY<-summary(AUC.10.GY)$tTable
 p.v.AUC.10.GY<-signif(p.v.AUC.10.GY[2,4], digits = 2)
 
 
-
+#plot
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC10Gy))) +
   scale_color_manual(values=c("#631879FF"))+
   scale_x_continuous(
@@ -133,6 +137,8 @@ ggsave(filename='RADAUC10.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 AUC.2.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(AUC2Gy), data=Data,
                           tree=pruned.tree,method="ML",se=SE)
 
+#grab r squared, p value, and lambda from summary 
+
 r.AUC.2.GY <- summary(AUC.2.GY)$corBeta
 r.AUC.2.GY <- format(r.AUC.2.GY[2,1])
 r.AUC.2.GY <-signif(as.numeric(r.AUC.2.GY)^2, digits = 2)
@@ -141,7 +147,7 @@ ld.v.AUC.2.GY <- signif(ld.v.AUC.2.GY[1], digits = 2)
 p.v.AUC.2.GY<-summary(AUC.2.GY)$tTable
 p.v.AUC.2.GY<-signif(p.v.AUC.2.GY[2,4], digits = 2)
 
-
+#plot
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC2Gy))) +
   scale_color_manual(values=c("#631879FF"))+
   scale_x_continuous(
@@ -174,6 +180,8 @@ ggsave(filename='RADAUC2.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 ##Model
 AUC.04.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(AUC04Gy), data=Data,
                          tree=pruned.tree,method="ML",se=SE)
+
+#grab r squared, p value, and lambda from summary 
 
 r.AUC.04.GY <- summary(AUC.04.GY)$corBeta
 r.AUC.04.GY <- format(r.AUC.04.GY[2,1])
@@ -212,14 +220,14 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC04Gy))) +
 ggsave(filename='RADAUC04.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 ##CHANGE 
-
+#read csv
 Data<-read.csv(file="min20RAD_UPDATE.csv")
 View(Data)
-
+#read tree
 tree<-read.tree(file="min10radtree.nwk")
 
 
-
+#prune tree and data 
 Data$Species <- gsub(" ", "_", Data$Species)
 includedSpecies <- Data$Species
 pruned.tree<-drop.tip(
@@ -237,6 +245,8 @@ SE<-setNames(Data$SE,Data$Species)[rownames(Data)]
 Change.10.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(Change10Gy), data=Data,
                           tree=pruned.tree,method="ML",se=SE)
 
+#grab r squared, p value, and lambda from summary 
+
 r.Change.10.GY <- summary(Change.10.GY)$corBeta
 r.Change.10.GY <- format(r.Change.10.GY[2,1])
 r.Change.10.GY <-signif(as.numeric(r.Change.10.GY)^2, digits = 2)
@@ -245,7 +255,7 @@ ld.v.Change.10.GY <- signif(ld.v.Change.10.GY[1], digits =2)
 p.v.Change.10.GY<-summary(Change.10.GY)$tTable
 p.v.Change.10.GY<-signif(p.v.Change.10.GY[2,4], digits = 2)
 
-
+#plot
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(Change10Gy))) +
   scale_color_manual(values=c("#631879FF"))+
   scale_x_continuous(
@@ -281,6 +291,8 @@ ggsave(filename='RADChange10.pdf', width=9.5, height=7, limitsize=FALSE,bg="whit
 Change.2.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(Change2Gy), data=Data,
                          tree=pruned.tree,method="ML",se=SE)
 
+#grab r squared, p value, and lambda from summary 
+
 r.Change.2.GY <- summary(Change.2.GY)$corBeta
 r.Change.2.GY <- format(r.Change.2.GY[2,1])
 r.Change.2.GY <-signif(as.numeric(r.Change.2.GY)^2, digits = 2)
@@ -289,7 +301,7 @@ ld.v.Change.2.GY <- signif(ld.v.Change.2.GY[1], digits = 2)
 p.v.Change.2.GY<-summary(Change.2.GY)$tTable
 p.v.Change.2.GY<-signif(p.v.Change.2.GY[2,4], digits = 2)
 
-
+#plot
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(Change2Gy))) +
   scale_color_manual(values=c("#631879FF"))+
   scale_x_continuous(
@@ -323,6 +335,8 @@ ggsave(filename='RADChange2.png', width=9.5, height=7, limitsize=FALSE,bg="white
 Change.04.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(Change04Gy), data=Data,
                           tree=pruned.tree,method="ML",se=SE)
 
+#grab r squared, p value, and lambda from summary 
+
 r.Change.04.GY <- summary(Change.04.GY)$corBeta
 r.Change.04.GY <- format(r.Change.04.GY[2,1])
 r.Change.04.GY <-signif(as.numeric(r.Change.04.GY)^2, digits = 3)
@@ -331,7 +345,7 @@ ld.v.Change.04.GY <- signif(ld.v.Change.04.GY[1], digits = 2)
 p.v.Change.04.GY<-summary(Change.04.GY)$tTable
 p.v.Change.04.GY<-signif(p.v.Change.04.GY[2,4], digits = 2)
 
-
+#plot
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(Change04Gy))) +
   scale_color_manual(values=c("#631879FF"))+
   scale_x_continuous(
@@ -369,6 +383,7 @@ ggsave(filename='RADChange04.png', width=9.5, height=7, limitsize=FALSE,bg="whit
 #10GY Change
 Change.10.GY.mal <- pglsSEyPagel(MalignancyPrevalence~log10(Change10Gy), data=Data,
                              tree=pruned.tree,method="ML",se=SE)
+#grab r squared, p value, and lambda from summary 
 
 r.Change.10.GY.mal <- summary(Change.10.GY.mal)$corBeta
 r.Change.10.GY.mal <- format(r.Change.10.GY.mal[2,1])
@@ -378,7 +393,7 @@ ld.v.Change.10.GY.mal <- signif(ld.v.Change.10.GY.mal[1], digits =2)
 p.v.Change.10.GY.mal<-summary(Change.10.GY.mal)$tTable
 p.v.Change.10.GY.mal<-signif(p.v.Change.10.GY.mal[2,4], digits = 2)
 
-
+#plot
 ggplot(Data, aes(y=MalignancyPrevalence*100, x=log10(Change10Gy))) +
   scale_color_manual(values=c("#631879FF"))+
   scale_x_continuous(
@@ -414,6 +429,8 @@ ggsave(filename='RADChange10mal.png', width=9.5, height=7, limitsize=FALSE,bg="w
 Change.2.GY.mal <- pglsSEyPagel(MalignancyPrevalence~log10(Change2Gy), data=Data,
                             tree=pruned.tree,method="ML",se=SE)
 
+#grab r squared, p value, and lambda from summary 
+
 r.Change.2.GY.mal <- summary(Change.2.GY.mal)$corBeta
 r.Change.2.GY.mal <- format(r.Change.2.GY.mal[2,1])
 r.Change.2.GY.mal <-signif(as.numeric(r.Change.2.GY.mal)^2, digits = 2)
@@ -422,7 +439,7 @@ ld.v.Change.2.GY.mal <- signif(ld.v.Change.2.GY.mal[1], digits = 2)
 p.v.Change.2.GY.mal<-summary(Change.2.GY.mal)$tTable
 p.v.Change.2.GY.mal<-signif(p.v.Change.2.GY.mal[2,4], digits = 2)
 
-
+#plot
 ggplot(Data, aes(y=MalignancyPrevalence*100, x=log10(Change2Gy))) +
   scale_color_manual(values=c("#631879FF"))+
   scale_x_continuous(
@@ -456,6 +473,8 @@ ggsave(filename='RADChange2mal.png', width=9.5, height=7, limitsize=FALSE,bg="wh
 Change.04.GY.mal <- pglsSEyPagel(MalignancyPrevalence~log10(Change04Gy), data=Data,
                              tree=pruned.tree,method="ML",se=SE)
 
+#grab r squared, p value, and lambda from summary 
+
 r.Change.04.GY.mal <- summary(Change.04.GY.mal)$corBeta
 r.Change.04.GY.mal <- format(r.Change.04.GY.mal[2,1])
 r.Change.04.GY.mal <-signif(as.numeric(r.Change.04.GY.mal)^2, digits = 2)
@@ -465,6 +484,7 @@ p.v.Change.04.GY.mal<-summary(Change.04.GY.mal)$tTable
 p.v.Change.04.GY.mal<-signif(p.v.Change.04.GY.mal[2,4], digits = 2)
 
 
+#plot
 ggplot(Data, aes(y=MalignancyPrevalence*100, x=log10(Change04Gy))) +
   scale_color_manual(values=c("#631879FF"))+
   scale_x_continuous(

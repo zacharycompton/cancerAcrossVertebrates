@@ -38,6 +38,9 @@ rownames(Data)<-Data$common_name
 Data <- Data[,c(4,5),drop=FALSE] 
 name.check(pruned.tree,Data)
 
+
+#create malignancy and neoplasia matrix
+
 colnames(Data) <- c('Malignancy Prevalence', 'Neoplasia Prevalence')
 
 matData<-as.matrix(Data)
@@ -112,11 +115,13 @@ arc.cladelabels<-function(tree=NULL,text,node,ln.offset=1.02,
 #plot with labels
 
 
-
+#create color list
 
 colors<-c("#1B1919FF","#3B4992FF","#EE0000FF","#008280FF","#BB0021FF","#A20056FF","#5F559BFF")
 
 names(colors)<-0:6
+
+#color code tree branches
 
 pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, rodentia$common_name),state="1",anc="0")
 pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, artio$common_name),state="2")
@@ -129,6 +134,9 @@ pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, diprotodontia$c
 plotSimmap(pruned.tree,colors,type="fan",xlim=xlim,ylim=ylim,
            lwd=1,ftype="i",fsize=1,part=0.5)
 
+
+#order labels
+
 par(fg="#3B4992FF")
 arc.cladelabels(text="Rodentia",cex = .8,node=findMRCA(pruned.tree, rodentia$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE)
 
@@ -138,22 +146,16 @@ arc.cladelabels(text="Artiodactyla",cex = .8,node=findMRCA(pruned.tree, artio$co
 par(fg="#008280FF")
 arc.cladelabels(text="Carnivora",cex = .8,node=findMRCA(pruned.tree, carnivora$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE)
 
-#arc.cladelabels(text="Cetacea",cex = .8,node=findMRCA(pruned.tree, cetacea$common_name),ln.offset=1.7,lab.offset=1.75)
+
 par(fg="#BB0021FF")
 arc.cladelabels(text=" Chiroptera",cex = .8,node=findMRCA(pruned.tree, chiroptera$common_name),ln.offset=1.7,lab.offset=1.75,mark.node =FALSE)
-#arc.cladelabels(text="Didelphimorphia",cex=.5,node=findMRCA(pruned.tree, didelphimorphia$common_name),ln.offset=1.7,lab.offset=1.8, orientation = "horizontal")
-#arc.cladelabels(text="Eulipotyphla",node=which(pruned.tree$tip.label=="Four-toed_hedgehog"), orientation="horizontal",ln.offset=1.7,lab.offset=1.75)
-#arc.cladelabels(text="Hyracoidea",fsize=.4,node=65,orientation="horizontal",ln.offset=1.45,lab.offset=1.5,mark.node=FALSE)
-#arc.cladelabels(text="Lagomorpha",cex.sub=.1,node=which(pruned.tree$tip.label=="Domestic_rabbit"),orientation="horizontal",ln.offset=1.45,lab.offset=1.45, mark.node=FALSE)
-#arc.cladelabels(text="Perissodactyla",cex = .8,node=which(pruned.tree$tip.label=="Grevys_zebra"),orientation="horizontal",ln.offset=1.45,lab.offset=1.5, mark.node=FALSE)
+
 par(fg="#A20056FF")
 arc.cladelabels(text="Primates",cex = .8,node=findMRCA(pruned.tree, primates$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE)
 
-#arc.cladelabels(text="Proboscidea",cex = .8,node=which(pruned.tree$tip.label=="Asian_elephant"),orientation="horizontal",ln.offset=1.45,lab.offset=1.5, mark.node=FALSE)
 par(fg="#5F559BFF")
 arc.cladelabels(text="Diprotodontia",cex = .8,node=findMRCA(pruned.tree, diprotodontia$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE)
 
-#arc.cladelabels(text="Cingulata",node=which(pruned.tree$tip.label=="Nine-banded_armadillo"),ln.offset=1.45,lab.offset=1.5,fsize=0.5, orientation = "horizontal",mark.node=FALSE)
 
 title(main = "A",col.main= "black",adj = .1, line = -1)
 
@@ -235,6 +237,7 @@ Data <- Data[,c(4,5),drop=FALSE]
 name.check(pruned.tree,Data)
 
 
+#create malignancy and neoplasia matrix
 
 colnames(Data) <- c('Malignancy Prevalence', 'Neoplasia Prevalence')
 
@@ -252,6 +255,9 @@ cols<-c("#631879FF","#008b45ff")
 xlim<-ylim<-1.2*c(-h,h)+c(-1,1)*0.15*m*h+0.2*c(-h,h)
 ylim<-c(0,ylim[2])
 ## plot tree
+
+
+#filter by order
 
 accipitriformes<-filter(specData, is.element(Orders, c("Accipitriformes")))
 anseriformes<-filter(specData, is.element(Orders, c("Anseriformes")))
@@ -275,6 +281,10 @@ testudines<-filter(specData, is.element(Orders, c("Testudines")))
 
 plotTree(pruned.tree,type="fan",xlim=xlim,ylim=ylim,
          lwd=1,ftype="i",fsize=1,part=0.5)
+
+
+#color tree branches
+
 colors<-c("#1B1919FF","#3B4992FF","#EE0000FF","#BB0021FF","#008280FF","#A20056FF","#5F559BFF")
 
 pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, anseriformes$common_name),state="1",anc="0")
@@ -290,34 +300,29 @@ plotSimmap(pruned.tree,colors,type="fan",xlim=xlim,ylim=ylim,
            lwd=1,ftype="i",fsize=1,part=0.5)
 
 
-#arc.cladelabels(text="Accipitriformes",cex = .8,node=findMRCA(pruned.tree, accipitriformes$common_name),ln.offset=1.7,lab.offset=1.8)
+#add labels
+
 par(fg="#3B4992FF")
 arc.cladelabels(text="Anseriformes",cex = .8,node=findMRCA(pruned.tree, anseriformes$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE)
 
-#arc.cladelabels(text="Bucerotiformes",cex = .8,node=findMRCA(pruned.tree, bucerotiformesiformes$common_name),ln.offset=1.7,lab.offset=1.75)
-#arc.cladelabels(text="Charadriiformes",cex = .8,node=findMRCA(pruned.tree, charadriiformes$common_name),ln.offset=1.7,lab.offset=1.75)
-#arc.cladelabels(text="Caprimulgiformes",cex = .8,node=findMRCA(pruned.tree, caprimulgiformes$common_name),ln.offset=1.7,lab.offset=1.75)
-#arc.cladelabels(text=" Ciconiiformes",cex = .8,node=findMRCA(pruned.tree, ciconiiformes$common_name),ln.offset=1.7,lab.offset=1.75)
-#arc.cladelabels(text="    Columbiformes",cex = .8,node=findMRCA(pruned.tree, columbiformes$common_name),ln.offset=1.7,lab.offset=1.75)
-#arc.cladelabels(text="Crocodilia",cex = .8,node=findMRCA(pruned.tree, crocodilia$common_name),ln.offset=1.7,lab.offset=1.75)
 par(fg="#EE0000FF")
 arc.cladelabels(text="Galliformes",cex = .8,node=findMRCA(pruned.tree, galliformes$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE)
+
 par(fg="#BB0021FF")
 arc.cladelabels(text="Pelecaniformes",cex = .8,node=findMRCA(pruned.tree, pelecaniformes$common_name),ln.offset=1.7,lab.offset=1.75, mark.node=FALSE,mark.node=FALSE)
 
 par(fg="#008280FF")
 arc.cladelabels(text="Passeriformes",cex = .8,node=findMRCA(pruned.tree, passeriformes$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE)
-#arc.cladelabels(text="piciformes",cex = .8,node=findMRCA(pruned.tree, piciformes$common_name),ln.offset=1.7,lab.offset=1.75)
+
 par(fg="#A20056FF")
 arc.cladelabels(text="Psittaciformes",cex = .8,node=findMRCA(pruned.tree, psittaciformes$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE)
-#arc.cladelabels(text="Rheiformes",cex = .8,node=findMRCA(pruned.tree, rheiformes$common_name),ln.offset=1.7,lab.offset=1.75)
-#arc.cladelabels(text="Sphenisciformes",cex = .8,node=findMRCA(pruned.tree, sphenisciformes$common_name),ln.offset=1.7,lab.offset=1.75)
+
 par(fg="#5F559BFF")
 arc.cladelabels(text="Squamata",cex = .8,node=findMRCA(pruned.tree, squamata$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE,mark.node=FALSE)
-#arc.cladelabels(text="Strigiformes",cex = .8,node=findMRCA(pruned.tree, strigiformes$common_name),ln.offset=1.7,lab.offset=1.75)
-#arc.cladelabels(text="Testudines",cex = .8,node=findMRCA(pruned.tree, testudines$common_name),ln.offset=1.7,lab.offset=1.75)
 
 title(main = "B",col.main= "black",adj = 0, line = -1)
+
+
 ## add traits
 for(i in 1:m){
   tt<-pruned.tree ## copy tree
@@ -390,21 +395,14 @@ rownames(Data)<-Data$common_name
 Data <- Data[,c(4,5),drop=FALSE] 
 name.check(pruned.tree,Data)
 
-
+#create malignancy and neoplasia matrix
 colnames(Data) <- c('Malignancy Prevalence', 'Neoplasia Prevalence')
 
 matData<-as.matrix(Data)
 
 
-## run phylogenetic PCA
-#anole.pca<-phyl.pca(pruned.pruned.tree,matData,mode="corr")
-#anole.pca
-## extract scores for first two PCs
 anole.pc<-(matData)[,1:2]
-## normalize to have the same variance
-#anole.norm<-anole.pc/matrix(rep(apply(anole.pc,2,sd),nrow(anole.pc)),
-#                            nrow(anole.pc),ncol(anole.pc),byrow=TRUE)*0.2
-## set background black & foreground to white for plotting
+
 par(fg="black",bg="white")
 ## compute max pruned.tree height and number of traits
 h<-max(nodeHeights(pruned.tree))
@@ -425,9 +423,11 @@ anura<-filter(specData, is.element(Orders, c("Anura")))
 caudata<-filter(specData, is.element(Orders, c("Caudata")))
 gymnophiona<-filter(specData, is.element(Orders, c("Gymnophiona")))
 
-
+#create color list
 colors<-c("#1B1919FF","#3B4992FF","#EE0000FF")
 
+
+#color tree branches
 pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, anura$common_name),state="1",anc="0")
 pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, caudata$common_name),state="2")
 
@@ -441,7 +441,6 @@ par(fg="#3B4992FF")
 arc.cladelabels(text="Anura",cex = .8,node=findMRCA(pruned.tree, anura$common_name),ln.offset=1.7,lab.offset=1.75, mark.node=FALSE)
 par(fg="#EE0000FF")
 arc.cladelabels(text="Caudata",cex = .8,node=findMRCA(pruned.tree, caudata$common_name),ln.offset=1.7,lab.offset=1.75, mark.node=FALSE)
-#arc.cladelabels(text="Gymnophiona",cex.sub=.1,node=which(pruned.tree$tip.label=="Gaboon_caecilian"),orientation="horizontal",ln.offset=1.45,lab.offset=1.45, mark.node=FALSE)
 
 title(main = "C",col.main= "black",adj = .1, line = -1)
 ## add traits

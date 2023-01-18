@@ -69,9 +69,7 @@ pglsSEyPagel=function(model, data, tree, lambdaInterval=c(0,1),...){
 #read data
 Data <- read.csv("min20516.csv")
 View(Data)
-pvals <- data.frame(matrix(ncol = 2, nrow = 0))
-x <- c("Test", "pvalue")
-colnames(pvals) <- x
+
 
 
 
@@ -96,9 +94,13 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 adult.weight.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(adult_weight.g.),data=cutData,tree=pruned.tree,se=SE,method = "ML")
 
 summary(adult.weight.neo) 
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.adult.weight.neo <- summary(adult.weight.neo)$corBeta
 r.v.adult.weight.neo <- format(r.v.adult.weight.neo[2,1])
@@ -108,7 +110,8 @@ ld.v.adult.weight.neo <- signif(ld.v.adult.weight.neo[1], digits = 2)
 p.v.adult.weight.neo<-summary(adult.weight.neo)$tTable
 p.v.adult.weight.neo<-signif(p.v.adult.weight.neo[2,4], digits = 2)
 
-#Brian: First line is where you make change. log10 x value. delete scale x continous completely
+
+#plot
 wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)))+
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ),)+
   scale_y_continuous(
@@ -136,7 +139,6 @@ wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.))
 
 #ggsave(filename='wgtneol.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
-pvals[nrow(pvals) + 1,] = c("wgtneo",p.v.adult.weight.neo)
 #adult weight mal
 cutData <- Data[,c(5,9,10,11,17,38,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
@@ -157,9 +159,12 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+#pgls model
 adult.weight.mal<-pglsSEyPagel(MalignancyPrevalence~log10(adult_weight.g.),data=cutData,
                                tree=pruned.tree,se=SE,method="ML")
 summary(adult.weight.mal)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.adult.weight.mal <- summary(adult.weight.mal)$corBeta
 r.v.adult.weight.mal <- format(r.v.adult.weight.mal[2,1])
@@ -201,7 +206,6 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)))+
 
 #ggsave(filename='S1wgtmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
-pvals[nrow(pvals) + 1,] = c("wgtmal",p.v.adult.weight.mal)
 #gestation models
 #gestation neo
 cutData <- Data[,c(5,9,10,11,13,30,42),drop=FALSE] 
@@ -222,10 +226,14 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 gestation.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(Gestation.months.),data=cutData,
                             tree=pruned.tree,method="ML",se=SE)
 
 summary(gestation.neo)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.gestneo <- summary(gestation.neo)$corBeta
 r.v.gestneo <- format(r.v.gestneo[2,1])
@@ -256,7 +264,7 @@ gestneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(Gestation.months
   labs(title="A")
 
 ##ggsave(filename='S2gestneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
-pvals[nrow(pvals) + 1,] = c("gestneo",p.v.gestneo)
+
 #gestation mal
 cutData <- Data[,c(5,9,10,11,17,30,42),drop=FALSE] 
 cutData[cutData$Gestation.months. < 0, ] <-NA
@@ -276,10 +284,12 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
-
+#pgls model
 gestation.mal<-pglsSEyPagel(MalignancyPrevalence~log10(Gestation.months.),data=cutData,
                             tree=pruned.tree,method="ML",se=SE)
 summary(gestation.mal)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.gestmal <- summary(gestation.mal)$corBeta
 r.v.gestmal <- format(r.v.gestmal[2,1])
@@ -310,8 +320,9 @@ gestmal<-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.month
   labs(title="B")
 
 ##ggsave(filename='gestmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
-pvals[nrow(pvals) + 1,] = c("gestmal",p.v.gestmal)
+
 gestneo/gestmal
+
 #ggsave(filename='gestneomal.pdf', width=9.5, height=18, limitsize=FALSE,bg="white")
 
 
@@ -336,9 +347,12 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+#pgls model
 litter.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(litter_size),data=cutData,
                          tree=pruned.tree,method="ML",se=SE)
 summary(litter.neo)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.litneo <- summary(litter.neo)$corBeta
 r.v.litneo <- format(r.v.litneo[2,1])
@@ -375,8 +389,6 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litter_size))) +
 
 #ggsave(filename='S3litneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
-pvals[nrow(pvals) + 1,] = c("littersizeneo",p.v.litneo)
-
 #litter size mal
 cutData <- Data[,c(5,9,10,11,17,33,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
@@ -397,9 +409,13 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 litter.mal <- pglsSEyPagel(MalignancyPrevalence~log10(litter_size),data=cutData,
                            tree=pruned.tree,method="ML",se=SE)
 summary(litter.mal)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.litmal <- summary(litter.mal)$corBeta
 r.v.litmal <- format(r.v.litmal[2,1])
@@ -435,7 +451,6 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litter_size))) +
 
 #ggsave(filename='S4litmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
-pvals[nrow(pvals) + 1,] = c("littersizemal",p.v.litmal)
 
 ### Longevity model
 #longevity neo
@@ -459,10 +474,12 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
-
+#pgls model
 longevity.neo<-pglsSEyPagel(NeoplasiaPrevalence~max_longevity.months.,data=cutData,
                             tree=pruned.tree,method="ML",se=SE)
 summary(longevity.neo)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.longneo <- summary(longevity.neo)$corBeta
 r.v.longneo <- format(r.v.longneo[2,1])
@@ -499,7 +516,6 @@ longneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(max_longevity.mo
 
 #ggsave(filename='longneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
-pvals[nrow(pvals) + 1,] = c("longneo",p.v.longneo)
 
 #create weight over longevity model
 wgtneo/longneo
@@ -528,9 +544,13 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 longevity.mal<-pglsSEyPagel(MalignancyPrevalence~(max_longevity.months.),data=cutData,
                             tree=pruned.tree,method="ML",se=SE)
 summary(longevity.mal)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.longmal <- summary(longevity.mal)$corBeta
 r.v.longmal <- format(r.v.longmal[2,1])
@@ -566,8 +586,6 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(max_longevity.months.)))
 
 #ggsave(filename='S5longmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
-pvals[nrow(pvals) + 1,] = c("longneo",p.v.longmal)
-
 
 ##BMR models
 #bmr neo
@@ -593,10 +611,12 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
-
+#pgls model
 BMR.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(metabolic_rate),data=cutData,
                       tree=pruned.tree,method="ML",se=SE)
 summary(BMR.neo)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.bmrneo <- summary(BMR.neo)$corBeta
 r.v.bmrneo <- format(r.v.bmrneo[2,1])
@@ -632,7 +652,6 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(metabolic_rate))) +
 
 #ggsave(filename='S6bmrneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
-pvals[nrow(pvals) + 1,] = c("bmrneo",p.v.bmrneo)
 
 #bmr mal
 
@@ -658,9 +677,13 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 BMR.mal<-pglsSEyPagel(MalignancyPrevalence~log10(metabolic_rate),data=cutData,
                       tree=pruned.tree,method="ML",se=SE)
 summary(BMR.mal)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.bmrmal <- summary(BMR.mal)$corBeta
 r.v.bmrmal <- format(r.v.bmrmal[2,1])
@@ -696,7 +719,6 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(metabolic_rate))) +
 
 #ggsave(filename='S7bmrmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
-pvals[nrow(pvals) + 1,] = c("bmrmal",p.v.bmrmal)
 
 #wxl models #weight and longevity
 #wxl neo
@@ -721,10 +743,14 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 wxl.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(max_longevity.months.*adult_weight.g.),data=cutData,
                       tree=pruned.tree,method="ML",se=SE)
 
 summary(wxl.neo)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.wxneo <- summary(wxl.neo)$corBeta
 r.v.wxneo <- format(r.v.wxneo[2,1])
@@ -782,10 +808,14 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 wxl.mal<-pglsSEyPagel(MalignancyPrevalence~log10(max_longevity.months.*adult_weight.g.),data=cutData,
                       tree=pruned.tree,method="ML",se=SE)
 
 summary(wxl.mal)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.wxmal <- summary(wxl.mal)$corBeta
 r.v.wxmal <- format(r.v.wxmal[2,1])
@@ -841,9 +871,13 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 lityear.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(litters_year),data=cutData,
                           tree=pruned.tree,method="ML",se=SE)
 summary(lityear.neo)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.lyearneo <- summary(lityear.neo)$corBeta
 r.v.lyearneo <- format(r.v.lyearneo[2,1])
@@ -878,8 +912,6 @@ lityearneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litters_year)
 
 #ggsave(filename='lityearneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
-pvals[nrow(pvals) + 1,] = c("litpyearneo",p.v.lyearneo)
-
 
 #create lit year over gest model
 lityearneo/gestmal
@@ -906,9 +938,13 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 lityear.mal<-pglsSEyPagel(MalignancyPrevalence~log10(litters_year),data=cutData,
                           tree=pruned.tree,method="ML",se=SE)
 summary(lityear.mal)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.lyearmal <- summary(lityear.mal)$corBeta
 r.v.lyearmal <- format(r.v.lyearmal[2,1])
@@ -944,8 +980,6 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litters_year))) +
 
 #ggsave(filename='S10lityearmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
-pvals[nrow(pvals) + 1,] = c("litpyearmal",p.v.lyearmal)
-
 ####Female Maturity neo
 cutData <- Data[,c(5,9,10,11,13,28,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
@@ -966,9 +1000,13 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 Fmaturity.neo<-pglsSEyPagel(NeoplasiaPrevalence~female_maturity.months.,data=cutData,
                             tree=pruned.tree,method="ML",se=SE)
 summary(Fmaturity.neo)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.fmaturityneo <- summary(Fmaturity.neo)$corBeta
 r.v.fmaturityneo <- format(r.v.fmaturityneo[2,1])
@@ -1004,7 +1042,6 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(female_maturity.months.))
 
 #ggsave(filename='S11femmatneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
-pvals[nrow(pvals) + 1,] = c("femmatneo",p.v.fmaturityneo)
 
 #Female Maturity Mal
 cutData <- Data[,c(5,9,10,11,17,28,42),drop=FALSE] 
@@ -1026,9 +1063,13 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 Fmaturity.mal<-pglsSEyPagel(MalignancyPrevalence~female_maturity.months.,data=cutData,
                             tree=pruned.tree,method="ML",se=SE)
 summary(Fmaturity.mal)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.fmaturitymal <- summary(Fmaturity.mal)$corBeta
 r.v.fmaturitymal <- format(r.v.fmaturitymal[2,1])
@@ -1064,8 +1105,6 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(female_maturity.months.)
 
 #ggsave(filename='S12femmatmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
-pvals[nrow(pvals) + 1,] = c("femmatmal",p.v.fmaturitymal)
-
 ####Male Maturity neo
 cutData <- Data[,c(5,9,10,11,13,29,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
@@ -1086,9 +1125,13 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 Mmaturity.neo<-pglsSEyPagel(NeoplasiaPrevalence~male_maturity.months.,data=cutData,
                             tree=pruned.tree,method="ML",se=SE)
 summary(Mmaturity.neo)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.Mmaturityneo <- summary(Mmaturity.neo)$corBeta
 r.v.Mmaturityneo <- format(r.v.Mmaturityneo[2,1])
@@ -1123,7 +1166,6 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(male_maturity.months.))) 
   annotate("text", x=-0.74, y=83.8, label = "13", size = 7)
 
 #ggsave(filename='S13malematneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
-pvals[nrow(pvals) + 1,] = c("malematneo",p.v.Mmaturityneo)
 
 #Male Maturity Mal
 cutData <- Data[,c(5,9,10,11,17,29,42),drop=FALSE] 
@@ -1145,9 +1187,13 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 Mmaturity.mal<-pglsSEyPagel(MalignancyPrevalence~male_maturity.months.,data=cutData,
                             tree=pruned.tree,method="ML",se=SE)
 summary(Mmaturity.mal)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.Mmaturitymal <- summary(Mmaturity.mal)$corBeta
 r.v.Mmaturitymal <- format(r.v.Mmaturitymal[2,1])
@@ -1183,8 +1229,6 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(male_maturity.months.)))
 
 #ggsave(filename='S14malematmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
-pvals[nrow(pvals) + 1,] = c("malematmal",p.v.Mmaturitymal)
-
 #Weaning Weight neo
 cutData <- Data[,c(5,9,10,11,13,37,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
@@ -1205,9 +1249,13 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 weanw.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(weaning_weight.g.),data=cutData,
                         tree=pruned.tree,method="ML",se=SE)
 summary(weanw.neo)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.weanwneo <- summary(weanw.neo)$corBeta
 r.v.weanwneo <- format(r.v.weanwneo[2,1])
@@ -1243,8 +1291,6 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(weaning_weight.g.))) +
 
 #ggsave(filename='S15weanneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
-pvals[nrow(pvals) + 1,] = c("weanweightneo",p.v.weanwneo)
-
 #Weaning Weight Mal
 cutData <- Data[,c(5,9,10,11,17,37,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
@@ -1265,9 +1311,12 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+#pgls model
 weanw.mal<-pglsSEyPagel(MalignancyPrevalence~log10(weaning_weight.g.),data=cutData,
                         tree=pruned.tree,method="ML",se=SE)
 summary(weanw.mal)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.weanwmal <- summary(weanw.mal)$corBeta
 r.v.weanwmal <- format(r.v.weanwmal[2,1])
@@ -1303,8 +1352,6 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(weaning_weight.g.))) +
 
 #ggsave(filename='S16weanmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
-pvals[nrow(pvals) + 1,] = c("weanweightmal",p.v.weanwmal)
-
 #Growth Rate Neo
 cutData <- Data[,c(5,9,10,11,13,39,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
@@ -1325,9 +1372,13 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 GrowthR.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(growth_rate.1.days.),data=cutData,
                           tree=pruned.tree,method="ML",se=SE)
 summary(GrowthR.neo)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.GrowthRneo <- summary(GrowthR.neo)$corBeta
 r.v.GrowthRneo <- format(r.v.GrowthRneo[2,1])
@@ -1363,8 +1414,6 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(growth_rate.1.days.))) +
 
 #ggsave(filename='S17growneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
-pvals[nrow(pvals) + 1,] = c("growthtneo",p.v.GrowthRneo)
-
 #Growth Rate Mal
 cutData <- Data[,c(5,9,10,11,17,39,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
@@ -1385,9 +1434,13 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 GrowthR.mal<-pglsSEyPagel(MalignancyPrevalence~log10(growth_rate.1.days.),data=cutData,
                           tree=pruned.tree,method="ML",se=SE)
 summary(GrowthR.mal)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.GrowthRmal <- summary(GrowthR.mal)$corBeta
 r.v.GrowthRmal <- format(r.v.GrowthRmal[2,1])
@@ -1423,8 +1476,6 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(growth_rate.1.days.))) +
 
 #ggsave(filename='S18growmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
-pvals[nrow(pvals) + 1,] = c("growthtmal",p.v.GrowthRmal)
-
 #w+g
 
 cutData <- Data[,c(5,9,10,11,13,38,30,42),drop=FALSE] 
@@ -1448,12 +1499,16 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 wpl.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(Gestation.months.)+log10(adult_weight.g.),data=cutData,
                       tree=pruned.tree,method="ML",se=SE)
 
 coef(wpl.neo)
 
 summary(wpl.neo)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.wpneo <- summary(wpl.neo)$corBeta
 r.v.wpneo <- format(r.v.wpneo[3,1])
@@ -1503,8 +1558,6 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)+log10(Ge
 #ggsave(filename='S19wgtgestneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 
-pvals[nrow(pvals) + 1,] = c("wgt+gestneo",combopwpgneo)
-
 
 #w+g mal
 
@@ -1529,10 +1582,13 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+#pgls model
 wpl.mal<-pglsSEyPagel(MalignancyPrevalence~log10(Gestation.months.)+log10(adult_weight.g.),data=cutData,
                       tree=pruned.tree,method="ML",se=SE)
 
 summary(wpl.mal)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.wpmal <- summary(wpl.mal)$corBeta
 r.v.wpmal <- format(r.v.wpmal[2,1])
@@ -1575,8 +1631,6 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.months.)+log10
   labs(colour="Clade", size="Total Necropsies")+
   annotate("text", x=.13, y=50.3, label = "20", size = 7)
 
-pvals[nrow(pvals) + 1,] = c("wgt+gestmal",combopwpgmal)
-
 
 #ggsave(filename='S20wgtgestmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
@@ -1603,11 +1657,15 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 wppl.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(Gestation.months.)+log10(max_longevity.months.),data=cutData,
                       tree=pruned.tree,method="ML",se=SE)
 
 summary(wppl.neo)
 coef(wppl.neo)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.wpplneo <- summary(wppl.neo)$corBeta
 r.v.wpplneo <- format(r.v.wpplneo[2,1])
@@ -1621,12 +1679,11 @@ c.wpplneogest<-coef(wppl.neo)[2]
 c.wpplneolong<-coef(wppl.neo)[3]
 
 
-
+#combine p values for fisher p value
 pvalues<-c(p.v.wpplneogest,p.v.wpplneolong)
 
 combopwpplneo<-fisher(pvalues)
 
-pvals[nrow(pvals) + 1,] = c("wgt+gestmal",combopwpplneo)
 
 
 #g+l mal
@@ -1652,10 +1709,14 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+
+#pgls model
 wppl.mal<-pglsSEyPagel(MalignancyPrevalence~log10(Gestation.months.)+log10(max_longevity.months.),data=cutData,
                       tree=pruned.tree,method="ML",se=SE)
 
 summary(wppl.mal)
+
+#grab r squared, lambda, and p values from summary 
 
 r.v.wpplmal <- summary(wppl.mal)$corBeta
 r.v.wpplmal <- format(r.v.wpplmal[2,1])
@@ -1669,15 +1730,70 @@ c.wpplmalgest<-coef(wppl.mal)[2]
 c.wpplmallong<-coef(wppl.mal)[3]
 
 
-
+#combine p values for fisher p value
 pvalues<-c(p.v.wpplmalgest,p.v.wpplmallong)
 
 combopwpplmal<-fisher(pvalues)
 
 
-pvals[nrow(pvals) + 1,] = c("wgt+gestmal",combopwpplmal)
+#adult weight and gest length model
 
-write.csv(pvals,"/Users/walkermellon/Documents/pvalues.csv", row.names = FALSE)
+cutData <- Data[,c(5,9,10,11,13,38,30,42),drop=FALSE] 
+cutData[cutData == -1 ] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+view(cutData)
+
+#pgls model
+wgt.gest<-pglsSEyPagel(Gestation.months.~log10(adult_weight.g.),data=cutData,tree=pruned.tree,se=SE,method = "ML")
+
+summary(wgt.gest) 
 
 
+#grab r squared, lambda, and p values from summary 
+r.v.wgt.gest <- summary(wgt.gest)$corBeta
+r.v.wgt.gest <- format(r.v.wgt.gest[2,1])
+r.v.wgt.gest <-signif(as.numeric(r.v.wgt.gest)^2, digits= 2)
+ld.v.wgt.gest<- summary(wgt.gest)$modelStruct$corStruct
+ld.v.wgt.gest <- signif(ld.v.wgt.gest[1], digits = 2)
+p.v.wgt.gest<-summary(wgt.gest)$tTable
+p.v.wgt.gest<-signif(p.v.wgt.gest[2,4], digits = 2)
+
+
+
+#plot
+wgtgest<-ggplot(cutData, aes(y=Gestation.months., x=log10(adult_weight.g.)))+
+  scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ),)+
+  geom_abline() +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Gestation length") +
+  xlab("(log10) Adult Weight (g)") +
+  geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
+  scale_size(name   = "Total Necropsies",
+             breaks = c(20,100,200,300,477),
+             labels =  c(20,100,200,300,477))+
+  geom_text_repel(aes(label=ifelse( Gestation.months. > 8,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  guides(colour = guide_legend(override.aes = list(size=3))) +
+  labs(title = "Gestation v. Adult Weight",
+       subtitle =bquote(p-value:.(p.v.wgt.gest)~R^2:.(r.v.wgt.gest)~Lambda:.(ld.v.wgt.gest))) +
+  theme(
+    plot.title = element_text(size = 20, face = "bold")) +
+  theme(legend.position = "bottom")+
+  labs(colour="Clade", size="Total Necropsies")
+
+
+wgtgest
 

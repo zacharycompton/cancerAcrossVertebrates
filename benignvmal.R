@@ -9,22 +9,27 @@ library(ggrepel)
 cleanPath <- read.csv("cleanPath.min20.062822.csv")
 min20Data <- read.csv("min20516.csv")
 view(min20Data)
+
+#linear model mav vs benign
 malben<-lm(MalignancyPrevalence~BenignPrevalence,data = min20Data) 
 summary(malben)
 summary(malben)$r.squared
 summary(malben)$coefficients[2,4]
 
+#ks test for benign lifespan vs malignant lifespan
 benign<-filter(cleanPath, is.element(Malignant, c(0)))
 malignant<-filter(cleanPath, is.element(Malignant, c(1)))
 ks.test(benign$proportion_lifespan,malignant$proportion_lifespan)
 cleanPath<- filter(cleanPath,Malignant >= 0)
 
 
-
+#grab r squared
 r2<-signif(as.numeric(summary(malben)$r.squared)^2, digits= 2)
 pval<-signif(as.numeric(summary(malben)$coefficients[2,4])^2, digits= 2)
 
 
+
+#plot malignancy prev vs benign prev
 ggplot(min20Data, aes(y=MalignancyPrevalence*100, x= BenignPrevalence*100))+
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ),)+
   scale_y_continuous(
@@ -57,12 +62,12 @@ ggplot(min20Data, aes(y=MalignancyPrevalence*100, x= BenignPrevalence*100))+
 
 
 
-
+#save 
 ggsave(filename='benignvmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 
-
+#plot prop lifespan malignant factor
 bvm<- ggplot(cleanPath, aes(x=proportion_lifespan*100, y=..scaled..,fill=factor((Malignant)))) + 
   geom_density(alpha=0.25) + 
   ggtitle("Tumor v. No Tumor Slow Life History",

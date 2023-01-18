@@ -17,14 +17,19 @@ cutoff<-median(fastSlow$wgtxlong)
 #slow == 0
 fastSlow$fastslow<-ifelse(fastSlow$wgtxlong>=cutoff,'0','1')
 
+
+#filter for all 
 fast<-filter(fastSlow, is.element(fastslow, c(1)))
 fast<-fast[fast$proportion_lifespan > 1, ]
 slow<-filter(fastSlow, is.element(fastslow, c(0)))
 slow<-slow[slow$proportion_lifespan > 1, ]
+#ks test
 ks.test(fast$proportion_lifespan,slow$proportion_lifespan)
 
 view(fastSlow)
 
+
+#plot
 fastvslowall<- ggplot(fastSlow, aes(x=proportion_lifespan*100, y=..scaled..,fill=factor((fastslow)))) + 
   geom_density(alpha=0.25) + 
   ggtitle("Fast v. Slow Density",
@@ -42,11 +47,11 @@ ggsave("fastvslowall.pdf",width=13, height=10, limitsize=FALSE,bg="white")
 
 #filter for mammals
 fastSlowMamm <- filter(fastSlow,Clade == "Mammalia")
-
 fastMamm<-filter(fastSlowMamm, is.element(fastslow, c(1)))
 fastMamm<-fastMamm[fastMamm$proportion_lifespan > 1, ]
 slowMamm<-filter(fastSlowMamm, is.element(fastslow, c(0)))
 slowMamm<-slowMamm[slowMamm$proportion_lifespan > 1, ]
+#ks test
 ks.test(fastMamm$proportion_lifespan,slowMamm$proportion_lifespan)
 
 fastvslowMamm<- ggplot(fastSlowMamm, aes(x=proportion_lifespan*100, y=..scaled..,fill=factor((fastslow)))) + 

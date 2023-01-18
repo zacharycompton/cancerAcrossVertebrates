@@ -28,27 +28,6 @@ pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
 Data$Keep <- Data$Species %in% pruned.tree$tip.label
 Data <- Data[!(Data$Keep==FALSE),]
 
-#write.csv(Data,"/Users/walkermellon/Documents/cav/cancerAcrossVertebrates/newPhyloCut.csv", row.names = FALSE )
-
-#newcut<-read.csv(file="newPhyloCut.csv")
-#nrow(newcut)
-#nrow(Data)
-
-#oldD$Species <- gsub(" ", "_", oldD$Species)
-
-#oldD<- oldD[,c(5,6,7,8,9),drop=FALSE] 
-
-#Data<-Data[,c(5,6,7,8,9),drop=FALSE] 
-
-
-
-#missed<-setdiff(oldD,Data)
-
-#view(missed)
-
-#write.csv(missed,"/Users/walkermellon/Documents/cav/cancerAcrossVertebrates/missedSpecies.csv",row.names = FALSE ) 
-
-
 
 
 # Basic violin plot

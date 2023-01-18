@@ -65,6 +65,7 @@ ggsave("density.pdf",width=5.5, height=9, limitsize=FALSE,bg="white")
 #Density plot for percentage of age of death for Sauropsids
 AgeRisk <- AgeRisk[,c(14,19,51,52),drop=FALSE] 
 
+#used for sanity check
 #newAgeRisk<-AgeRisk %>% rowwise() %>%
  # mutate(malandneo = sum(c_across(Masspresent:Malignant)))
 

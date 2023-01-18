@@ -62,10 +62,10 @@ pglsSEyPagel=function(model, data, tree, lambdaInterval=c(0,1),...){
   return(modPgls.SEy(model=model,data=data,tree=tree,corClass=corPagel,fixed=T,corClassValue=optimizedModel$minimum,...)) #Returns the final model fit
 }
 
-## Here I split the csv into class but do whatever you want
+# Read CSV
 Data<-read.csv(file="min20DOX.csv")
 View(Data)
-
+#read tree
 tree<-read.tree(file="min20Fixed516.nwk")
 length(tree$tip.label)
 
@@ -84,6 +84,8 @@ SE<-setNames(Data$SE,Data$Species)[rownames(Data)]
 ANVFold72.1 <- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVAUCFold72.1), data=Data,
                             tree=pruned.tree,method="ML",se=SE)
 
+#grab r squared, p value, and lambda from summary 
+
 r.v.ANVFold72.1 <- summary(ANVFold72.1)$corBeta
 r.v.ANVFold72.1 <- format(r.v.ANVFold72.1[2,1])
 r.v.ANVFold72.1 <-signif(as.numeric(r.v.ANVFold72.1)^2, digits= 3)
@@ -92,7 +94,7 @@ ld.v.ANVFold72.1 <- signif(ld.v.ANVFold72.1[1])
 p.v.ANVFold72.1<-summary(ANVFold72.1)$tTable
 p.v.ANVFold72.1<-signif(p.v.ANVFold72.1[2,4], digits = 3)
 
-
+#plot
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(ANVAUCFold72.1))) +
   scale_x_continuous(
     limits = c(-.01,1.397),
@@ -127,6 +129,9 @@ ggsave(filename='anvfold721.png', width=13, height=10, limitsize=FALSE,bg="white
 ANVFold72.33<- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVAUCFold72.33), data=Data,
                             tree=pruned.tree,method="ML",se=SE)
 
+
+#grab r squared, p value, and lambda from summary 
+
 r.v.ANVFold72.33 <- summary(ANVFold72.33)$corBeta
 r.v.ANVFold72.33 <- format(r.v.ANVFold72.33[2,1])
 r.v.ANVFold72.33 <-signif(as.numeric(r.v.ANVFold72.33)^2, digits= 3)
@@ -135,7 +140,7 @@ ld.v.ANVFold72.33<- signif(ld.v.ANVFold72.33[1])
 p.v.ANVFold72.33<-summary(ANVFold72.33)$tTable
 p.v.ANVFold72.33<-signif(p.v.ANVFold72.33[2,4], digits = 3)
 
-
+#plot
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(ANVAUCFold72.33))) +
   scale_x_continuous(
     limits = c(-.3,1),
@@ -169,6 +174,8 @@ ggsave(filename='anvfold72.33.png', width=13, height=10, limitsize=FALSE,bg="whi
 ANVFold72.11<- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVAUCFold72.11), data=Data,
                             tree=pruned.tree,method="ML",se=SE)
 
+#grab r squared, p value, and lambda from summary 
+
 r.v.ANVFold72.11 <- summary(ANVFold72.11)$corBeta
 r.v.ANVFold72.11<- format(r.v.ANVFold72.11[2,1])
 r.v.ANVFold72.11 <-signif(as.numeric(r.v.ANVFold72.11)^2, digits= 3)
@@ -177,7 +184,7 @@ ld.v.ANVFold72.11<- signif(ld.v.ANVFold72.11[1], digits = 3)
 p.v.ANVFold72.11<-summary(ANVFold72.11)$tTable
 p.v.ANVFold72.11<-signif(p.v.ANVFold72.11[2,4], digits = 3)
 
-
+#plot
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(ANVAUCFold72.11))) +
   scale_x_continuous(
     limits = c(-.02,.69897),
@@ -213,6 +220,7 @@ ggsave(filename='anvfold72.11.png', width=13, height=10, limitsize=FALSE,bg="whi
 ##Model
 ANVDeath72.1 <- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVCellDeath72.1), data=Data,
                              tree=pruned.tree,method="ML",se=SE)
+#grab r squared, p value, and lambda from summary 
 
 r.v.ANVDeath72.1 <- summary(ANVDeath72.1)$corBeta
 r.v.ANVDeath72.1 <- format(r.v.ANVDeath72.1[2,1])
@@ -222,7 +230,7 @@ ld.v.ANVDeath72.1 <- signif(ld.v.ANVDeath72.1[1])
 p.v.ANVDeath72.1<-summary(ANVDeath72.1)$tTable
 p.v.ANVDeath72.1<-signif(p.v.ANVDeath72.1[2,4], digits = 3)
 
-
+#plot
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(ANVCellDeath72.1))) +
   scale_x_continuous(
     limits = c(-.4,1.74),
@@ -259,6 +267,8 @@ ggsave(filename='celldeath72.1.png', width=13, height=10, limitsize=FALSE,bg="wh
 ANVDeath72.33<- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVCellDeath72.33), data=Data,
                              tree=pruned.tree,method="ML",se=SE)
 
+#grab r squared, p value, and lambda from summary 
+
 r.v.ANVDeath72.33 <- summary(ANVDeath72.33)$corBeta
 r.v.ANVDeath72.33 <- format(r.v.ANVDeath72.33[2,1])
 r.v.ANVDeath72.33 <-signif(as.numeric(r.v.ANVDeath72.33)^2, digits= 3)
@@ -268,6 +278,8 @@ p.v.ANVDeath72.33<-summary(ANVDeath72.33)$tTable
 p.v.ANVDeath72.33<-signif(p.v.ANVDeath72.33[2,4], digits = 3)
 
 
+
+#plot
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(ANVCellDeath72.33))) +
   scale_x_continuous(
     limits = c(-.8,1.74),
@@ -302,6 +314,8 @@ ggsave(filename='celldeath72.33.png', width=13, height=10, limitsize=FALSE,bg="w
 ANVDeath72.11<- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVCellDeath72.11), data=Data,
                              tree=pruned.tree,method="ML",se=SE)
 
+#grab r squared, p value, and lambda from summary 
+
 r.v.ANVDeath72.11 <- summary(ANVDeath72.11)$corBeta
 r.v.ANVDeath72.11<- format(r.v.ANVDeath72.11[2,1])
 r.v.ANVDeath72.11 <-signif(as.numeric(r.v.ANVDeath72.11)^2, digits= 3)
@@ -310,7 +324,7 @@ ld.v.ANVDeath72.11<- signif(ld.v.ANVDeath72.11[1], digits = 3)
 p.v.ANVDeath72.11<-summary(ANVDeath72.11)$tTable
 p.v.ANVDeath72.11<-signif(p.v.ANVDeath72.11[2,4], digits = 3)
 
-
+#plot
 ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(ANVCellDeath72.11))) +
   scale_x_continuous(
     limits = c(-.8,1.47712),
