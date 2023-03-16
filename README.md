@@ -35,7 +35,7 @@ This file creates functional PGLS regressions and plots for species under a doxo
 This file creates functional PGLS regressions and plots for species under a radiation regimen.
 
 ## mutationRegression.R
-This creates a PGLS regressino and plot using mutation data
+This creates a PGLS regression and plot using mutation data
 
 ## Mltv.AIC.Rmd
 
@@ -44,4 +44,10 @@ This creates pgls multivariate regressions for multiple life history traits.
 ## kruskalwilcox.R
 This file carries out kruskal and wilcox tests between and across clades
 
+##vc2.R
 
+This file creates the violin plots and grabs the mean and range of each group's cancer prevalence
+
+##benignvmal.R
+
+Regression and density plot for benign and malignant prevalence
