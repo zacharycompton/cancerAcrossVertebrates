@@ -165,6 +165,18 @@ mutation.mal<-pglsSEyPagel(MalignancyPrevalence~log10(Mean.mutation.rate..SBS.ge
 
 
 ```{r}
+summary(mutation.mal) 
+###the code below extracts the stats from the above model to be used to construct the regression graph
+r.v.mutation.mal <- summary(mutation.mal)$corBeta
+r.v.mutation.mal <- format(r.v.mutation.mal[2,1])
+r.v.mutation.mal <-signif(as.numeric(r.v.mutation.mal)^2, digits= 2)
+ld.v.mutation.mal<- summary(mutation.mal)$modelStruct$corStruct
+ld.v.mutation.mal <- signif(ld.v.mutation.mal[1], digits = 2)
+p.v.mutation.mal<-summary(mutation.mal)$tTable
+p.v.mutation.mal<-signif(p.v.mutation.mal[2,4], digits = 2)
+```
+
+```{r}
 
 
 
