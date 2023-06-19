@@ -158,9 +158,44 @@ mutation.neo
 ##this line will save the graph to the folder you are using as your working directory
 ggsave(filename='mutation.neo.pdf', width=9.5, height=7, limitsize=FALSE,bg="white")
 ```
+Construct the Regression Model  Malignancy  
+```{r}
+mutation.mal<-pglsSEyPagel(MalignancyPrevalence~log10(Mean.mutation.rate..SBS.genome.year.),data=Data,tree=pruned.tree,se=SE,method = "ML")
+```
+
+
+```{r}
 
 
 
+mutation.mal<-ggplot(Data, aes(y=MalignancyPrevalence*100, x=log10(Mean.mutation.rate..SBS.genome.year.)))+
+  ## I *think* that we only have mutation for Mammalia so you may need to change the line below
+  scale_color_manual(values = c("Mammalia" = "#631879FF"))+
+  scale_y_continuous(
+    limits = c(0,75),
+    breaks = c(0, 25,50,75),
+    labels = c(0, 25,50,75))+
+  geom_abline(intercept = coef(mutation.mal)[1]*100, slope =  coef(mutation.mal)[2]*100,
+              color = 'grey',size = 1.2) +
+  theme_cowplot(12)+
+  theme(axis.title = element_text(size = 18))+
+  ylab("Malignancy Prevalence (%)") +
+  xlab("(log10) Mutation Rate") +
+  geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
+  scale_size(name   = "Total Necropsies",
+             breaks = c(20,100,200,300,477),
+             labels =  c(20,100,200,300,477))+
+  geom_text_repel(aes(label=ifelse( MalignancyPrevalence > 0,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
+  guides(colour = guide_legend(override.aes = list(size=3))) +
+  labs(title = "Malignancy vs. Mutation Rate")+
+  theme(
+    plot.title = element_text(size = 20, face = "bold")) +
+  theme(legend.position = "bottom")+
+  labs(colour="Clade", size="Total Necropsies")
+mutation.mal
+##this line will save the graph to the folder you are using as your working directory
+ggsave(filename='mutation.mal.pdf', width=9.5, height=7, limitsize=FALSE,bg="white")
+```
 
 
 
