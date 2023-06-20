@@ -130,7 +130,7 @@ p.v.mutation.neo<-signif(p.v.mutation.neo[2,4], digits = 2)
 ```
 
 ```{r}
-mutation.neo<-ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(Mean.mutation.rate..SBS.genome.year.)))+
+mutation.neo.plot<-ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(Mean.mutation.rate..SBS.genome.year.)))+
   ## I *think* that we only have mutation for Mammalia so you may need to change the line below
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
@@ -154,7 +154,7 @@ mutation.neo<-ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(Mean.mutation.
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
   labs(colour="Clade", size="Total Necropsies")
-mutation.neo
+mutation.neo.plot
 ##this line will save the graph to the folder you are using as your working directory
 ggsave(filename='mutation.neo.pdf', width=9.5, height=7, limitsize=FALSE,bg="white")
 ```
@@ -171,7 +171,7 @@ r.v.mutation.mal <- summary(mutation.mal)$corBeta
 r.v.mutation.mal <- format(r.v.mutation.mal[2,1])
 r.v.mutation.mal <-signif(as.numeric(r.v.mutation.mal)^2, digits= 2)
 ld.v.mutation.mal<- summary(mutation.mal)$modelStruct$corStruct
-ld.v.mutation.mal <- signif(ld.v.mutation.mal[1], digits = 2)
+ld.v.mutation.mal <- signif(ld.v.mutation.mal[1], digits = 3)
 p.v.mutation.mal<-summary(mutation.mal)$tTable
 p.v.mutation.mal<-signif(p.v.mutation.mal[2,4], digits = 2)
 ```
@@ -180,7 +180,7 @@ p.v.mutation.mal<-signif(p.v.mutation.mal[2,4], digits = 2)
 
 
 
-mutation.mal<-ggplot(Data, aes(y=MalignancyPrevalence*100, x=log10(Mean.mutation.rate..SBS.genome.year.)))+
+mutation.mal.plot<-ggplot(Data, aes(y=MalignancyPrevalence*100, x=log10(Mean.mutation.rate..SBS.genome.year.)))+
   ## I *think* that we only have mutation for Mammalia so you may need to change the line below
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
@@ -199,14 +199,15 @@ mutation.mal<-ggplot(Data, aes(y=MalignancyPrevalence*100, x=log10(Mean.mutation
              labels =  c(20,100,200,300,477))+
   geom_text_repel(aes(label=ifelse( MalignancyPrevalence > 0,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   guides(colour = guide_legend(override.aes = list(size=3))) +
-  labs(title = "Malignancy vs. Mutation Rate")+
+  labs(title = "Malignancy Prevalence vs. Mutation Rate",  
+       subtitle =bquote(p-value:.(p.v.mutation.mal)~R^2:.(r.v.mutation.mal)~Lambda:.(ld.v.mutation.mal))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
   labs(colour="Clade", size="Total Necropsies")
-mutation.mal
+mutation.mal.plot
 ##this line will save the graph to the folder you are using as your working directory
-ggsave(filename='mutation.mal.pdf', width=9.5, height=7, limitsize=FALSE,bg="white")
+ggsave(filename='mutation.mal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 ```
 
 
