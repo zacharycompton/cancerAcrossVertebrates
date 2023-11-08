@@ -65,7 +65,7 @@ pglsSEyPagel=function(model, data, tree, lambdaInterval=c(0,1),...){
 
 
 #read data
-Data <- read.csv("min20516.csv")
+Data <- read.csv("min20-2022.05.16.csv")
 Data<- filter(Data, is.element(Clade, c("Mammalia")))
 View(Data)
 

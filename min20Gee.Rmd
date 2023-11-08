@@ -1,0 +1,1250 @@
+---
+title: "min20GEE"
+author: "Walker M"
+date: "2023-09-11"
+output: html_document
+---
+
+```{r results="hide"}
+library(ape)
+library(nlme)
+library(rms)
+library(phytools)
+library(geiger)
+library(caper)
+library(tidyverse)
+library(cowplot)
+library(ggrepel)
+library(ggsci)
+library(patchwork)
+library(gee)
+
+#read data
+Data <- read.csv("min20-2022.05.16.csv")
+
+
+Age <- read.csv("cleanPath.min20.062822.csv")
+
+#sometimes this returns error stating "argument "by" is missing". Restarting R via session dropdown will fix this
+
+max_longevity.months_per_species <- Age %>%
+  group_by(Species) %>%
+  summarize(max_longevity.months = max(age_months))
+
+
+Data <- merge(Data, max_longevity.months_per_species, by = "Species", all.x = TRUE)
+```
+#adult weight neo
+```{r}
+
+cutData <- Data[,c(1,5,9,10,11,12,38,42),drop=FALSE] 
+cutData[cutData$adult_weight == -1, ] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+adultWeight<-log10(cutData$adult_weight.g.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~adultWeight, phy = pruned.tree, family = "binomial")
+compar
+
+coef(compar)[2]
+
+```
+
+
+#adult weight mal
+```{r}
+
+cutData <- Data[,c(1,5,9,10,11,16,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies <- cutData$Species
+
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~adultWeight, phy = pruned.tree, family = "binomial")
+compar
+```
+
+max age neo 
+```{r}
+cutData <- Data[,c(1,5,9,10,11,12,40,42),drop=FALSE]
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+max_longevity.months.<-log10(cutData$max_longevity.months.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~max_longevity.months., phy = pruned.tree, family = "binomial")
+compar
+
+```
+
+max age mal 
+```{r}
+cutData <- Data[,c(1,5,9,10,11,16,40,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~max_longevity.months., phy = pruned.tree, family = "binomial")
+compar
+```
+
+
+Gest neo 
+```{r}
+cutData <- Data[,c(1,5,9,10,11,12,30,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+Gestation<-log10(cutData$Gestation.months.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~Gestation, phy = pruned.tree, family = "binomial")
+compar
+
+```
+
+Gest mal 
+```{r}
+cutData <- Data[,c(1,5,9,10,11,16,30,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~Gestation, phy = pruned.tree, family = "binomial")
+compar
+```
+
+Long+Gest+Mass Neo
+```{r}
+cutData <- Data[,c(1,5,9,10,11,12,30,40,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+Gestation<-log10(cutData$Gestation.months.)
+Longevity<-log10(cutData$max_longevity.months.)
+Mass<-log10(cutData$adult_weight.g.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~Gestation+Longevity+Mass, phy = pruned.tree, family = "binomial")
+compar
+```
+
+Long+Gest+Mass Mal
+```{r}
+cutData <- Data[,c(1,5,9,10,11,16,30,40,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+Gestation<-log10(cutData$Gestation.months.)
+Longevity<-log10(cutData$max_longevity.months.)
+Mass<-log10(cutData$adult_weight.g.)
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~Gestation+Longevity+Mass, phy = pruned.tree, family = "binomial")
+compar
+```
+Filter for Mammals
+```{r}
+#read data
+Data <- read.csv("min20-2022.05.16.csv")
+Data<- filter(Data, Clade == "Mammalia")
+
+
+Age <- read.csv("cleanPath.min20.062822.csv")
+
+
+max_longevity.months._per_species <- Age %>%
+  group_by(Species) %>%
+  summarize(max_longevity.months. = max(age_months))
+
+
+
+Data <- merge(Data, max_longevity.months._per_species, by = "Species", all.x = TRUE)
+```
+
+
+#adult weight neo mammals
+```{r}
+
+cutData <- Data[,c(1,5,9,10,11,12,38,42),drop=FALSE] 
+cutData[cutData$adult_weight == -1, ] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+adultWeight<-log10(cutData$adult_weight.g.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~adultWeight, phy = pruned.tree, family = "binomial")
+compar
+
+```
+#adult weight mal mammals
+```{r}
+
+cutData <- Data[,c(1,5,9,10,11,16,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies <- cutData$Species
+
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~adultWeight, phy = pruned.tree, family = "binomial")
+compar
+```
+
+max age neo mammals
+```{r}
+cutData <- Data[,c(1,5,9,10,11,12,40,42),drop=FALSE]
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+max_longevity.months.<-log10(cutData$max_longevity.months.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~max_longevity.months., phy = pruned.tree, family = "binomial")
+compar
+
+```
+
+max age mal mammals
+```{r}
+cutData <- Data[,c(1,5,9,10,11,16,40,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~max_longevity.months., phy = pruned.tree, family = "binomial")
+compar
+```
+
+
+Gest neo mammals
+```{r}
+cutData <- Data[,c(1,5,9,10,11,12,30,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+Gestation<-log10(cutData$Gestation.months.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~Gestation, phy = pruned.tree, family = "binomial")
+compar
+
+```
+
+Gest mal mammals
+```{r}
+cutData <- Data[,c(1,5,9,10,11,16,30,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~Gestation, phy = pruned.tree, family = "binomial")
+compar
+```
+Long+Gest+Mass Neo mammals
+```{r}
+cutData <- Data[,c(1,5,9,10,11,12,30,40,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+Gestation<-log10(cutData$Gestation.months.)
+Longevity<-log10(cutData$max_longevity.months.)
+Mass<-log10(cutData$adult_weight.g.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~Gestation+Longevity+Mass, phy = pruned.tree, family = "binomial")
+compar
+```
+
+Long+Gest+Mass Mal mammals
+```{r}
+cutData <- Data[,c(1,5,9,10,11,16,30,40,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+Gestation<-log10(cutData$Gestation.months.)
+Longevity<-log10(cutData$max_longevity.months.)
+Mass<-log10(cutData$adult_weight.g.)
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~Gestation+Longevity+Mass, phy = pruned.tree, family = "binomial")
+compar
+```
+
+Filter for Sauropsids
+```{r}
+#read data
+Data <- read.csv("min20-2022.05.16.csv")
+Data<- filter(Data, Clade == "Sauropsida")
+
+
+Age <- read.csv("cleanPath.min20.062822.csv")
+
+
+max_longevity.months._per_species <- Age %>%
+  group_by(Species) %>%
+  summarize(max_longevity.months. = max(age_months))
+
+
+
+Data <- merge(Data, max_longevity.months._per_species, by = "Species", all.x = TRUE)
+```
+
+
+#adult weight neo Sauropsids
+```{r}
+cutData <- Data[,c(1,5,9,10,11,12,38,42),drop=FALSE] 
+cutData[cutData$adult_weight == -1, ] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+adultWeight<-log10(cutData$adult_weight.g.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~adultWeight, phy = pruned.tree, family = "binomial")
+compar
+
+```
+#adult weight mal Sauropsids
+```{r}
+
+cutData <- Data[,c(1,5,9,10,11,16,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies <- cutData$Species
+
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~adultWeight, phy = pruned.tree, family = "binomial")
+compar
+```
+
+max age neo saur
+```{r}
+cutData <- Data[,c(1,5,9,10,11,12,40,42),drop=FALSE]
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+max_longevity.months.<-log10(cutData$max_longevity.months.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~max_longevity.months., phy = pruned.tree, family = "binomial")
+compar
+
+```
+
+max age mal saur
+```{r}
+cutData <- Data[,c(1,5,9,10,11,16,40,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~max_longevity.months., phy = pruned.tree, family = "binomial")
+compar
+```
+
+
+Gest neo saur
+```{r}
+cutData <- Data[,c(1,5,9,10,11,12,30,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+Gestation<-log10(cutData$Gestation.months.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~Gestation, phy = pruned.tree, family = "binomial")
+compar
+
+```
+
+Gest mal saur
+```{r}
+cutData <- Data[,c(1,5,9,10,11,16,30,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~Gestation, phy = pruned.tree, family = "binomial")
+compar
+```
+
+Long+Gest+Mass Neo suar
+```{r}
+cutData <- Data[,c(1,5,9,10,11,12,30,40,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+Gestation<-log10(cutData$Gestation.months.)
+Longevity<-log10(cutData$max_longevity.months.)
+Mass<-log10(cutData$adult_weight.g.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~Gestation+Longevity+Mass, phy = pruned.tree, family = "binomial")
+compar
+```
+
+Long+Gest+Mass Mal saur
+```{r}
+cutData <- Data[,c(1,5,9,10,11,16,30,40,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+Gestation<-log10(cutData$Gestation.months.)
+Longevity<-log10(cutData$max_longevity.months.)
+Mass<-log10(cutData$adult_weight.g.)
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~Gestation+Longevity+Mass, phy = pruned.tree, family = "binomial")
+compar
+```
+Filter for Amphibians
+```{r}
+#read data
+Data <- read.csv("min20-2022.05.16.csv")
+Data<- filter(Data, Clade == "Amphibia")
+
+
+Age <- read.csv("cleanPath.min20.062822.csv")
+
+
+max_longevity.months._per_species <- Age %>%
+  group_by(Species) %>%
+  summarize(max_longevity.months. = max(age_months))
+
+
+
+Data <- merge(Data, max_longevity.months._per_species, by = "Species", all.x = TRUE)
+```
+
+
+#adult weight neo Amphibians
+```{r}
+cutData <- Data[,c(1,5,9,10,11,12,38,42),drop=FALSE] 
+cutData[cutData$adult_weight == -1, ] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+adultWeight<-log10(cutData$adult_weight.g.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~adultWeight, phy = pruned.tree, family = "binomial")
+compar
+
+```
+#adult weight mal Amphibians
+```{r}
+
+cutData <- Data[,c(1,5,9,10,11,16,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies <- cutData$Species
+
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+
+
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~adultWeight, phy = pruned.tree, family = "binomial")
+compar
+```
+
+max age neo amph
+```{r eval=FALSE, include=FALSE}
+library(phytools)
+cutData <- Data[,c(1,5,9,10,11,12,40,42),drop=FALSE]
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+max_longevity.months.<-log10(cutData$max_longevity.months.)
+aNeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+aNonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(aNeoplasiaOccurences, aNonOccurences) ~max_longevity.months., phy = pruned.tree, family = "binomial")
+compar
+
+```
+
+max age mal amph
+```{r eval=FALSE, include=FALSE}
+cutData <- Data[,c(1,5,9,10,11,16,40,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~max_longevity.months., phy = pruned.tree, family = "binomial")
+compar
+```
+
+
+Gest neo amph
+```{r}
+cutData <- Data[,c(1,5,9,10,11,12,30,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+Gestation<-log10(cutData$Gestation.months.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~Gestation, phy = pruned.tree, family = "binomial")
+compar
+
+```
+
+Gest mal amph
+```{r}
+cutData <- Data[,c(1,5,9,10,11,16,30,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~Gestation, phy = pruned.tree, family = "binomial")
+compar
+```
+
+Long+Gest+Mass Neo amph
+```{r eval=FALSE, include=FALSE}
+cutData <- Data[,c(1,5,9,10,11,12,30,40,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+Gestation<-log10(cutData$Gestation.months.)
+Longevity<-log10(cutData$max_longevity.months.)
+Mass<-log10(cutData$adult_weight.g.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~Gestation+Longevity+Mass, phy = pruned.tree, family = "binomial")
+compar
+```
+
+Long+Gest+Mass Mal amph
+```{r eval=FALSE, include=FALSE}
+cutData <- Data[,c(1,5,9,10,11,16,30,40,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+Gestation<-log10(cutData$Gestation.months.)
+Longevity<-log10(cutData$max_longevity.months.)
+Mass<-log10(cutData$adult_weight.g.)
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~Gestation+Longevity+Mass, phy = pruned.tree, family = "binomial")
+compar
+```
+
+Filter for Squamates
+```{r}
+#read data
+Data <- read.csv("min20-2022.05.16.csv")
+Data<- filter(Data, Orders == "Squamata")
+
+
+Age <- read.csv("cleanPath.min20.062822.csv")
+
+
+max_longevity.months._per_species <- Age %>%
+  group_by(Species) %>%
+  summarize(max_longevity.months. = max(age_months))
+
+
+
+Data <- merge(Data, max_longevity.months._per_species, by = "Species", all.x = TRUE)
+```
+
+
+#adult weight neo Squamates
+```{r}
+
+cutData <- Data[,c(1,5,9,10,11,12,38,42),drop=FALSE] 
+cutData[cutData$adult_weight == -1, ] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+adultWeight<-log10(cutData$adult_weight.g.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~adultWeight, phy = pruned.tree, family = "binomial")
+compar
+
+```
+#adult weight mal Squamates
+```{r}
+
+cutData <- Data[,c(1,5,9,10,11,16,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies <- cutData$Species
+
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~adultWeight, phy = pruned.tree, family = "binomial")
+compar
+```
+
+max age neo squamates
+```{r eval=FALSE, include=FALSE}
+cutData <- Data[,c(1,5,9,10,11,12,40,42),drop=FALSE]
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+max_longevity.months.<-log10(cutData$max_longevity.months.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~max_longevity.months., phy = pruned.tree, family = "binomial")
+compar
+
+```
+
+max age mal squamates
+```{r eval=FALSE, include=FALSE}
+cutData <- Data[,c(1,5,9,10,11,16,40,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~max_longevity.months., phy = pruned.tree, family = "binomial")
+compar
+```
+
+
+Gest neo squamtes
+```{r}
+cutData <- Data[,c(1,5,9,10,11,12,30,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+Gestation<-log10(cutData$Gestation.months.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~Gestation, phy = pruned.tree, family = "binomial")
+compar
+
+```
+
+Gest mal squamates
+```{r}
+cutData <- Data[,c(1,5,9,10,11,16,30,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~Gestation, phy = pruned.tree, family = "binomial")
+compar
+```
+
+Long+Gest+Mass Neo squamates
+```{r eval=FALSE, include=FALSE}
+cutData <- Data[,c(1,5,9,10,11,12,30,40,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+Gestation<-log10(cutData$Gestation.months.)
+Longevity<-log10(cutData$max_longevity.months.)
+Mass<-log10(cutData$adult_weight.g.)
+NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~Gestation+Longevity+Mass, phy = pruned.tree, family = "binomial")
+compar
+```
+
+Long+Gest+Mass Mal squamtes
+```{r}
+cutData <- Data[,c(1,5,9,10,11,16,30,40,38,42),drop=FALSE] 
+cutData[cutData < 0] <-NA
+cutData <- na.omit(cutData)
+tree <- read.tree("min20Fixed516.nwk")
+
+cutData$Species <- gsub(" ", "_", cutData$Species) 
+cutData$common_name<-gsub("_", "", cutData$common_name)
+includedSpecies<-cutData$Species
+pruned.tree<-drop.tip(
+  tree, setdiff(
+    tree$tip.label, includedSpecies))
+pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
+cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
+cutData <- cutData[!(cutData$Keep==FALSE),]
+rownames(cutData)<-cutData$Species
+SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
+
+Gestation<-log10(cutData$Gestation.months.)
+Longevity<-log10(cutData$max_longevity.months.)
+Mass<-log10(cutData$adult_weight.g.)
+MalignancyOccurences<-cutData$Malignant
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~Gestation+Longevity+Mass, phy = pruned.tree, family = "binomial")
+compar
+```
+

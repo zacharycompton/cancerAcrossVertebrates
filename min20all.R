@@ -67,7 +67,7 @@ pglsSEyPagel=function(model, data, tree, lambdaInterval=c(0,1),...){
 
 
 #read data
-Data <- read.csv("min20516.csv")
+Data <- read.csv("min20-2022.05.16.csv")
 View(Data)
 
 
@@ -546,7 +546,7 @@ view(cutData)
 
 
 #pgls model
-longevity.mal<-pglsSEyPagel(MalignancyPrevalence~(max_longevity.months.),data=cutData,
+longevity.mal<-pglsSEyPagel(MalignancyPrevalence~log10(max_longevity.months.),data=cutData,
                             tree=pruned.tree,method="ML",se=SE)
 summary(longevity.mal)
 
@@ -1796,4 +1796,5 @@ wgtgest<-ggplot(cutData, aes(y=Gestation.months., x=log10(adult_weight.g.)))+
 
 
 wgtgest
+
 

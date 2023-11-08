@@ -7,7 +7,7 @@ library(ggrepel)
 
 #read csv
 cleanPath <- read.csv("cleanPath.min20.062822.csv")
-min20Data <- read.csv("min20516.csv")
+min20Data <- read.csv("min20-2022.05.16.csv")
 view(min20Data)
 
 #linear model mav vs benign

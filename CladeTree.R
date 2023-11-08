@@ -9,7 +9,7 @@ library(cowplot)
 
 #par(mfrow=c(3,1))
 #read tree
-Data<-read.csv(file="min20516.csv")
+Data<-read.csv(file="min20-2022.05.16.csv")
 Data<- filter(Data, is.element(Clade, c("Mammalia")))
 Data <- Data[,c(6,7,9,10,17,13),drop=FALSE] 
 tree<-read.tree(file="min20Fixed516.nwk")
@@ -209,7 +209,7 @@ cladelabels(text="Ursidae",cex = .8,node=findMRCA(pruned.tree, Ursidae$Species),
 
 
 #read for Sauropsids
-Data<-read.csv(file="min20516.csv")
+Data<-read.csv(file="min20-2022.05.16.csv")
 Data<- filter(Data, is.element(Clade, c("Sauropsida")))
 Data <- Data[,c(6,7,9,10,17,13),drop=FALSE] 
 tree<-read.tree(file="min20Fixed516.nwk")
@@ -435,7 +435,7 @@ cladelabels(text="Varanidae",cex = .8,node=findMRCA(pruned.tree, Varanidae$Speci
 
 
 #read for Amphibians
-Data<-read.csv(file="min20516.csv")
+Data<-read.csv(file="min20-2022.05.16.csv")
 Data<- filter(Data, is.element(Clade, c("Amphibia")))
 Data <- Data[,c(6,7,9,10,17,13),drop=FALSE] 
 tree<-read.tree(file="min20Fixed516.nwk")

@@ -15,7 +15,7 @@ library(plotrix)
 ##Mammals
 
 
-Data<-read.csv(file="min20516.csv")
+Data<-read.csv(file="min20-2022.05.16.csv")
 Data<- filter(Data, is.element(Clade, c("Mammalia")))
 Data <- Data[,c(6,9,10,17,13),drop=FALSE] 
 Data[Data < 0] <-NA
@@ -213,7 +213,7 @@ segments(x0=xx,y0=yy,x1=260,y1=yy,lwd=8,col=cols)
 ##Sauropsids
 
 
-Data<-read.csv(file="min20516.csv")
+Data<-read.csv(file="min20-2022.05.16.csv")
 Data<- filter(Data, is.element(Clade, c("Sauropsida")))
 Data <- Data[,c(6,9,10,17,13),drop=FALSE] 
 Data[Data < 0] <-NA
@@ -372,7 +372,7 @@ for(i in 1:m){
 ## read data and tree frosm file
 ##Amphibians
 
-Data<-read.csv(file="min20516.csv")
+Data<-read.csv(file="min20-2022.05.16.csv")
 Data<- filter(Data, is.element(Clade, c("Amphibia")))
 Data <- Data[,c(6,9,10,17,13),drop=FALSE] 
 Data[Data < 0] <-NA

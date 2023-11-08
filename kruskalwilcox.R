@@ -1,6 +1,6 @@
 library(tidyverse)
 
-Data <- read.csv('min20516.csv')
+Data <- read.csv('min20-2022.05.16.csv')
 
 neoClade<-kruskal.test(NeoplasiaPrevalence~Clade,data=Data)
 
