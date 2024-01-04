@@ -73,7 +73,15 @@ View(Data)
 
 Data<-left_join(Data, trophic, by = "Species")
 
+matching_column <- grep("common_name", colnames(cutData), ignore.case = TRUE)
 
+# Modify the column names to "common_name"
+colnames(cutData)[matching_column] <- "common_name"
+
+matching_column <- grep("Species", colnames(cutData), ignore.case = TRUE)
+
+# Modify the column names to "common_name"
+colnames(cutData)[matching_column] <- "Species"
 
 
 

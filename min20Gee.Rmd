@@ -850,13 +850,19 @@ pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
 cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
 cutData <- cutData[!(cutData$Keep==FALSE),]
 rownames(cutData)<-cutData$Species
+pruned.tree$edge.length[which(pruned.tree$edge.length <=0)] <- 1e-10
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 
-max_longevity.months.<-log10(cutData$max_longevity.months.)
-aNeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
-aNonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
 
-compar<-compar.gee(cbind(aNeoplasiaOccurences, aNonOccurences) ~max_longevity.months., phy = pruned.tree, family = "binomial")
+max_longevity.months.<-log10(cutData$max_longevity.months.)
+MalignancyOccurences<-cutData$NeoplasiaWithDenominators
+NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
+
+#recompute branch lengths
+tree2<-compute.brlen(phy=pruned.tree,method="Grafen",power=0.5)
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~max_longevity.months., phy = tree2, family = "binomial")
 compar
 
 ```
@@ -883,8 +889,12 @@ SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 MalignancyOccurences<-cutData$Malignant
 NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
 
+#recompute branch lengths
+tree2<-compute.brlen(phy=pruned.tree,method="Grafen",power=0.5)
 
-compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~max_longevity.months., phy = pruned.tree, family = "binomial")
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~max_longevity.months., phy = tree2, family = "binomial")
 compar
 ```
 
@@ -912,7 +922,11 @@ Gestation<-log10(cutData$Gestation.months.)
 NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
 NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
 
-compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~Gestation, phy = pruned.tree, family = "binomial")
+#recompute branch lengths
+tree2<-compute.brlen(phy=pruned.tree,method="Grafen",power=0.5)
+
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~Gestation, phy = tree2, family = "binomial")
 compar
 
 ```
@@ -939,8 +953,12 @@ SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 MalignancyOccurences<-cutData$Malignant
 NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
 
+#recompute branch lengths
+tree2<-compute.brlen(phy=pruned.tree,method="Grafen",power=0.5)
 
-compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~Gestation, phy = pruned.tree, family = "binomial")
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~Gestation, phy = tree2, family = "binomial")
 compar
 ```
 
@@ -969,7 +987,11 @@ Mass<-log10(cutData$adult_weight.g.)
 NeoplasiaOccurences<-cutData$NeoplasiaWithDenominators
 NonOccurences<-(cutData$RecordsWithDenominators-cutData$NeoplasiaWithDenominators)
 
-compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~Gestation+Longevity+Mass, phy = pruned.tree, family = "binomial")
+#recompute branch lengths
+tree2<-compute.brlen(phy=pruned.tree,method="Grafen",power=0.5)
+
+
+compar<-compar.gee(cbind(NeoplasiaOccurences, NonOccurences) ~Gestation+Longevity+Mass, phy = tree2, family = "binomial")
 compar
 ```
 
@@ -998,7 +1020,11 @@ Mass<-log10(cutData$adult_weight.g.)
 MalignancyOccurences<-cutData$Malignant
 NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
 
-compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~Gestation+Longevity+Mass, phy = pruned.tree, family = "binomial")
+#recompute branch lengths
+tree2<-compute.brlen(phy=pruned.tree,method="Grafen",power=0.5)
+
+
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~Gestation+Longevity+Mass, phy = tree2, family = "binomial")
 compar
 ```
 
@@ -1238,13 +1264,17 @@ cutData <- cutData[!(cutData$Keep==FALSE),]
 rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 
+#recompute branch lengths
+tree2<-compute.brlen(phy=pruned.tree,method="Grafen",power=0.5)
+
+
 Gestation<-log10(cutData$Gestation.months.)
 Longevity<-log10(cutData$max_longevity.months.)
 Mass<-log10(cutData$adult_weight.g.)
 MalignancyOccurences<-cutData$Malignant
 NonOccurences<-(cutData$RecordsWithDenominators-cutData$Malignant)
 
-compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~Gestation+Longevity+Mass, phy = pruned.tree, family = "binomial")
+compar<-compar.gee(cbind(MalignancyOccurences, NonOccurences) ~Gestation+Longevity+Mass, phy = tree2, family = "binomial")
 compar
 ```
 

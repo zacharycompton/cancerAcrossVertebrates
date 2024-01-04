@@ -114,6 +114,9 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+# Assuming your_dataframe is your actual data frame
+colnames(cutData)[ncol(cutData)-1] <- "highest_age"
+
 
 #pgls model
 adult.highage.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(highest_age),data=cutData,tree=pruned.tree,se=SE,method = "ML")
@@ -184,7 +187,7 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
-
+colnames(cutData)[ncol(cutData)-1] <- "highest_age"
 #pgls model
 adult.highage.mal<-pglsSEyPagel(MalignancyPrevalence~log10(highest_age),data=cutData,tree=pruned.tree,se=SE,method = "ML")
 
@@ -252,7 +255,7 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
-
+colnames(cutData)[ncol(cutData)-1] <- "highest_age"
 #pgls model
 adult.weight.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(adult_weight.g.)+highest_age,data=cutData,tree=pruned.tree,se=SE,method = "ML")
 
@@ -317,6 +320,8 @@ cutData <- cutData[!(cutData$Keep==FALSE),]
 rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
+
+colnames(cutData)[ncol(cutData)-1] <- "highest_age"
 
 #pgls model
 adult.weight.mal<-pglsSEyPagel(MalignancyPrevalence~log10(adult_weight.g.)+highest_age,data=cutData,
@@ -387,6 +392,8 @@ SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
 
+colnames(cutData)[ncol(cutData)-1] <- "highest_age"
+
 #pgls model
 gestation.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(Gestation.months.)+highest_age,data=cutData,
                             tree=pruned.tree,method="ML",se=SE)
@@ -447,6 +454,8 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+colnames(cutData)[ncol(cutData)-1] <- "highest_age"
+
 #pgls model
 gestation.mal<-pglsSEyPagel(MalignancyPrevalence~log10(Gestation.months.)+highest_age,data=cutData,
                             tree=pruned.tree,method="ML",se=SE)
@@ -505,6 +514,8 @@ cutData <- cutData[!(cutData$Keep==FALSE),]
 rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
+
+colnames(cutData)[ncol(cutData)-1] <- "highest_age"
 
 #pgls model
 litter.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(litter_size)+highest_age,data=cutData,
@@ -570,6 +581,8 @@ cutData <- cutData[!(cutData$Keep==FALSE),]
 rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
+
+colnames(cutData)[ncol(cutData)-1] <- "highest_age"
 
 
 #pgls model
@@ -637,6 +650,8 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
+colnames(cutData)[ncol(cutData)-1] <- "highest_age"
+
 #pgls model
 longevity.neo<-pglsSEyPagel(NeoplasiaPrevalence~max_longevity.months.+highest_age,data=cutData,
                             tree=pruned.tree,method="ML",se=SE)
@@ -702,6 +717,8 @@ cutData <- cutData[!(cutData$Keep==FALSE),]
 rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
+
+colnames(cutData)[ncol(cutData)-1] <- "highest_age"
 
 
 #pgls model

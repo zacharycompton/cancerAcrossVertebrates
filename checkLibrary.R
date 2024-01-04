@@ -5,7 +5,7 @@ required_libraries <- c(
   "poolr", "OUwie", "ggpubr", "gridGraphics",
   "devtools", "ggtree", "plotrix", "picante",
   "car", "gridExtra", "ggplot2", "grid",
-  "lemon", "sqldf"
+  "lemon", "sqldf", "broom.mixed","huxtable","tidymodels"
 )
 
 # Function to check and install libraries

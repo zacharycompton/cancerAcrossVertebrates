@@ -69,6 +69,11 @@ View(Data)
 tree<-read.tree(file="min20Fixed516.nwk")
 length(tree$tip.label)
 
+matching_column <- grep("common_name", colnames(cutData), ignore.case = TRUE)
+
+# Modify the column names to "common_name"
+colnames(cutData)[matching_column] <- "common_name"
+
 Data$Species <- gsub(" ", "_", Data$Species)
 includedSpecies <- Data$Species
 pruned.tree<-drop.tip(
