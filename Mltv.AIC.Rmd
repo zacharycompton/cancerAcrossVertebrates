@@ -106,6 +106,10 @@ pruned.tree <- keep.tip(pruned.tree,pruned.tree$tip.label)
 cutData$Keep <- cutData$Species %in% pruned.tree$tip.label
 cutData <- cutData[!(cutData$Keep==FALSE),]
 cat(nrow(cutData),"Species")
+matching_column <- grep("common_name", colnames(cutData), ignore.case = TRUE)
+
+# Modify the column names to "common_name"
+colnames(cutData)[matching_column] <- "common_name"
 
 ```
 Set row names as Species name and extract Standard Error as a vector
