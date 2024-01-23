@@ -215,7 +215,7 @@ segments(x0=xx,y0=yy,x1=260,y1=yy,lwd=8,col=cols)
 
 Data<-read.csv(file="min20-2022.05.16.csv")
 Data<- filter(Data, is.element(Clade, c("Sauropsida")))
-Data <- Data[,c(6,9,10,17,13),drop=FALSE] 
+Data <- Data[,c(4,6,9,10,17,13),drop=FALSE] 
 Data[Data < 0] <-NA
 Data <- na.omit(Data)
 
@@ -277,6 +277,7 @@ sphenisciformes<-filter(specData, is.element(Orders, c("Sphenisciformes")))
 squamata<-filter(specData, is.element(Orders, c("Squamata")))
 strigiformes<-filter(specData, is.element(Orders, c("Strigiformes")))
 testudines<-filter(specData, is.element(Orders, c("Testudines")))
+aves<-filter(specData, is.element(Class, c("Aves")))
 
 
 plotTree(pruned.tree,type="fan",xlim=xlim,ylim=ylim,
@@ -285,9 +286,9 @@ plotTree(pruned.tree,type="fan",xlim=xlim,ylim=ylim,
 
 #color tree branches
 
-colors<-c("#1B1919FF","#3B4992FF","#EE0000FF","#BB0021FF","#008280FF","#A20056FF","#5F559BFF")
+colors<-c("#1B1919FF","#008280FF","#EE0000FF","#BB0021FF","#3B4992FF","#A20056FF","#5F559BFF")
 
-pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, anseriformes$common_name),state="1",anc="0")
+pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, aves$common_name),state="1",anc="0")
 pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, galliformes$common_name),state="2")
 pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, pelecaniformes$common_name),state="3")
 pruned.tree<-paintSubTree(pruned.tree,node=findMRCA(pruned.tree, passeriformes$common_name),state="4")
@@ -302,20 +303,20 @@ plotSimmap(pruned.tree,colors,type="fan",xlim=xlim,ylim=ylim,
 
 #add labels
 
-par(fg="#3B4992FF")
-arc.cladelabels(text="Anseriformes",cex = .8,node=findMRCA(pruned.tree, anseriformes$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE)
-
-par(fg="#EE0000FF")
-arc.cladelabels(text="Galliformes",cex = .8,node=findMRCA(pruned.tree, galliformes$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE)
-
-par(fg="#BB0021FF")
-arc.cladelabels(text="Pelecaniformes",cex = .8,node=findMRCA(pruned.tree, pelecaniformes$common_name),ln.offset=1.7,lab.offset=1.75, mark.node=FALSE,mark.node=FALSE)
-
 par(fg="#008280FF")
-arc.cladelabels(text="Passeriformes",cex = .8,node=findMRCA(pruned.tree, passeriformes$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE)
+arc.cladelabels(text="Aves",cex = .8,node=findMRCA(pruned.tree, aves$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE)
 
-par(fg="#A20056FF")
-arc.cladelabels(text="Psittaciformes",cex = .8,node=findMRCA(pruned.tree, psittaciformes$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE)
+# par(fg="#EE0000FF")
+# arc.cladelabels(text="Galliformes",cex = .8,node=findMRCA(pruned.tree, galliformes$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE)
+# 
+# par(fg="#BB0021FF")
+# arc.cladelabels(text="Pelecaniformes",cex = .8,node=findMRCA(pruned.tree, pelecaniformes$common_name),ln.offset=1.7,lab.offset=1.75, mark.node=FALSE,mark.node=FALSE)
+# 
+# par(fg="#008280FF")
+# arc.cladelabels(text="Passeriformes",cex = .8,node=findMRCA(pruned.tree, passeriformes$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE)
+# 
+# par(fg="#A20056FF")
+# arc.cladelabels(text="Psittaciformes",cex = .8,node=findMRCA(pruned.tree, psittaciformes$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE)
 
 par(fg="#5F559BFF")
 arc.cladelabels(text="Squamata",cex = .8,node=findMRCA(pruned.tree, squamata$common_name),ln.offset=1.7,lab.offset=1.75,mark.node=FALSE,mark.node=FALSE)
