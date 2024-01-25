@@ -69,9 +69,16 @@ sum_Aves_records <- Data %>%
   summarise(total_Aves_records = sum(RecordsWithDenominators, na.rm = TRUE))
 
 
-# Basic violin plot
-#Neoplasia
-p <- ggplot(Data, aes(x=CladeGroup, y=100*NeoplasiaPrevalence, fill=CladeGroup)) + 
+# Calculate the median of NeoplasiaPrevalence for each CladeGroup
+medians <- Data %>%
+  group_by(CladeGroup) %>%
+  summarize(Median = median(100 * NeoplasiaPrevalence))
+
+# Merge the medians back into the original data frame
+Data <- merge(Data, medians, by = "CladeGroup")
+
+# Plot
+p <- ggplot(Data, aes(x=reorder(CladeGroup, Median), y=100*NeoplasiaPrevalence, fill=CladeGroup)) + 
   geom_violin(adjust=1) +
   scale_y_continuous(
     limits = c(0,65))+
@@ -80,20 +87,20 @@ p <- ggplot(Data, aes(x=CladeGroup, y=100*NeoplasiaPrevalence, fill=CladeGroup))
   ) +
   scale_fill_manual(values = c("Mammalia" = "#631879FF", "Squamata"= "#008b45ff", "Amphibia"= "#3B4992ff", "Aves" = "red" ),labels=c("98 Species, N=5684", "63 Species, N=2393", "41 Species, N=3061","86 Species, N=4797"))+
   ggtitle("A") +
-#  labs(fill = 'Clade')+
   ylab("Neoplasia Prevalence %") +
   theme(
-    plot.title = element_text(size = 20, face = "bold")) +
-  theme(axis.text=element_text(size=25),
-        axis.title=element_text(size=0),
-  ) +
-  theme(plot.caption.position = "plot",
-        plot.caption = element_text(hjust = 0))
-print(p)
+    plot.title = element_text(size = 20, face = "bold"),
+    axis.text=element_text(size=25),
+    axis.title=element_text(size=0),
+    plot.caption.position = "plot",
+    plot.caption = element_text(hjust = 0)
+  )
+
+p
 
 
-##Add the jitter points and the mean bar 
-pFinal <-p + geom_jitter(shape=16, position=position_jitter(0.2))+
+##Add the jitter points and the median bar 
+pFinal <-p + geom_jitter(shape=16,width = 0.2, height = 0, alpha = 0.4)+
   stat_summary(fun=median, geom="crossbar", size=0.7) + 
   theme_cowplot(12)+
   theme(legend.position = "bottom")+
@@ -106,9 +113,17 @@ pFinal <-p + geom_jitter(shape=16, position=position_jitter(0.2))+
 print(pFinal)
 
 
+mediansM <- Data %>%
+  group_by(CladeGroup) %>%
+  summarize(MedianM = median(100 * MalignancyPrevalence))
+
+# Merge the medians back into the original data frame
+Data <- merge(Data, mediansM, by = "CladeGroup")
+
+
 # Basic violin plot
 #Malignancy
-m <- ggplot(Data, aes(x=CladeGroup, y=100*MalignancyPrevalence, fill=CladeGroup)) + 
+m <- ggplot(Data, aes(x=reorder(CladeGroup, MedianM), y=100*MalignancyPrevalence, fill=CladeGroup)) + 
   geom_violin(adjust=1) +
   scale_y_continuous(
     limits = c(0,65))+
@@ -130,7 +145,7 @@ print(m)
 
 
 ##Add the jitter points and the mean bar 
-mFinal <-m + geom_jitter(shape=16, position=position_jitter(0.2))+
+mFinal <-m + geom_jitter(shape=16,width = 0.2, height = 0, alpha = 0.4)+
   stat_summary(fun=median, geom="crossbar", size=0.7) + 
   theme_cowplot(12)+
   theme(legend.position = "bottom")+
