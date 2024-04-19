@@ -65,7 +65,7 @@ pglsSEyPagel=function(model, data, tree, lambdaInterval=c(0,1),...){
 
 #read in data and filter
 Data <- read.csv("min20-2022.05.16.csv")
-Data<- filter(Data, is.element(Orders, c("Squamata")))
+Data<- filter(Data, is.element(Class, c("Aves")))
 View(Data)
 
 
@@ -73,7 +73,7 @@ View(Data)
 #adult weight models
 #adult weight neo
 
-cutData <- Data[,c(5,9,10,6,11,13,38,42),drop=FALSE] 
+cutData <- Data[,c(5,9,10,4,11,13,38,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
@@ -105,7 +105,7 @@ p.v.adult.weight.neo<-signif(p.v.adult.weight.neo[2,4], digits = 2)
 
 #Brian: First line is where you make change. log10 x value. delete scale x continous completely
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)))+
-  scale_color_manual(values = c("Squamata" = "#631879FF" ),)+
+  scale_color_manual(values = c("Aves" = "#631879FF" ),)+
   scale_y_continuous(
     
     breaks = c(0, 25,50,75),
@@ -116,7 +116,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)))+
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Adult Weight (g)") +
-  geom_point(aes(colour= Orders, size = RecordsWithDenominators)) +
+  geom_point(aes(colour= Class, size = RecordsWithDenominators)) +
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
@@ -128,7 +128,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)))+
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
-  labs(colour="Orders", size="Total Necropsies")+
+  labs(colour="Class", size="Total Necropsies")+
   #SELIN: Add these 3 lines to the end of every model. Then change label="21" to whatever number model. 
   coord_cartesian(xlim = c(log10(min(cutData$adult_weight.g.)),log10(max(cutData$adult_weight.g.))),
                   ylim = c(0,75),clip = "off")+
@@ -140,7 +140,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)))+
 
 
 #adult weight mal
-cutData <- Data[,c(5,9,10,6,11,17,38,42),drop=FALSE] 
+cutData <- Data[,c(5,9,10,4,11,17,38,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
@@ -173,7 +173,7 @@ p.v.adult.weight.mal<-signif(p.v.adult.weight.mal[2,4], digits = 3)
 
 
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)))+
-  scale_color_manual(values = c("Squamata" = "#631879FF"))+
+  scale_color_manual(values = c("Aves" = "#631879FF"))+
   scale_y_continuous(
     breaks = c(0, 25,45),
     labels = c(0, 25,45))+
@@ -185,14 +185,14 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)))+
   theme(axis.title = element_text(size = 18))+
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Adult Weight (g)") +
-  geom_point(aes(colour= Orders, size = RecordsWithDenominators)) +
+  geom_point(aes(colour= Class, size = RecordsWithDenominators)) +
   geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+  
   labs(title = "Malignancy Prevalence vs. Adult Weight",
        subtitle =bquote(p-value:.(p.v.adult.weight.mal)~R^2:.(r.v.adult.weight.mal)~Lambda:.(ld.v.adult.weight.mal))) +
   guides(colour = FALSE) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Orders", size="Total Necropsies")+
+  theme(legend.position = "bottom")+   labs(colour="Class", size="Total Necropsies")+
   guides(size=guide_legend())+
   annotate("text", x=.42, y=50.2, label = "22", size = 7)
 
@@ -204,7 +204,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)))+
 
 #gestation models
 #gestation neo
-cutData <- Data[,c(5,9,10,6,11,13,30,42),drop=FALSE] 
+cutData <- Data[,c(5,9,10,4,11,13,30,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
@@ -235,7 +235,7 @@ p.v.gestneo<-summary(gestation.neo)$tTable
 p.v.gestneo<-signif(p.v.gestneo[2,4], digits = 3)
 
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(Gestation.months.))) +
-  scale_color_manual(values = c("Squamata" = "#631879FF"))+
+  scale_color_manual(values = c("Aves" = "#631879FF"))+
   scale_y_continuous(
     
     breaks = c(0, 25,50,75),
@@ -246,17 +246,17 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(Gestation.months.))) +
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Gestation (Mo)") +
-  geom_point(aes(colour= Orders, size = RecordsWithDenominators)) +
+  geom_point(aes(colour= Class, size = RecordsWithDenominators)) +
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
   geom_text_repel(aes(label=ifelse( NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
-  labs(title = "Neoplasia Prevalence vs. Gestation in Squamatans",  
+  labs(title = "Neoplasia Prevalence vs. Gestation in Avesns",  
        subtitle =bquote(p-value:.(p.v.gestneo)~R^2:.(r.v.gestneo)~Lambda:.(ld.v.gestneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Orders", size="Total Necropsies")+
+  theme(legend.position = "bottom")+   labs(colour="Class", size="Total Necropsies")+
   coord_cartesian(xlim = c(min(log10(cutData$Gestation.months.)),max(log10(cutData$Gestation.months.))),
                   ylim = c(0,75),clip = "off")+
   annotate("text", x=-.53, y=83.8, label = "23", size = 7)
@@ -266,7 +266,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(Gestation.months.))) +
 #ggsave(filename='S23gestneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #gestation mal
-cutData <- Data[,c(5,9,10,6,11,17,30,42),drop=FALSE] 
+cutData <- Data[,c(5,9,10,4,11,17,30,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
@@ -297,7 +297,7 @@ p.v.gestmal<-summary(gestation.mal)$tTable
 p.v.gestmal<-signif(p.v.gestmal[2,4], digits = 3)
 
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.months.))) + 
-  scale_color_manual(values = c("Squamata" = "#631879FF"))+
+  scale_color_manual(values = c("Aves" = "#631879FF"))+
   scale_y_continuous(
     
     breaks = c(0, 25,45),
@@ -310,17 +310,17 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.months.))) +
   theme(axis.title = element_text(size = 18))+
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Gestation (Mo)") +
-  geom_point(aes(colour= Orders, size = RecordsWithDenominators)) +
+  geom_point(aes(colour= Class, size = RecordsWithDenominators)) +
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
   geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
-  labs(title = "Malignancy Prevalence vs. Gestation in Squamatans",  
+  labs(title = "Malignancy Prevalence vs. Gestation in Avesns",  
        subtitle =bquote(p-value:.(p.v.gestmal)~R^2:.(r.v.gestmal)~Lambda:.(ld.v.gestmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Orders", size="Total Necropsies")+
+  theme(legend.position = "bottom")+   labs(colour="Class", size="Total Necropsies")+
   annotate("text", x=-.53, y=50.2, label = "24", size = 7)
 
 
@@ -328,7 +328,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.months.))) +
 
 #litter size models 
 #litter size neo
-cutData <- Data[,c(5,9,10,6,11,13,33,42),drop=FALSE] 
+cutData <- Data[,c(5,9,10,4,11,13,33,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
@@ -357,7 +357,7 @@ p.v.litneo<-summary(litter.neo)$tTable
 p.v.litneo<-signif(p.v.litneo[2,4], digits = 3)
 
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litter_size))) + 
-  scale_color_manual(values = c("Squamata" = "#631879FF"))+
+  scale_color_manual(values = c("Aves" = "#631879FF"))+
   scale_y_continuous(
     
     breaks = c(0, 25,50,75),
@@ -368,17 +368,17 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litter_size))) +
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Litter Size") +
-  geom_point(aes(colour= Orders, size = RecordsWithDenominators)) +
+  geom_point(aes(colour= Class, size = RecordsWithDenominators)) +
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
   geom_text_repel(aes(label=ifelse( NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
-  labs(title = "Neoplasia Prevalence vs. Litter Size in Squamatans",  
+  labs(title = "Neoplasia Prevalence vs. Litter Size in Avesns",  
        subtitle =bquote(p-value:.(p.v.litneo)~R^2:.(r.v.litneo)~Lambda:.(ld.v.litneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Orders", size="Total Necropsies")+
+  theme(legend.position = "bottom")+   labs(colour="Class", size="Total Necropsies")+
   coord_cartesian(xlim = c(log10(min(cutData$litter_size)),log10(max(cutData$litter_size))),
                   ylim = c(0,75),clip = "off")+
   annotate("text", x=-.13, y=83.8, label = "25", size = 7)
@@ -387,7 +387,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litter_size))) +
 #ggsave(filename='S25litneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #litter size mal
-cutData <- Data[,c(5,9,10,6,11,17,33,42),drop=FALSE] 
+cutData <- Data[,c(5,9,10,4,11,17,33,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
 cutData <- na.omit(cutData)
 
@@ -417,7 +417,7 @@ p.v.litmal<-summary(litter.mal)$tTable
 p.v.litmal<-signif(p.v.litmal[2,4], digits = 3)
 
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litter_size))) + 
-  scale_color_manual(values = c("Squamata" = "#631879FF"))+
+  scale_color_manual(values = c("Aves" = "#631879FF"))+
   scale_y_continuous(
     
     breaks = c(0, 25,45),
@@ -430,17 +430,17 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litter_size))) +
   theme(axis.title = element_text(size = 18))+
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Litter Size") +
-  geom_point(aes(colour= Orders, size = RecordsWithDenominators)) +
+  geom_point(aes(colour= Class, size = RecordsWithDenominators)) +
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
   geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
-  labs(title = "Malignancy Prevalence vs. Litter Size in Squamatans",  
+  labs(title = "Malignancy Prevalence vs. Litter Size in Avesns",  
        subtitle =bquote(p-value:.(p.v.litmal)~R^2:.(r.v.litmal)~Lambda:.(ld.v.litmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Orders", size="Total Necropsies")+
+  theme(legend.position = "bottom")+   labs(colour="Class", size="Total Necropsies")+
   annotate("text", x=-.13, y=50.3, label = "26", size = 7)
 
 
@@ -448,7 +448,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litter_size))) +
 
 ### Longevity model
 #longevity neo
-cutData <- Data[,c(5,9,10,6,11,13,40,42),drop=FALSE] 
+cutData <- Data[,c(5,9,10,4,11,13,40,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
@@ -481,7 +481,7 @@ p.v.longneo<-summary(longevity.neo)$tTable
 p.v.longneo<-signif(p.v.longneo[2,4], digits = 3)
 
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(max_longevity.months.))) +
-  scale_color_manual(values = c("Squamata" = "#631879FF"))+
+  scale_color_manual(values = c("Aves" = "#631879FF"))+
   scale_y_continuous(
     
     breaks = c(0, 25,50,75),
@@ -494,18 +494,18 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(max_longevity.months.))) 
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Max Longevity (Mo)") +
-  geom_point(aes(colour= Orders, size = RecordsWithDenominators)) +
+  geom_point(aes(colour= Class, size = RecordsWithDenominators)) +
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
   geom_text_repel(aes(label=ifelse( NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
-  labs(title = "Neoplasia Prevalence vs. Max Longevity in Squamatans",  
+  labs(title = "Neoplasia Prevalence vs. Max Longevity in Avesns",  
        subtitle =bquote(p-value:.(p.v.longneo)~R^2:.(r.v.longneo)~Lambda:.(ld.v.longneo))) +
   guides(colour = FALSE) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
-  labs(colour="Orders", size="Total Necropsies")+
+  labs(colour="Class", size="Total Necropsies")+
   annotate("text", x=1.565, y=83.8, label = "27", size = 7)
 
 
@@ -513,7 +513,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(max_longevity.months.))) 
 
 #longevity mal
 
-cutData <- Data[,c(5,9,10,6,11,17,40,42),drop=FALSE] 
+cutData <- Data[,c(5,9,10,4,11,17,40,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
@@ -545,7 +545,7 @@ p.v.longmal<-summary(longevity.mal)$tTable
 p.v.longmal<-signif(p.v.longmal[2,4], digits = 3)
 
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(max_longevity.months.))) + 
-  scale_color_manual(values = c("Squamata" = "#631879FF"))+
+  scale_color_manual(values = c("Aves" = "#631879FF"))+
   scale_y_continuous(
     
     breaks = c(0, 25,45),
@@ -558,17 +558,17 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(max_longevity.months.)))
   theme(axis.title = element_text(size = 18))+
   ylab("Malignancy Prevalence (%)") +
   xlab("Max Longevity (Mo)") +
-  geom_point(aes(colour= Orders, size = RecordsWithDenominators)) +
+  geom_point(aes(colour= Class, size = RecordsWithDenominators)) +
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
   geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
-  labs(title = "Malignancy Prevalence vs. Max Longevity in Squamatans",  
+  labs(title = "Malignancy Prevalence vs. Max Longevity in Avesns",  
        subtitle =bquote(p-value:.(p.v.longmal)~R^2:.(r.v.longmal)~Lambda:.(ld.v.longmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Orders", size="Total Necropsies")+
+  theme(legend.position = "bottom")+   labs(colour="Class", size="Total Necropsies")+
   annotate("text", x=1.565, y=50.2, label = "28", size = 7)
 
 
@@ -577,7 +577,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(max_longevity.months.)))
 
 #wxl models #weight and longevity
 #wxl neo
-cutData <- Data[,c(5,9,10,6,11,13,40,38,42),drop=FALSE] 
+cutData <- Data[,c(5,9,10,4,11,13,40,38,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
@@ -610,7 +610,7 @@ p.v.wxneo<-summary(wxl.neo)$tTable
 p.v.wxneo<-signif(p.v.wxneo[2,4], digits = 3)
 
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)*log10(max_longevity.months.))) +
-  scale_color_manual(values = c("Squamata" = "#631879FF"))+
+  scale_color_manual(values = c("Aves" = "#631879FF"))+
   scale_y_continuous(
     
     breaks = c(0, 25,50,75),
@@ -623,24 +623,24 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)*log10(ma
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log10) Adult Weight(g)*Longevity(Mo)") +
-  geom_point(aes(colour= Orders, size = RecordsWithDenominators)) +
+  geom_point(aes(colour= Class, size = RecordsWithDenominators)) +
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
   geom_text_repel(aes(label=ifelse( NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
-  labs(title = "Neoplasia Prevalence vs. Max Longevity*Weight in Squamatans",  
+  labs(title = "Neoplasia Prevalence vs. Max Longevity*Weight in Avesns",  
        subtitle =bquote(p-value:.(p.v.wxneo)~R^2:.(r.v.wxneo)~Lambda:.(ld.v.wxneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Orders", size="Total Necropsies")+
+  theme(legend.position = "bottom")+   labs(colour="Class", size="Total Necropsies")+
   annotate("text", x=.18, y=83.8, label = "31", size = 7)
 
 
 #ggsave(filename='S31wgtlongneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #wxl mal
-cutData <- Data[,c(5,9,10,6,11,17,40,38,42),drop=FALSE] 
+cutData <- Data[,c(5,9,10,4,11,17,40,38,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
@@ -673,7 +673,7 @@ p.v.wxmal<-summary(wxl.mal)$tTable
 p.v.wxmal<-signif(p.v.wxmal[2,4], digits = 3)
 
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)*log10(max_longevity.months.))) + 
-  scale_color_manual(values = c("Squamata" = "#631879FF"))+
+  scale_color_manual(values = c("Aves" = "#631879FF"))+
   scale_y_continuous(
     
     breaks = c(0, 25,45),
@@ -686,17 +686,17 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)*log10(m
   theme(axis.title = element_text(size = 18))+
   ylab("Malignancy Prevalence (%)") +
   xlab("(log10) Adult Weight(g)*Longevity(Mo)") +
-  geom_point(aes(colour= Orders, size = RecordsWithDenominators)) +
+  geom_point(aes(colour= Class, size = RecordsWithDenominators)) +
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
   geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
-  labs(title = "Malignancy Prevalence vs. Max Longevity*Weight in Squamatans",  
+  labs(title = "Malignancy Prevalence vs. Max Longevity*Weight in Avesns",  
        subtitle =bquote(p-value:.(p.v.wxmal)~R^2:.(r.v.wxmal)~Lambda:.(ld.v.wxmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Orders", size="Total Necropsies")+
+  theme(legend.position = "bottom")+   labs(colour="Class", size="Total Necropsies")+
   annotate("text", x=.18, y=50.2, label = "32", size = 7)
 
 #ggsave(filename='S32wxlmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
@@ -706,7 +706,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)*log10(m
 
 
 ####Female Maturity neo
-cutData <- Data[,c(5,9,10,6,11,13,28,42),drop=FALSE] 
+cutData <- Data[,c(5,9,10,4,11,13,28,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
@@ -736,7 +736,7 @@ p.v.fmaturityneo<-summary(Fmaturity.neo)$tTable
 p.v.fmaturityneo<-signif(p.v.fmaturityneo[2,4], digits = 3)
 
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(female_maturity.months.))) +
-  scale_color_manual(values = c("Squamata" = "#631879FF"))+
+  scale_color_manual(values = c("Aves" = "#631879FF"))+
   scale_y_continuous(
     
     breaks = c(0, 25,50,75),
@@ -747,17 +747,17 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(female_maturity.months.))
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
   xlab("Female Maturity (Mo)") +
-  geom_point(aes(colour= Orders, size = RecordsWithDenominators)) +
+  geom_point(aes(colour= Class, size = RecordsWithDenominators)) +
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
   geom_text_repel(aes(label=ifelse( NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
-  labs(title = "Neoplasia Prevalence vs. Female Maturity in Squamatans",  
+  labs(title = "Neoplasia Prevalence vs. Female Maturity in Avesns",  
        subtitle =bquote(p-value:.(p.v.fmaturityneo)~R^2:.(r.v.fmaturityneo)~Lambda:.(ld.v.fmaturityneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Orders", size="Total Necropsies")+
+  theme(legend.position = "bottom")+   labs(colour="Class", size="Total Necropsies")+
   coord_cartesian(xlim = c(log10(min(cutData$female_maturity.months.)),log10(max(cutData$female_maturity.months.))),
                   ylim = c(0,75),clip = "off")+
   annotate("text", x=-.08, y=83.8, label = "35", size = 7)
@@ -766,7 +766,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(female_maturity.months.))
 #ggsave(filename='S35femmatneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Female Maturity Mal
-cutData <- Data[,c(5,9,10,6,11,17,28,42),drop=FALSE] 
+cutData <- Data[,c(5,9,10,4,11,17,28,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
@@ -796,7 +796,7 @@ p.v.fmaturitymal<-summary(Fmaturity.mal)$tTable
 p.v.fmaturitymal<-signif(p.v.fmaturitymal[2,4], digits = 3)
 
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(female_maturity.months.))) + 
-  scale_color_manual(values = c("Squamata" = "#631879FF"))+
+  scale_color_manual(values = c("Aves" = "#631879FF"))+
   scale_y_continuous(
     
     breaks = c(0, 25,45),
@@ -809,23 +809,23 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(female_maturity.months.)
   theme(axis.title = element_text(size = 18))+
   ylab("Malignancy Prevalence (%)") +
   xlab("Female Maturity (Mo)") +
-  geom_point(aes(colour= Orders, size = RecordsWithDenominators)) +
+  geom_point(aes(colour= Class, size = RecordsWithDenominators)) +
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
-  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+  labs(title = "Malignancy Prevalence vs. Female Maturity in Squamatans",  
+  geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+  labs(title = "Malignancy Prevalence vs. Female Maturity in Avesns",  
                                                                                                                                                subtitle =bquote(p-value:.(p.v.fmaturitymal)~R^2:.(r.v.fmaturitymal)~Lambda:.(ld.v.fmaturitymal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Orders", size="Total Necropsies")+
+  theme(legend.position = "bottom")+   labs(colour="Class", size="Total Necropsies")+
   annotate("text", x=-.08, y=50.2, label = "36", size = 7)
 
 
 #ggsave(filename='S36femmatmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 ####Male Maturity neo
-cutData <- Data[,c(5,9,10,6,11,13,29,42),drop=FALSE] 
+cutData <- Data[,c(5,9,10,4,11,13,29,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
@@ -855,7 +855,7 @@ p.v.Mmaturityneo<-summary(Mmaturity.neo)$tTable
 p.v.Mmaturityneo<-signif(p.v.Mmaturityneo[2,4], digits = 3)
 
 ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(male_maturity.months.))) + 
-  scale_color_manual(values = c("Squamata" = "#631879FF"))+
+  scale_color_manual(values = c("Aves" = "#631879FF"))+
   scale_y_continuous(
     
     breaks = c(0, 25,50,75),
@@ -866,17 +866,17 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(male_maturity.months.))) 
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
   xlab("Male Maturity (Mo)") +
-  geom_point(aes(colour= Orders, size = RecordsWithDenominators)) +
+  geom_point(aes(colour= Class, size = RecordsWithDenominators)) +
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
   geom_text_repel(aes(label=ifelse( NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
-  labs(title = "Neoplasia Prevalence vs. Male Maturity in Squamatans",  
+  labs(title = "Neoplasia Prevalence vs. Male Maturity in Avesns",  
        subtitle =bquote(p-value:.(p.v.Mmaturityneo)~R^2:.(r.v.Mmaturityneo)~Lambda:.(ld.v.Mmaturityneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Orders", size="Total Necropsies")+
+  theme(legend.position = "bottom")+   labs(colour="Class", size="Total Necropsies")+
   coord_cartesian(xlim = c(log10(min(cutData$male_maturity.months.)),log10(max(cutData$male_maturity.months.))),
                   ylim = c(0,75),clip = "off")+
   annotate("text", x=-.08, y=83.8, label = "37", size = 7)
@@ -885,7 +885,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(male_maturity.months.))) 
 #ggsave(filename='S37malematneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Male Maturity Mal
-cutData <- Data[,c(5,9,10,6,11,17,29,42),drop=FALSE] 
+cutData <- Data[,c(5,9,10,4,11,17,29,42),drop=FALSE] 
 cutData[cutData < 0] <-NA
 cutData <- na.omit(cutData)
 tree <- read.tree("min20Fixed516.nwk")
@@ -915,7 +915,7 @@ p.v.Mmaturitymal<-summary(Mmaturity.mal)$tTable
 p.v.Mmaturitymal<-signif(p.v.Mmaturitymal[2,4], digits = 3)
 
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(male_maturity.months.))) +
-  scale_color_manual(values = c("Squamata" = "#631879FF"))+
+  scale_color_manual(values = c("Aves" = "#631879FF"))+
   scale_y_continuous(
     
     breaks = c(0, 25,45),
@@ -928,17 +928,17 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(male_maturity.months.)))
   theme(axis.title = element_text(size = 18))+
   ylab("Malignancy Prevalence (%)") +
   xlab("Male Maturity (Mo)") +
-  geom_point(aes(colour= Orders, size = RecordsWithDenominators)) +
+  geom_point(aes(colour= Class, size = RecordsWithDenominators)) +
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
   geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
-  labs(title = "Malignancy Prevalence vs. Male Maturity in Squamatans",  
+  labs(title = "Malignancy Prevalence vs. Male Maturity in Avesns",  
        subtitle =bquote(p-value:.(p.v.Mmaturitymal)~R^2:.(r.v.Mmaturitymal)~Lambda:.(ld.v.Mmaturitymal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
-  theme(legend.position = "bottom")+   labs(colour="Orders", size="Total Necropsies")+
+  theme(legend.position = "bottom")+   labs(colour="Class", size="Total Necropsies")+
   annotate("text", x=-.08, y=50.2, label = "38", size = 7)
 
 

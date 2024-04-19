@@ -138,7 +138,7 @@ wgtneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.))
   labs(colour="Clade", size="Total Necropsies")
 
 
-#ggsave(filename='wgtneol.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='wgtneol.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #adult weight mal
 cutData <- Data[,c(5,9,10,11,17,38,42),drop=FALSE] 
@@ -179,10 +179,11 @@ p.v.adult.weight.mal<-signif(p.v.adult.weight.mal[2,4], digits = 3)
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)))+
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
   scale_y_continuous(
-    breaks = c(0, 25,45),
-    labels = c(0, 25,45))+
+    limits = c(0,75),
+    breaks = c(0, 25,45,75),
+    labels = c(0, 25,45,75))+
   coord_cartesian(xlim = c(log10(min(cutData$adult_weight.g.)),log10(max(cutData$adult_weight.g.))),
-                  ylim = c(0,45),clip = "off")+
+                  ylim = c(0,75),clip = "off")+
   geom_abline(intercept = coef(adult.weight.mal)[1]*100, slope =  coef(adult.weight.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -194,9 +195,8 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)))+
   scale_size(name   = "Total Necropsies",
              breaks = c(20,100,200,300,477),
              labels =  c(20,100,200,300,477))+
-  labs(title = "Malignancy Prevalence vs. Adult Weight",
-       subtitle =bquote(p-value:.(p.v.adult.weight.mal)~R^2:.(r.v.adult.weight.mal)~Lambda:.(ld.v.adult.weight.mal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
+  labs(title = "A.1")+
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
@@ -205,7 +205,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)))+
 
 
 
-#ggsave(filename='S1wgtmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S1wgtmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #gestation models
 #gestation neo
@@ -264,7 +264,7 @@ gestneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(Gestation.months
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   labs(title="A")
 
-##ggsave(filename='S2gestneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S2gestneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #gestation mal
 cutData <- Data[,c(5,9,10,11,17,30,42),drop=FALSE] 
@@ -320,7 +320,7 @@ gestmal<-ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.month
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   labs(title="B")
 
-##ggsave(filename='gestmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='gestmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 gestneo/gestmal
 
@@ -376,8 +376,6 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litter_size))) +
   xlab("(log10) Litter Size") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
   geom_text_repel(aes(label=ifelse(NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
-  labs(title = "Neoplasia Prevalence vs. Litter Size",  
-       subtitle =bquote(p-value:.(p.v.litneo)~R^2:.(r.v.litneo)~Lambda:.(ld.v.litneo))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
@@ -429,8 +427,9 @@ p.v.litmal<-signif(p.v.litmal[2,4], digits = 3)
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litter_size))) +
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
   scale_y_continuous(
-    breaks = c(0, 25,45),
-    labels = c(0, 25,45))+
+    limits = c(0,75),
+    breaks = c(0, 25,45,75),
+    labels = c(0, 25,45,75))+
   coord_cartesian(xlim = c(log10(min(cutData$litter_size)),log10(max(cutData$litter_size))),
                   ylim = c(0,45),clip = "off")+
   geom_abline(intercept = coef(litter.mal)[1]*100, slope =  coef(litter.mal)[2]*100,
@@ -441,8 +440,6 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litter_size))) +
   xlab("(log10) Litter Size") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
   geom_text_repel(aes(label=ifelse(MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
-  labs(title = "Malignancy Prevalence vs. Litter Size",  
-       subtitle =bquote(p-value:.(p.v.litmal)~R^2:.(r.v.litmal)~Lambda:.(ld.v.litmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
@@ -515,7 +512,7 @@ longneo<-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(max_longevity.mo
   labs(colour="Clade", size="Total Necropsies")
 
 
-#ggsave(filename='longneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='longneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 #create weight over longevity model
@@ -564,10 +561,11 @@ p.v.longmal<-signif(p.v.longmal[2,4], digits = 3)
 ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(max_longevity.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF", "Sauropsida"= "#008b45ff", "Amphibia"= "#3B4992ff" ))+
   scale_y_continuous(
-    breaks = c(0, 25,45),
-    labels = c(0, 25,45))+
+    limits = c(0,75),
+    breaks = c(0, 25,50,75),
+    labels = c(0, 25,50,75))+
   coord_cartesian(xlim = c(log10(min(cutData$max_longevity.months.)),log10(max(cutData$max_longevity.months.))),
-                  ylim = c(0,45),clip = "off")+
+                  ylim = c(0,75),clip = "off")+
   geom_abline(intercept = coef(longevity.mal)[1]*100, slope =  coef(longevity.mal)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
@@ -576,16 +574,15 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(max_longevity.months.)))
   xlab("Max Longevity (Mo)") +
   geom_point(aes(colour= Clade, size = RecordsWithDenominators)) +
   geom_text_repel(aes(label=ifelse( MalignancyPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
-  labs(title = "Malignancy Prevalence vs. Max Longevity",  
-       subtitle =bquote(p-value:.(p.v.longmal)~R^2:.(r.v.longmal)~Lambda:.(ld.v.longmal))) +
   guides(colour = guide_legend(override.aes = list(size=5))) +
+  labs(title = "B.2")+
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
-  guides(size=guide_legend())+
-  annotate("text", x=1.07, y=50.3, label = "5", size = 7)
+  guides(size=guide_legend())
+  #annotate("text", x=1.07, y=50.3, label = "5", size = 7)
 
-#ggsave(filename='S5longmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S5longmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 ##BMR models
@@ -1520,9 +1517,22 @@ p.v.wpneo<-summary(wpl.neo)$tTable
 p.v.wpneogest<-signif(p.v.wpneo[2,4], digits = 3)
 p.v.wpneowgt<-signif(p.v.wpneo[3,4], digits = 2)
 p.v.wpgneogest<-signif(p.v.wpneo[2,4], digits = 3)
-p.v.wpgneolong<-signif(p.v.wpneo[3,4], digits = 2)
+p.v.wpgneogest<-signif(p.v.wpneo[3,4], digits = 2)
 c.wpplneogest<-coef(wpl.neo)[2]
 c.wpplneolong<-coef(wpl.neo)[3]
+
+
+# Assuming you have a vector of p-values from multiple tests
+p.values <- c(p.v.wpneogest,p.v.wpneowgt)
+
+# Use the p.adjust function with the BH method to adjust the p-values
+adjusted.p.values <- p.adjust(p.values, method = "BH")
+
+# Determine which coefficients are significant at the 10% FDR level
+significant_effects <- adjusted.p.values < 0.1
+
+# Print which coefficients are significant
+print(significant_effects)
 
 
 
@@ -1602,6 +1612,18 @@ p.v.wpgmallong<-signif(p.v.wpmal[3,4], digits = 2)
 c.wpplmalgest<-coef(wpl.mal)[2]
 c.wpplmallong<-coef(wpl.mal)[3]
 
+
+# Assuming you have a vector of p-values from multiple tests
+p.values <- c(p.v.wpgmalgest,p.v.wpgmallong)
+
+# Use the p.adjust function with the BH method to adjust the p-values
+adjusted.p.values <- p.adjust(p.values, method = "BH")
+
+# Determine which coefficients are significant at the 10% FDR level
+significant_effects <- adjusted.p.values < 0.1
+
+# Print which coefficients are significant
+print(significant_effects)
 
 
 pvalues<-c(p.v.wpgmalgest,p.v.wpgmallong)
