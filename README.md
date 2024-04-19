@@ -53,6 +53,18 @@ Main PGLS analysis of all life history variables
 ### min20mam.R
 PGLS Analysis of life history variables for mammals
 
+### min20aves.R
+PGLS Analysis of life history variables for aves
+
+### min20amph.R
+PGLS Analysis of life history variables for amphibians
+
+### min20Sauropsids.R
+PGLS Analysis of life history variables for sauropsids
+
+### min20VertGroup.R
+PGLS Analysis of life history variables for different vertebrate groups
+
 ### min20AgeControl.Rmd
 PGLS controlled for available individual age data
 
@@ -82,6 +94,9 @@ PGLS for doxirubicin treatment data
 
 ### kruskalwilcox.R
 Perform Kruskal and Wilcox test between clades
+
+### arcsinMin20.Rmd || arcsinMin20.html
+arcsine tranformation of significant dependent variables in pgls analysis
 
 ## Results from Statistical Methods
 
