@@ -10,6 +10,7 @@ library(ggpubr)
 library(grid)
 library(lemon)
 library(sqldf)
+library(dplyr)
 #load csv 
 Data<-read.csv(file="min20-2022.05.16.csv")
 nrow(Data)
@@ -36,6 +37,8 @@ Data <- Data %>%
     Clade %in% c("Mammalia", "Amphibia") ~ Clade,
     TRUE ~ NA_character_  # For other cases
   ))
+
+
 
 
 # Assuming your data frame is named 'df'
@@ -83,9 +86,12 @@ p <- ggplot(Data, aes(x=reorder(CladeGroup, Median), y=100*NeoplasiaPrevalence, 
   scale_y_continuous(
     limits = c(0,65))+
   theme(
-    legend.text = element_text(size = 10),
+    legend.text = element_text(size = 10)
   ) +
-  scale_fill_manual(values = c("Mammalia" = "#631879FF", "Squamata"= "#008b45ff", "Amphibia"= "#3B4992ff", "Aves" = "red" ),labels=c("98 Species, N=5684", "63 Species, N=2393", "41 Species, N=3061","86 Species, N=4797"))+
+  scale_fill_manual(
+    values = c("Mammalia" = "#631879FF", "Squamata"= "#008b45ff", "Amphibia"= "#3B4992ff", "Aves" = "red"),
+    labels=c("Mammalia" = "98 Species, N=5684", "Squamata" = "63 Species, N=2393", "Amphibia" = "41 Species, N=3061", "Aves" = "86 Species, N=4797")
+  ) +
   ggtitle("A") +
   ylab("Neoplasia Prevalence %") +
   theme(
@@ -94,7 +100,8 @@ p <- ggplot(Data, aes(x=reorder(CladeGroup, Median), y=100*NeoplasiaPrevalence, 
     axis.title=element_text(size=0),
     plot.caption.position = "plot",
     plot.caption = element_text(hjust = 0)
-  )
+  )+
+  labs( fill = "Clade")
 
 p
 
@@ -123,25 +130,29 @@ Data <- merge(Data, mediansM, by = "CladeGroup")
 
 # Basic violin plot
 #Malignancy
-m <- ggplot(Data, aes(x=reorder(CladeGroup, MedianM), y=100*MalignancyPrevalence, fill=CladeGroup)) + 
+m <- ggplot(Data, aes(x=reorder(CladeGroup, Median), y=100*MalignancyPrevalence, fill=CladeGroup)) + 
   geom_violin(adjust=1) +
   scale_y_continuous(
     limits = c(0,65))+
   theme(
-    legend.text = element_text(size = 10),
+    legend.text = element_text(size = 10)
   ) +
-  scale_fill_manual(values = c("Mammalia" = "#631879FF", "Squamata"= "#008b45ff", "Amphibia"= "#3B4992ff", "Aves" = "red" ),labels=c("98 Species, N=5684", "63 Species, N=2393", "41 Species, N=3061","86 Species, N=4797"))+
+  scale_fill_manual(
+    values = c("Mammalia" = "#631879FF", "Squamata"= "#008b45ff", "Amphibia"= "#3B4992ff", "Aves" = "red"),
+    labels=c("Mammalia" = "98 Species, N=5684", "Squamata" = "63 Species, N=2393", "Amphibia" = "41 Species, N=3061", "Aves" = "86 Species, N=4797")
+  ) +
   ggtitle("B") +
-  #  labs(fill = 'Clade')+
   ylab("Malignancy Prevalence %") +
   theme(
-    plot.title = element_text(size = 20, face = "bold")) +
-  theme(axis.text=element_text(size=25),
-        axis.title=element_text(size=0),
-  ) +
-  theme(plot.caption.position = "plot",
-        plot.caption = element_text(hjust = 0))
-print(m)
+    plot.title = element_text(size = 20, face = "bold"),
+    axis.text=element_text(size=25),
+    axis.title=element_text(size=0),
+    plot.caption.position = "plot",
+    plot.caption = element_text(hjust = 0)
+  )+
+  labs( fill = "Clade")
+
+m
 
 
 ##Add the jitter points and the mean bar 
@@ -155,7 +166,7 @@ mFinal <-m + geom_jitter(shape=16,width = 0.2, height = 0, alpha = 0.4)+
         axis.title.x=element_blank(),
         axis.title.y=element_text(size=20),
         title=element_text(size = 25),)
-print(mFinal)
+mFinal
 
 
 #Arrange both violins into one image
@@ -181,50 +192,62 @@ reposition_legend(arrange, legend = legend, x=.2, y=.05, just = 0)
 
 alleanNeo<-mean(Data$NeoplasiaPrevalence)
 allRangNneo<-range(Data$NeoplasiaPrevalence)
+allMedianNeo<-median(Data$NeoplasiaPrevalence)
 
-cat("All Neoplasia Mean: ", alleanNeo, "All Neoplasia Range", allRangNneo)
+cat("All Neoplasia Mean: ", alleanNeo, "All Neoplasia Range", allRangNneo, "median", allMedianNeo)
 
 alleanMal<- mean(Data$MalignancyPrevalence)
 mamRangeMal<-range(Data$MalignancyPrevalence)
+allMedianMal<-median(Data$MalignancyPrevalence)
 
-cat("All Malignancy Mean: ", alleanMal, "All Malginancy Range", mamRangeMal)
+cat("All Malignancy Mean: ", alleanMal, "All Malginancy Range", mamRangeMal,"median", allMedianMal)
 
 
 #Mammals
 Mamm<- filter(Data, is.element(Clade, c("Mammalia")))
-mamMeanNeo<-mean(Mamm$NeoplasiaPrevalence)
+mamNumSpecies<-rnow(Mamm)
 mammRangNneo<-range(Mamm$NeoplasiaPrevalence)
+mammMedianNeo<-median(Mamm$NeoplasiaPrevalence)
 
-cat("Mammmal Neoplasia Mean: ", mamMeanNeo, " Mammal Neoplasia Range", mammRangNneo)
+cat("Mammmal Neoplasia Mean: ", mamMeanNeo, " Mammal Neoplasia Range", mammRangNneo, "median", mammMedianNeo)
 
 mamMeanMal<- mean(Mamm$MalignancyPrevalence)
 mamRangeMal<-range(Mamm$MalignancyPrevalence)
+mammMedianMal<-median(Mamm$MalignancyPrevalence)
 
-cat("Mammmal Malignancy Mean: ", mamMeanMal, " Mammal Malginancy Range", mamRangeMal)
+cat("Mammmal Malignancy Mean: ", mamMeanMal, " Mammal Malginancy Range", mamRangeMal, "median", mammMedianMal)
+
+mamNumSpecies<-nrow(Mamm)
+mamN<-sum(Mamm$RecordsWithDenominators)
+
 
 #Sauropsids
 Saur<- filter(Data, is.element(Clade, c("Sauropsida")))
 saurMeanNeo<-mean(Saur$NeoplasiaPrevalence)
 saurRangNneo<-range(Saur$NeoplasiaPrevalence)
+saurMedianNeo<-median(Saur$NeoplasiaPrevalence)
 
-cat("Sauropsid Neoplasia Mean: ", saurMeanNeo, " Sauropsid Neoplasia Range", saurRangNneo)
+cat("Sauropsid Neoplasia Mean: ", saurMeanNeo, " Sauropsid Neoplasia Range", saurRangNneo, "median", saurMedianNeo)
 
 saurMeanMal<- mean(Saur$MalignancyPrevalence)
 saurRangeMal<-range(Saur$MalignancyPrevalence)
+saurMedianMal<-median(Saur$MalignancyPrevalence)
 
-cat("Sauropsid Malignancy Mean: ", saurMeanMal, " Sauropsid Malginancy Range", saurRangeMal)
+cat("Sauropsid Malignancy Mean: ", saurMeanMal, " Sauropsid Malginancy Range", saurRangeMal, "median", saurMedianMal)
 
 #Amphibia
 amph<- filter(Data, is.element(Clade, c("Amphibia")))
 amphMeanNeo<-mean(amph$NeoplasiaPrevalence)
 amphRangNneo<-range(amph$NeoplasiaPrevalence)
+amphMedianNeo<-median(amph$NeoplasiaPrevalence)
 
-cat("Amphibian Neoplasia Mean: ", amphMeanNeo, " Sauropsid Neoplasia Range", amphRangNneo)
+cat("Amphibian Neoplasia Mean: ", amphMeanNeo, " Amph Neoplasia Range", amphRangNneo, "median", amphMedianNeo)
 
 amphMeanMal<- mean(amph$MalignancyPrevalence)
 amphRangeMal<-range(amph$MalignancyPrevalence)
+amphMedianMal<-median(amph$MalignancyPrevalence)
 
-cat("Amphibian Malignancy Mean: ", amphMeanMal, " Sauropsid Malginancy Range", amphRangeMal)
+cat("Amphibian Malignancy Mean: ", amphMeanMal, " Amph Malginancy Range", amphRangeMal, "median", amphMedianMal)
 
 
 

@@ -95,7 +95,7 @@ num_simulations <- 100
 tree <- read.tree("min1.nwk")
 
 
-slope_values <- c(.021, 0, -.002)  # Array of slope values
+slope_values <- c(.021, 0, -.2)  # Array of slope values
 
 
 no_cores <- detectCores() - 1

@@ -125,7 +125,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)))+
   geom_text_repel(aes(label=ifelse( NeoplasiaPrevalence > .3,as.character(common_name),'')),max.overlaps = Inf,size=5, direction = "y")+
   guides(colour = guide_legend(override.aes = list(size=3))) +
   labs(title = "Neoplasia vs. Adult Weight",
-       subtitle =bquote(p-value:.(p.v.adult.weight.mal)~R^2:.(r.v.adult.weight.mal)~Lambda:.(ld.v.adult.weight.mal))) +
+       subtitle =bquote(p-value:.(p.v.adult.weight.neo)~R^2:.(r.v.adult.weight.neo)~Lambda:.(ld.v.adult.weight.neo))) +
   
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
@@ -137,7 +137,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)))+
 
 
 
-ggsave(filename='S21wgtneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S21wgtneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 #adult weight mal
@@ -203,7 +203,7 @@ guides(size=guide_legend())+
 
 
 
-ggsave(filename='S22wgtmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S22wgtmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #gestation models
 #gestation neo
@@ -270,7 +270,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(Gestation.months.))) +
 
 
 
-ggsave(filename='S23gestneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S23gestneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #gestation mal
 cutData <- Data[,c(5,9,10,11,17,30,42),drop=FALSE] 
@@ -336,7 +336,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.months.))) +
   annotate("text", x=-.53, y=50.2, label = "24", size = 7)
 
 
-ggsave(filename='S24gestmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S24gestmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #litter size models 
 #litter size neo
@@ -401,7 +401,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litter_size))) +
   annotate("text", x=-.13, y=83.8, label = "25", size = 7)
 
 
-ggsave(filename='S25litneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S25litneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #litter size mal
 cutData <- Data[,c(5,9,10,11,17,33,42),drop=FALSE] 
@@ -466,7 +466,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litter_size))) +
   annotate("text", x=-.13, y=50.3, label = "26", size = 7)
 
 
-ggsave(filename='S26litmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S26litmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 ### Longevity model
 #longevity neo
@@ -536,7 +536,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(max_longevity.months.))) 
   annotate("text", x=1.565, y=83.8, label = "27", size = 7)
 
 
-ggsave(filename='S27longneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S27longneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #longevity mal
 
@@ -603,7 +603,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(max_longevity.months.)))
   annotate("text", x=1.565, y=50.2, label = "28", size = 7)
 
 
-ggsave(filename='S28longmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S28longmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 ##BMR models
 #bmr neo
@@ -671,7 +671,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(metabolic_rate))) +
   annotate("text", x=.9, y=83.8, label = "29", size = 7)
 
 
-ggsave(filename='S29bmrneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S29bmrneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #bmr mal
 
@@ -739,7 +739,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(metabolic_rate)))+
   annotate("text", x=.9, y=50.2, label = "30", size = 7)
 
 
-ggsave(filename='S30bmrmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S30bmrmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #wxl models #weight and longevity
 #wxl neo
@@ -807,7 +807,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)*log10(ma
   annotate("text", x=.18, y=83.8, label = "31", size = 7)
 
 
-ggsave(filename='S31wgtlongneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S31wgtlongneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #wxl mal
 cutData <- Data[,c(5,9,10,11,17,40,38,42),drop=FALSE] 
@@ -872,7 +872,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)*log10(m
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   annotate("text", x=.18, y=50.2, label = "32", size = 7)
 
-ggsave(filename='S32wxlmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S32wxlmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 
@@ -938,7 +938,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litters_year))) +
   annotate("text", x=-.8, y=83.8, label = "33", size = 7)
   
   
-  ggsave(filename='S33lityearneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+  #ggsave(filename='S33lityearneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #litter size mal
 cutData <- Data[,c(5,9,10,11,17,34,42),drop=FALSE] 
@@ -1001,7 +1001,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litters_year))) +
   annotate("text", x=-.8, y=50.2, label = "34", size = 7)
 
 
-ggsave(filename='S34lityearmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S34lityearmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 ####Female Maturity neo
 cutData <- Data[,c(5,9,10,11,13,28,42),drop=FALSE] 
@@ -1064,7 +1064,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(female_maturity.months.))
   annotate("text", x=-.08, y=83.8, label = "35", size = 7)
 
 
-ggsave(filename='S35femmatneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S35femmatneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Female Maturity Mal
 cutData <- Data[,c(5,9,10,11,17,28,42),drop=FALSE] 
@@ -1127,7 +1127,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(female_maturity.months.)
   annotate("text", x=-.08, y=50.2, label = "36", size = 7)
 
 
-ggsave(filename='S36femmatmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S36femmatmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 ####Male Maturity neo
 cutData <- Data[,c(5,9,10,11,13,29,42),drop=FALSE] 
@@ -1190,7 +1190,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(male_maturity.months.))) 
   annotate("text", x=-.08, y=83.8, label = "37", size = 7)
 
 
-ggsave(filename='S37malematneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S37malematneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Male Maturity Mal
 cutData <- Data[,c(5,9,10,11,17,29,42),drop=FALSE] 
@@ -1253,7 +1253,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(male_maturity.months.)))
   annotate("text", x=-.08, y=50.2, label = "38", size = 7)
 
 
-ggsave(filename='S38malematmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S38malematmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Weaning Weight neo
 cutData <- Data[,c(5,9,10,11,13,37,42),drop=FALSE] 
@@ -1316,7 +1316,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(weaning_weight.g.))) +
   annotate("text", x=.42, y=83.8, label = "39", size = 7)
 
 
-ggsave(filename='S39weanneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S39weanneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Weaning Weight Mal
 cutData <- Data[,c(5,9,10,11,17,37,42),drop=FALSE] 
@@ -1379,7 +1379,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(weaning_weight.g.))) +
   annotate("text", x=.42, y=50.2, label = "40", size = 7)
 
 
-ggsave(filename='S40weanmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S40weanmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Growth Rate Neo
 cutData <- Data[,c(5,9,10,11,13,39,42),drop=FALSE] 
@@ -1442,7 +1442,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(growth_rate.1.days.))) +
   annotate("text", x=-3.29, y=83.8, label = "41", size = 7)
 
 
-ggsave(filename='S41growneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S41growneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Growth Rate Mal
 cutData <- Data[,c(5,9,10,11,17,39,42),drop=FALSE] 
@@ -1506,7 +1506,7 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(growth_rate.1.days.))) +
   annotate("text", x=-3.29, y=50.2, label = "42", size = 7)
 
 
-ggsave(filename='S42growmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S42growmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #w+g
 
@@ -1529,7 +1529,7 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
-wpl.neo<-pglsSEyPagel(NeoplasiaPrevalence~Gestation.months.+log10(adult_weight.g.),data=cutData,
+wpl.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(Gestation.months.)+log10(adult_weight.g.),data=cutData,
                       tree=pruned.tree,method="ML",se=SE)
 
 summary(wpl.neo)
@@ -1545,7 +1545,7 @@ p.v.wpneo<-summary(wpl.neo)$tTable
 p.v.wpneo<-signif(p.v.wpneo[2,4], digits = 3)
 
 #plot
-ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)+Gestation.months.)) + 
+ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)+log10(Gestation.months.))) + 
   scale_color_manual(values = c("Mammalia" = "#631879FF"))+
   scale_y_continuous(
 
@@ -1574,7 +1574,7 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)+Gestatio
   annotate("text", x=-.4, y=83.8, label = "43", size = 7)
 
 
-ggsave(filename='S43wgtgestneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S43wgtgestneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 #w+g mal
@@ -1598,7 +1598,7 @@ rownames(cutData)<-cutData$Species
 SE<-setNames(cutData$SE_simple,cutData$Species)[rownames(cutData)]
 view(cutData)
 
-wpl.mal<-pglsSEyPagel(MalignancyPrevalence~Gestation.months.+log10(adult_weight.g.),data=cutData,
+wpl.mal<-pglsSEyPagel(MalignancyPrevalence~log10(Gestation.months.)+log10(adult_weight.g.),data=cutData,
                       tree=pruned.tree,method="ML",se=SE)
 
 summary(wpl.mal)
@@ -1643,4 +1643,4 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=Gestation.months.+log10(adult_
 
 
 
-ggsave(filename='S44wgtgestmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+#ggsave(filename='S44wgtgestmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
