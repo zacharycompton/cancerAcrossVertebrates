@@ -108,6 +108,13 @@ Age of death distribution plots
 ### violinsNeoMal.R
 Script for violin plots
 
+## Experimentation
+
+### expExperiments.R
+Simulation test of pglsPagelSey and compar.GEE. This is a large and and long-running script. 
+
+
+
 
 
 
