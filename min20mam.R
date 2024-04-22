@@ -7,6 +7,7 @@ library(tidyverse)
 library(cowplot)
 library(ggrepel)
 library(ggsci)
+library(rr2)
 #make sure to run all of this before you get to work.
 #pgls sey base (just run all of this)
 modPgls.SEy = function (model, data, corClass = corBrownian, tree, se = NULL, 
@@ -97,9 +98,9 @@ summary(adult.weight.neo)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.adult.weight.neo <- summary(adult.weight.neo)$corBeta
-r.v.adult.weight.neo <- format(r.v.adult.weight.neo[2,1])
-r.v.adult.weight.neo <-signif(as.numeric(r.v.adult.weight.neo)^2, digits= 2)
+r.v.adult.weight.neo <- R2(phy = pruned.tree,adult.weight.neo)
+r.v.adult.weight.neo <- format(r.v.adult.weight.neo[3])
+r.v.adult.weight.neo <-signif(as.numeric(r.v.adult.weight.neo), digits= 2)
 ld.v.adult.weight.neo<- summary(adult.weight.neo)$modelStruct$corStruct
 ld.v.adult.weight.neo <- signif(ld.v.adult.weight.neo[1], digits = 2)
 p.v.adult.weight.neo<-summary(adult.weight.neo)$tTable
@@ -133,11 +134,11 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)))+
   labs(colour="Clade", size="Total Necropsies")+
   coord_cartesian(xlim = c(log10(min(cutData$adult_weight.g.)),log10(max(cutData$adult_weight.g.))),
                   ylim = c(0,75),clip = "off")+
-  annotate("text", x=.42, y=83.8, label = "21", size = 7)
+  annotate("text", x=.42, y=83.8, label = "17", size = 7)
 
 
 
-#ggsave(filename='S21wgtneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S17wgtneo.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 #adult weight mal
@@ -166,9 +167,9 @@ summary(adult.weight.mal)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.adult.weight.mal <- summary(adult.weight.mal)$corBeta
-r.v.adult.weight.mal <- format(r.v.adult.weight.mal[2,1])
-r.v.adult.weight.mal <-signif(as.numeric(r.v.adult.weight.mal)^2, digits= 2)
+r.v.adult.weight.mal <- R2(phy = pruned.tree,adult.weight.mal)
+r.v.adult.weight.mal <- format(r.v.adult.weight.mal[3])
+r.v.adult.weight.mal <-signif(as.numeric(r.v.adult.weight.mal), digits= 2)
 ld.v.adult.weight.mal<- summary(adult.weight.mal)$modelStruct$corStruct
 ld.v.adult.weight.mal <- signif(ld.v.adult.weight.mal[1], digits= 2)
 p.v.adult.weight.mal<-summary(adult.weight.mal)$tTable
@@ -197,13 +198,13 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)))+
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
 guides(size=guide_legend())+
-    annotate("text", x=.42, y=50.2, label = "22", size = 7)
+    annotate("text", x=.42, y=50.2, label = "18", size = 7)
   
 
 
 
 
-#ggsave(filename='S22wgtmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S18wgtmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #gestation models
 #gestation neo
@@ -231,9 +232,9 @@ summary(gestation.neo)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.gestneo <- summary(gestation.neo)$corBeta
-r.v.gestneo <- format(r.v.gestneo[2,1])
-r.v.gestneo<-signif(as.numeric(r.v.gestneo)^2, digits= 2)
+r.v.gestneo <- R2(phy = pruned.tree,gestation.neo)
+r.v.gestneo <- format(r.v.gestneo[3])
+r.v.gestneo<-signif(as.numeric(r.v.gestneo), digits= 2)
 ld.v.gestneo<- summary(gestation.neo)$modelStruct$corStruct
 ld.v.gestneo <- signif(ld.v.gestneo[1], digits = 2)
 p.v.gestneo<-summary(gestation.neo)$tTable
@@ -266,11 +267,11 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(Gestation.months.))) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   coord_cartesian(xlim = c(min(log10(cutData$Gestation.months.)),max(log10(cutData$Gestation.months.))),
                   ylim = c(0,75),clip = "off")+
-  annotate("text", x=-.53, y=83.8, label = "23", size = 7)
+  annotate("text", x=-.53, y=83.8, label = "19", size = 7)
 
 
 
-#ggsave(filename='S23gestneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S19gestneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #gestation mal
 cutData <- Data[,c(5,9,10,11,17,30,42),drop=FALSE] 
@@ -298,9 +299,9 @@ summary(gestation.mal)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.gestmal <- summary(gestation.mal)$corBeta
-r.v.gestmal <- format(r.v.gestmal[2,1])
-r.v.gestmal<-signif(as.numeric(r.v.gestneo)^2, digits= 2)
+r.v.gestmal <- R2(phy = pruned.tree,gestation.mal)
+r.v.gestmal <- format(r.v.gestmal[3])
+r.v.gestmal<-signif(as.numeric(r.v.gestneo), digits= 2)
 ld.v.gestmal<- summary(gestation.mal)$modelStruct$corStruct
 ld.v.gestmal<- signif(ld.v.gestmal[1], digits = 2)
 p.v.gestmal<-summary(gestation.mal)$tTable
@@ -333,10 +334,10 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(Gestation.months.))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
-  annotate("text", x=-.53, y=50.2, label = "24", size = 7)
+  annotate("text", x=-.53, y=50.2, label = "20", size = 7)
 
 
-#ggsave(filename='S24gestmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S20gestmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #litter size models 
 #litter size neo
@@ -363,9 +364,9 @@ summary(litter.neo)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.litneo <- summary(litter.neo)$corBeta
-r.v.litneo <- format(r.v.litneo[2,1])
-r.v.litneo <-signif(as.numeric(r.v.litneo)^2, digits= 2)
+r.v.litneo <- R2(phy = pruned.tree,litter.neo)
+r.v.litneo <- format(r.v.litneo[3])
+r.v.litneo <-signif(as.numeric(r.v.litneo), digits= 2)
 ld.v.litneo<- summary(litter.neo)$modelStruct$corStruct
 ld.v.litneo <- signif(ld.v.litneo[1], digits = 2)
 p.v.litneo<-summary(litter.neo)$tTable
@@ -398,10 +399,10 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litter_size))) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   coord_cartesian(xlim = c(log10(min(cutData$litter_size)),log10(max(cutData$litter_size))),
                   ylim = c(0,75),clip = "off")+
-  annotate("text", x=-.13, y=83.8, label = "25", size = 7)
+  annotate("text", x=-.13, y=83.8, label = "21", size = 7)
 
 
-#ggsave(filename='S25litneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S21litneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #litter size mal
 cutData <- Data[,c(5,9,10,11,17,33,42),drop=FALSE] 
@@ -428,9 +429,9 @@ summary(litter.mal)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.litmal <- summary(litter.mal)$corBeta
-r.v.litmal <- format(r.v.litmal[2,1])
-r.v.litmal <-signif(as.numeric(r.v.litmal)^2, digits= 2)
+r.v.litmal <- R2(phy = pruned.tree,litter.mal)
+r.v.litmal <- format(r.v.litmal[3])
+r.v.litmal <-signif(as.numeric(r.v.litmal), digits= 2)
 ld.v.litmal<- summary(litter.mal)$modelStruct$corStruct
 ld.v.litmal <- signif(ld.v.litmal[1], digits = 2)
 p.v.litmal<-summary(litter.mal)$tTable
@@ -463,10 +464,10 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litter_size))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
-  annotate("text", x=-.13, y=50.3, label = "26", size = 7)
+  annotate("text", x=-.13, y=50.3, label = "22", size = 7)
 
 
-#ggsave(filename='S26litmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S22litmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 ### Longevity model
 #longevity neo
@@ -497,9 +498,9 @@ summary(longevity.neo)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.longneo <- summary(longevity.neo)$corBeta
-r.v.longneo <- format(r.v.longneo[2,1])
-r.v.longneo <-signif(as.numeric(r.v.longneo)^2, digits= 2)
+r.v.longneo <- R2(phy = pruned.tree,longevity.neo)
+r.v.longneo <- format(r.v.longneo[3])
+r.v.longneo <-signif(as.numeric(r.v.longneo), digits= 2)
 ld.v.longneo<- summary(longevity.neo)$modelStruct$corStruct
 ld.v.longneo <- signif(ld.v.longneo[1], digits = 2)
 p.v.longneo<-summary(longevity.neo)$tTable
@@ -533,10 +534,10 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(max_longevity.months.))) 
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
   labs(colour="Clade", size="Total Necropsies")+
-  annotate("text", x=1.565, y=83.8, label = "27", size = 7)
+  annotate("text", x=1.565, y=83.8, label = "23", size = 7)
 
 
-#ggsave(filename='S27longneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S23longneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #longevity mal
 
@@ -565,9 +566,9 @@ summary(longevity.mal)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.longmal <- summary(longevity.mal)$corBeta
-r.v.longmal <- format(r.v.longmal[2,1])
-r.v.longmal <-signif(as.numeric(r.v.longmal)^2, digits= 2)
+r.v.longmal <- R2(phy = pruned.tree,longevity.mal)
+r.v.longmal <- format(r.v.longmal[3])
+r.v.longmal <-signif(as.numeric(r.v.longmal), digits= 2)
 ld.v.longmal<- summary(longevity.mal)$modelStruct$corStruct
 ld.v.longmal <- signif(ld.v.longmal[1])
 p.v.longmal<-summary(longevity.mal)$tTable
@@ -600,10 +601,10 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(max_longevity.months.)))
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
-  annotate("text", x=1.565, y=50.2, label = "28", size = 7)
+  annotate("text", x=1.565, y=50.2, label = "24", size = 7)
 
 
-#ggsave(filename='S28longmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S24longmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 ##BMR models
 #bmr neo
@@ -634,9 +635,9 @@ summary(BMR.neo)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.bmrneo <- summary(BMR.neo)$corBeta
-r.v.bmrneo <- format(r.v.bmrneo[2,1])
-r.v.bmrneo <-signif(as.numeric(r.v.bmrneo)^2, digits= 2)
+r.v.bmrneo <- R2(phy = pruned.tree,BMR.neo)
+r.v.bmrneo <- format(r.v.bmrneo[3])
+r.v.bmrneo <-signif(as.numeric(r.v.bmrneo), digits= 2)
 ld.v.bmrneo<- summary(BMR.neo)$modelStruct$corStruct
 ld.v.bmrneo <- signif(ld.v.bmrneo[1], digits = 2)
 p.v.bmrneo<-summary(BMR.neo)$tTable
@@ -668,10 +669,10 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(metabolic_rate))) +
   theme(legend.position = "bottom")+   labs(size="Total Necropsies")+guides(colour=FALSE)+
   coord_cartesian(xlim = c(log10(min(cutData$metabolic_rate)),log10(max(cutData$metabolic_rate))),
                   ylim = c(0,75),clip = "off")+
-  annotate("text", x=.9, y=83.8, label = "29", size = 7)
+  annotate("text", x=.9, y=83.8, label = "25", size = 7)
 
 
-#ggsave(filename='S29bmrneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S25bmrneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #bmr mal
 
@@ -702,9 +703,9 @@ summary(BMR.mal)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.bmrmal <- summary(BMR.mal)$corBeta
-r.v.bmrmal <- format(r.v.bmrmal[2,1])
-r.v.bmrmal <-signif(as.numeric(r.v.bmrmal)^2, digits= 2)
+r.v.bmrmal <- R2(phy = pruned.tree,BMR.mal)
+r.v.bmrmal <- format(r.v.bmrmal[3])
+r.v.bmrmal <-signif(as.numeric(r.v.bmrmal), digits= 2)
 ld.v.bmrmal<- summary(BMR.mal)$modelStruct$corStruct
 ld.v.bmrmal <- signif(ld.v.bmrmal[1], digits = 2)
 p.v.bmrmal<-summary(BMR.mal)$tTable
@@ -736,10 +737,10 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(metabolic_rate)))+
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
-  annotate("text", x=.9, y=50.2, label = "30", size = 7)
+  annotate("text", x=.9, y=50.2, label = "26", size = 7)
 
 
-#ggsave(filename='S30bmrmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S26bmrmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #wxl models #weight and longevity
 #wxl neo
@@ -770,9 +771,9 @@ summary(wxl.neo)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.wxneo <- summary(wxl.neo)$corBeta
-r.v.wxneo <- format(r.v.wxneo[2,1])
-r.v.wxneo <-signif(as.numeric(r.v.wxneo)^2, digits= 2)
+r.v.wxneo <- R2(phy = pruned.tree,wxl.neo)
+r.v.wxneo <- format(r.v.wxneo[3])
+r.v.wxneo <-signif(as.numeric(r.v.wxneo), digits= 2)
 ld.v.wxneo<- summary(wxl.neo)$modelStruct$corStruct
 ld.v.wxneo <- signif(ld.v.wxneo[1], digits = 2)
 p.v.wxneo<-summary(wxl.neo)$tTable
@@ -804,10 +805,10 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)*log10(ma
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
-  annotate("text", x=.18, y=83.8, label = "31", size = 7)
+  annotate("text", x=.18, y=83.8, label = "27", size = 7)
 
 
-#ggsave(filename='S31wgtlongneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S27wgtlongneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #wxl mal
 cutData <- Data[,c(5,9,10,11,17,40,38,42),drop=FALSE] 
@@ -836,9 +837,9 @@ summary(wxl.mal)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.wxmal <- summary(wxl.mal)$corBeta
-r.v.wxmal <- format(r.v.wxmal[2,1])
-r.v.wxmal <-signif(as.numeric(r.v.wxmal)^2, digits= 2)
+r.v.wxmal <- R2(phy = pruned.tree,wxl.mal)
+r.v.wxmal <- format(r.v.wxmal[3])
+r.v.wxmal <-signif(as.numeric(r.v.wxmal), digits= 2)
 ld.v.wxmal<- summary(wxl.mal)$modelStruct$corStruct
 ld.v.wxmal <- signif(ld.v.wxmal[1], digits = 2)
 p.v.wxmal<-summary(wxl.mal)$tTable
@@ -870,9 +871,9 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(adult_weight.g.)*log10(m
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
-  annotate("text", x=.18, y=50.2, label = "32", size = 7)
+  annotate("text", x=.18, y=50.2, label = "28", size = 7)
 
-#ggsave(filename='S32wxlmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S28wxlmal.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 
@@ -901,9 +902,9 @@ summary(lityear.neo)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.lyearneo <- summary(lityear.neo)$corBeta
-r.v.lyearneo <- format(r.v.lyearneo[2,1])
-r.v.lyearneo<-signif(as.numeric(r.v.lyearneo)^2, digits= 2)
+r.v.lyearneo <- R2(phy = pruned.tree,lityear.neo)
+r.v.lyearneo <- format(r.v.lyearneo[3])
+r.v.lyearneo<-signif(as.numeric(r.v.lyearneo), digits= 2)
 ld.v.lyearneo<- summary(lityear.neo)$modelStruct$corStruct
 ld.v.lyearneo <- signif(ld.v.lyearneo[1], digits = 2)
 p.v.lyearneo<-summary(lityear.neo)$tTable
@@ -935,10 +936,10 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(litters_year))) +
   theme(legend.position = "bottom")+   labs(size="Total Necropsies",colour="Clade")+
   coord_cartesian(xlim = c(log10(min(cutData$litters_year)),log10(max(cutData$litters_year))),
                   ylim = c(0,75),clip = "off")+
-  annotate("text", x=-.8, y=83.8, label = "33", size = 7)
+  annotate("text", x=-.8, y=83.8, label = "29", size = 7)
   
   
-  #ggsave(filename='S33lityearneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+  ggsave(filename='S29lityearneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #litter size mal
 cutData <- Data[,c(5,9,10,11,17,34,42),drop=FALSE] 
@@ -964,9 +965,9 @@ summary(lityear.mal)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.lyearmal <- summary(lityear.mal)$corBeta
-r.v.lyearmal <- format(r.v.lyearmal[2,1])
-r.v.lyearmal<-signif(as.numeric(r.v.lyearmal)^2, digits= 2)
+r.v.lyearmal <- R2(phy = pruned.tree,lityear.mal)
+r.v.lyearmal <- format(r.v.lyearmal[3])
+r.v.lyearmal<-signif(as.numeric(r.v.lyearmal), digits= 2)
 ld.v.lyearmal<- summary(lityear.mal)$modelStruct$corStruct
 ld.v.lyearmal<- signif(ld.v.lyearmal[1], digits = 2)
 p.v.lyearmal<-summary(lityear.mal)$tTable
@@ -998,10 +999,10 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(litters_year))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
-  annotate("text", x=-.8, y=50.2, label = "34", size = 7)
+  annotate("text", x=-.8, y=50.2, label = "30", size = 7)
 
 
-#ggsave(filename='S34lityearmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S30lityearmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 ####Female Maturity neo
 cutData <- Data[,c(5,9,10,11,13,28,42),drop=FALSE] 
@@ -1027,9 +1028,9 @@ summary(Fmaturity.neo)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.fmaturityneo <- summary(Fmaturity.neo)$corBeta
-r.v.fmaturityneo <- format(r.v.fmaturityneo[2,1])
-r.v.fmaturityneo<-signif(as.numeric(r.v.fmaturityneo)^2, digits= 2)
+r.v.fmaturityneo <- R2(phy = pruned.tree,Fmaturity.neo)
+r.v.fmaturityneo <- format(r.v.fmaturityneo[3])
+r.v.fmaturityneo<-signif(as.numeric(r.v.fmaturityneo), digits= 2)
 ld.v.fmaturityneo<- summary(Fmaturity.neo)$modelStruct$corStruct
 ld.v.fmaturityneo <- signif(ld.v.fmaturityneo[1], digits = 2)
 p.v.fmaturityneo<-summary(Fmaturity.neo)$tTable
@@ -1061,10 +1062,10 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(female_maturity.months.))
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   coord_cartesian(xlim = c(log10(min(cutData$female_maturity.months.)),log10(max(cutData$female_maturity.months.))),
                   ylim = c(0,75),clip = "off")+
-  annotate("text", x=-.08, y=83.8, label = "35", size = 7)
+  annotate("text", x=-.08, y=83.8, label = "31", size = 7)
 
 
-#ggsave(filename='S35femmatneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S31femmatneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Female Maturity Mal
 cutData <- Data[,c(5,9,10,11,17,28,42),drop=FALSE] 
@@ -1091,9 +1092,9 @@ summary(Fmaturity.mal)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.fmaturitymal <- summary(Fmaturity.mal)$corBeta
-r.v.fmaturitymal <- format(r.v.fmaturitymal[2,1])
-r.v.fmaturitymal<-signif(as.numeric(r.v.fmaturitymal)^2, digits= 2)
+r.v.fmaturitymal <- R2(phy = pruned.tree,Fmaturity.mal)
+r.v.fmaturitymal <- format(r.v.fmaturitymal[3])
+r.v.fmaturitymal<-signif(as.numeric(r.v.fmaturitymal), digits= 2)
 ld.v.fmaturitymal<- summary(Fmaturity.mal)$modelStruct$corStruct
 ld.v.fmaturitymal <- signif(ld.v.fmaturitymal[1], digits = 2)
 p.v.fmaturitymal<-summary(Fmaturity.mal)$tTable
@@ -1124,10 +1125,10 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(female_maturity.months.)
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
-  annotate("text", x=-.08, y=50.2, label = "36", size = 7)
+  annotate("text", x=-.08, y=50.2, label = "32", size = 7)
 
 
-#ggsave(filename='S36femmatmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S32femmatmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 ####Male Maturity neo
 cutData <- Data[,c(5,9,10,11,13,29,42),drop=FALSE] 
@@ -1153,9 +1154,9 @@ summary(Mmaturity.neo)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.Mmaturityneo <- summary(Mmaturity.neo)$corBeta
-r.v.Mmaturityneo <- format(r.v.Mmaturityneo[2,1])
-r.v.Mmaturityneo<-signif(as.numeric(r.v.Mmaturityneo)^2, digits= 2)
+r.v.Mmaturityneo <- R2(phy = pruned.tree,Mmaturity.neo)
+r.v.Mmaturityneo <- format(r.v.Mmaturityneo[3])
+r.v.Mmaturityneo<-signif(as.numeric(r.v.Mmaturityneo), digits= 2)
 ld.v.Mmaturityneo<- summary(Mmaturity.neo)$modelStruct$corStruct
 ld.v.Mmaturityneo <- signif(ld.v.Mmaturityneo[1], digits = 2)
 p.v.Mmaturityneo<-summary(Mmaturity.neo)$tTable
@@ -1187,10 +1188,10 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(male_maturity.months.))) 
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   coord_cartesian(xlim = c(log10(min(cutData$male_maturity.months.)),log10(max(cutData$male_maturity.months.))),
                   ylim = c(0,75),clip = "off")+
-  annotate("text", x=-.08, y=83.8, label = "37", size = 7)
+  annotate("text", x=-.08, y=83.8, label = "33", size = 7)
 
 
-#ggsave(filename='S37malematneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S33malematneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Male Maturity Mal
 cutData <- Data[,c(5,9,10,11,17,29,42),drop=FALSE] 
@@ -1216,9 +1217,9 @@ summary(Mmaturity.mal)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.Mmaturitymal <- summary(Mmaturity.mal)$corBeta
-r.v.Mmaturitymal <- format(r.v.Mmaturitymal[2,1])
-r.v.Mmaturitymal<-signif(as.numeric(r.v.Mmaturitymal)^2, digits= 2)
+r.v.Mmaturitymal <- R2(phy = pruned.tree,Mmaturity.mal)
+r.v.Mmaturitymal <- format(r.v.Mmaturitymal[3])
+r.v.Mmaturitymal<-signif(as.numeric(r.v.Mmaturitymal), digits= 2)
 ld.v.Mmaturitymal<- summary(Mmaturity.mal)$modelStruct$corStruct
 ld.v.Mmaturitymal <- signif(ld.v.Mmaturitymal[1], digits = 2)
 p.v.Mmaturitymal<-summary(Mmaturity.mal)$tTable
@@ -1250,10 +1251,10 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(male_maturity.months.)))
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
-  annotate("text", x=-.08, y=50.2, label = "38", size = 7)
+  annotate("text", x=-.08, y=50.2, label = "34", size = 7)
 
 
-#ggsave(filename='S38malematmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S34malematmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Weaning Weight neo
 cutData <- Data[,c(5,9,10,11,13,37,42),drop=FALSE] 
@@ -1279,9 +1280,9 @@ summary(weanw.neo)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.weanwneo <- summary(weanw.neo)$corBeta
-r.v.weanwneo <- format(r.v.weanwneo[2,1])
-r.v.weanwneo<-signif(as.numeric(r.v.weanwneo)^2, digits= 2)
+r.v.weanwneo <- R2(phy = pruned.tree,weanw.neo)
+r.v.weanwneo <- format(r.v.weanwneo[3])
+r.v.weanwneo<-signif(as.numeric(r.v.weanwneo), digits= 2)
 ld.v.weanwneo<- summary(weanw.neo)$modelStruct$corStruct
 ld.v.weanwneo <- signif(ld.v.weanwneo[1], digits = 2)
 p.v.weanwneo<-summary(weanw.neo)$tTable
@@ -1313,10 +1314,10 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(weaning_weight.g.))) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   coord_cartesian(xlim = c(log10(min(cutData$weaning_weight.g.)),log10(max(cutData$weaning_weight.g.))),
                   ylim = c(0,75),clip = "off")+
-  annotate("text", x=.42, y=83.8, label = "39", size = 7)
+  annotate("text", x=.42, y=83.8, label = "35", size = 7)
 
 
-#ggsave(filename='S39weanneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S35weanneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Weaning Weight Mal
 cutData <- Data[,c(5,9,10,11,17,37,42),drop=FALSE] 
@@ -1342,9 +1343,9 @@ summary(weanw.mal)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.weanwmal <- summary(weanw.mal)$corBeta
-r.v.weanwmal <- format(r.v.weanwmal[2,1])
-r.v.weanwmal<-signif(as.numeric(r.v.weanwmal)^2, digits= 2)
+r.v.weanwmal <- R2(phy = pruned.tree,weanw.mal)
+r.v.weanwmal <- format(r.v.weanwmal[3])
+r.v.weanwmal<-signif(as.numeric(r.v.weanwmal), digits= 2)
 ld.v.weanwmal<- summary(weanw.mal)$modelStruct$corStruct
 ld.v.weanwmal <- signif(ld.v.weanwmal[1], digits = 2)
 p.v.weanwmal<-summary(weanw.mal)$tTable
@@ -1376,10 +1377,10 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(weaning_weight.g.))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
-  annotate("text", x=.42, y=50.2, label = "40", size = 7)
+  annotate("text", x=.42, y=50.2, label = "36", size = 7)
 
 
-#ggsave(filename='S40weanmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S36weanmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Growth Rate Neo
 cutData <- Data[,c(5,9,10,11,13,39,42),drop=FALSE] 
@@ -1405,9 +1406,9 @@ summary(GrowthR.neo)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.GrowthRneo <- summary(GrowthR.neo)$corBeta
-r.v.GrowthRneo <- format(r.v.GrowthRneo[2,1])
-r.v.GrowthRneo<-signif(as.numeric(r.v.GrowthRneo)^2, digits= 2)
+r.v.GrowthRneo <- R2(phy = pruned.tree,GrowthR.neo)
+r.v.GrowthRneo <- format(r.v.GrowthRneo[3])
+r.v.GrowthRneo<-signif(as.numeric(r.v.GrowthRneo), digits= 2)
 ld.v.GrowthRneo<- summary(GrowthR.neo)$modelStruct$corStruct
 ld.v.GrowthRneo <- signif(ld.v.GrowthRneo[1], digits = 2)
 p.v.GrowthRneo<-summary(GrowthR.neo)$tTable
@@ -1439,10 +1440,10 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(growth_rate.1.days.))) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
   coord_cartesian(xlim = c(log10(min(cutData$growth_rate.1.days.)),log10(max(cutData$growth_rate.1.days.))),
                   ylim = c(0,75),clip = "off")+
-  annotate("text", x=-3.29, y=83.8, label = "41", size = 7)
+  annotate("text", x=-3.29, y=83.8, label = "37", size = 7)
 
 
-#ggsave(filename='S41growneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S37growneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #Growth Rate Mal
 cutData <- Data[,c(5,9,10,11,17,39,42),drop=FALSE] 
@@ -1468,9 +1469,9 @@ summary(GrowthR.mal)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.GrowthRmal <- summary(GrowthR.mal)$corBeta
-r.v.GrowthRmal <- format(r.v.GrowthRmal[2,1])
-r.v.GrowthRmal<-signif(as.numeric(r.v.GrowthRmal)^2, digits= 2)
+r.v.GrowthRmal <- R2(phy = pruned.tree,GrowthR.mal)
+r.v.GrowthRmal <- format(r.v.GrowthRmal[3])
+r.v.GrowthRmal<-signif(as.numeric(r.v.GrowthRmal), digits= 2)
 ld.v.GrowthRmal<- summary(GrowthR.mal)$modelStruct$corStruct
 ld.v.GrowthRmal <- signif(ld.v.GrowthRmal[1], digits = 2)
 p.v.GrowthRmal<-summary(GrowthR.mal)$tTable
@@ -1503,10 +1504,10 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=log10(growth_rate.1.days.))) +
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+   labs(colour="Clade", size="Total Necropsies")+
-  annotate("text", x=-3.29, y=50.2, label = "42", size = 7)
+  annotate("text", x=-3.29, y=50.2, label = "38", size = 7)
 
 
-#ggsave(filename='S42growmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S38growmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #w+g
 
@@ -1536,9 +1537,9 @@ summary(wpl.neo)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.wpneo <- summary(wpl.neo)$corBeta
-r.v.wpneo <- format(r.v.wpneo[2,1])
-r.v.wpneo <-signif(as.numeric(r.v.wpneo)^2, digits= 2)
+r.v.wpneo <- R2(phy = pruned.tree,wpl.neo)
+r.v.wpneo <- format(r.v.wpneo[3])
+r.v.wpneo <-signif(as.numeric(r.v.wpneo), digits= 2)
 ld.v.wpneo<- summary(wpl.neo)$modelStruct$corStruct
 ld.v.wpneo <- signif(ld.v.wpneo[1], digits = 2)
 p.v.wpneo<-summary(wpl.neo)$tTable
@@ -1571,10 +1572,10 @@ ggplot(cutData, aes(y=NeoplasiaPrevalence*100, x=log10(adult_weight.g.)+log10(Ge
   labs(colour="Clade", size="Total Necropsies")+
   coord_cartesian(xlim = c((min(log10(cutData$adult_weight.g.)+cutData$Gestation.months.)),max(log10(cutData$adult_weight.g.)+cutData$Gestation.months.)),
                   ylim = c(0,75),clip = "off")+
-  annotate("text", x=-.4, y=83.8, label = "43", size = 7)
+  annotate("text", x=-.4, y=83.8, label = "39", size = 7)
 
 
-#ggsave(filename='S43wgtgestneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S39wgtgestneomam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 #w+g mal
@@ -1605,9 +1606,9 @@ summary(wpl.mal)
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.wpmal <- summary(wpl.mal)$corBeta
-r.v.wpmal <- format(r.v.wpmal[2,1])
-r.v.wpmal <-signif(as.numeric(r.v.wpmal)^2, digits= 2)
+r.v.wpmal <- R2(phy = pruned.tree,wpl.mal)
+r.v.wpmal <- format(r.v.wpmal[3])
+r.v.wpmal <-signif(as.numeric(r.v.wpmal), digits= 2)
 ld.v.wpmal<- summary(wpl.mal)$modelStruct$corStruct
 ld.v.wpmal <- signif(ld.v.wpmal[1], digits = 2)
 p.v.wpmal<-summary(wpl.mal)$tTable
@@ -1639,8 +1640,8 @@ ggplot(cutData, aes(y=MalignancyPrevalence*100, x=Gestation.months.+log10(adult_
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
   labs(colour="Clade", size="Total Necropsies")+
-  annotate("text", x=-.4, y=50.2, label = "44", size = 7)
+  annotate("text", x=-.4, y=50.2, label = "40", size = 7)
 
 
 
-#ggsave(filename='S44wgtgestmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S41wgtgestmalmam.pdf', width=13, height=10, limitsize=FALSE,bg="white")
