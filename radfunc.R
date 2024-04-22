@@ -7,6 +7,7 @@ library(ggrepel)
 library(cowplot)
 library(ggsci)
 library(patchwork)
+library(rr2)
 
 modPgls.SEy = function (model, data, corClass = corBrownian, tree, se = NULL,
                         method = c("REML", "ML"), interval = c(0, 1000), corClassValue=1, sig2e=NULL, ...)
@@ -92,9 +93,9 @@ summary(auc)$r.squared
 
 
 #grab r squared, p value, and lambda from summary 
-r.AUC.10.GY <- summary(AUC.10.GY)$corBeta
-r.AUC.10.GY <- format(r.AUC.10.GY[2,1])
-r.AUC.10.GY <-signif(as.numeric(r.AUC.10.GY)^2, digits = 2)
+r.AUC.10.GY <- R2(phy = pruned.tree,AUC.10.GY)
+r.AUC.10.GY <- format(r.AUC.10.GY[3])
+r.AUC.10.GY <-signif(as.numeric(r.AUC.10.GY), digits = 2)
 ld.v.AUC.10.GY<- summary(AUC.10.GY)$modelStruct$corStruct
 ld.v.AUC.10.GY <- signif(ld.v.AUC.10.GY[1], digits =2)
 p.v.AUC.10.GY<-summary(AUC.10.GY)$tTable
@@ -127,7 +128,7 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC10Gy))) +
         subtitle =bquote(p-value:.(p.v.AUC.10.GY)~R^2:.(r.AUC.10.GY)~Lambda:.(ld.v.AUC.10.GY)))+
   guides(col=FALSE)
 
-ggsave(filename='RADAUC10.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+ggsave(filename='S40RADAUC10.pdf', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #AUC 2
 
@@ -139,9 +140,9 @@ AUC.2.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(AUC2Gy), data=Data,
 
 #grab r squared, p value, and lambda from summary 
 
-r.AUC.2.GY <- summary(AUC.2.GY)$corBeta
-r.AUC.2.GY <- format(r.AUC.2.GY[2,1])
-r.AUC.2.GY <-signif(as.numeric(r.AUC.2.GY)^2, digits = 2)
+r.AUC.2.GY <- R2(phy = pruned.tree,AUC.2.GY)
+r.AUC.2.GY <- format(r.AUC.2.GY[3])
+r.AUC.2.GY <-signif(as.numeric(r.AUC.2.GY), digits = 2)
 ld.v.AUC.2.GY<- summary(AUC.2.GY)$modelStruct$corStruct
 ld.v.AUC.2.GY <- signif(ld.v.AUC.2.GY[1], digits = 2)
 p.v.AUC.2.GY<-summary(AUC.2.GY)$tTable
@@ -173,7 +174,7 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC2Gy))) +
         subtitle =bquote(p-value:.(p.v.AUC.2.GY)~R^2:.(r.AUC.2.GY)~Lambda:.(ld.v.AUC.2.GY)))+
   guides(col=FALSE)
 
-ggsave(filename='RADAUC2.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+ggsave(filename='S41RADAUC2.pdf', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #AUC .4
 
@@ -183,9 +184,9 @@ AUC.04.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(AUC04Gy), data=Data,
 
 #grab r squared, p value, and lambda from summary 
 
-r.AUC.04.GY <- summary(AUC.04.GY)$corBeta
-r.AUC.04.GY <- format(r.AUC.04.GY[2,1])
-r.AUC.04.GY <-signif(as.numeric(r.AUC.04.GY)^2, digits = 2)
+r.AUC.04.GY <- R2(phy = pruned.tree,AUC.04.GY)
+r.AUC.04.GY <- format(r.AUC.04.GY[3])
+r.AUC.04.GY <-signif(as.numeric(r.AUC.04.GY), digits = 2)
 ld.v.AUC.04.GY<- summary(AUC.04.GY)$modelStruct$corStruct
 ld.v.AUC.04.GY <- signif(ld.v.AUC.04.GY[1], digits = 2)
 p.v.AUC.04.GY<-summary(AUC.04.GY)$tTable
@@ -217,7 +218,7 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC04Gy))) +
         subtitle =bquote(p-value:.(p.v.AUC.04.GY)~R^2:.(r.AUC.04.GY)~Lambda:.(ld.v.AUC.04.GY)))+
   guides(col=FALSE)
 
-ggsave(filename='RADAUC04.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+ggsave(filename='S42RADAUC04.pdf', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 ##CHANGE 
 #read csv
@@ -247,9 +248,9 @@ Change.10.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(Change10Gy), data=Data,
 
 #grab r squared, p value, and lambda from summary 
 
-r.Change.10.GY <- summary(Change.10.GY)$corBeta
-r.Change.10.GY <- format(r.Change.10.GY[2,1])
-r.Change.10.GY <-signif(as.numeric(r.Change.10.GY)^2, digits = 2)
+r.Change.10.GY <- R2(phy = pruned.tree,Change.10.GY)
+r.Change.10.GY <- format(r.Change.10.GY[3])
+r.Change.10.GY <-signif(as.numeric(r.Change.10.GY), digits = 2)
 ld.v.Change.10.GY<- summary(Change.10.GY)$modelStruct$corStruct
 ld.v.Change.10.GY <- signif(ld.v.Change.10.GY[1], digits =2)
 p.v.Change.10.GY<-summary(Change.10.GY)$tTable
@@ -281,7 +282,7 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(Change10Gy))) +
   ##labs(title = "Neoplasia vs. AUC Area Change From UT 10Gy Radiation")+
   guides(col=FALSE)
 
-ggsave(filename='RADChange10.pdf', width=9.5, height=7, limitsize=FALSE,bg="white")
+ggsave(filename='S43RADChange10.pdf', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #Change 2
 
@@ -293,9 +294,9 @@ Change.2.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(Change2Gy), data=Data,
 
 #grab r squared, p value, and lambda from summary 
 
-r.Change.2.GY <- summary(Change.2.GY)$corBeta
-r.Change.2.GY <- format(r.Change.2.GY[2,1])
-r.Change.2.GY <-signif(as.numeric(r.Change.2.GY)^2, digits = 2)
+r.Change.2.GY <- R2(phy = pruned.tree,Change.2.GY)
+r.Change.2.GY <- format(r.Change.2.GY[3])
+r.Change.2.GY <-signif(as.numeric(r.Change.2.GY), digits = 2)
 ld.v.Change.2.GY<- summary(Change.2.GY)$modelStruct$corStruct
 ld.v.Change.2.GY <- signif(ld.v.Change.2.GY[1], digits = 2)
 p.v.Change.2.GY<-summary(Change.2.GY)$tTable
@@ -327,7 +328,7 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(Change2Gy))) +
        subtitle =bquote(p-value:.(p.v.Change.2.GY)~R^2:.(r.Change.2.GY)~Lambda:.(ld.v.Change.2.GY)))+
   guides(col=FALSE)
 
-ggsave(filename='RADChange2.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+ggsave(filename='S44RADChange2.pdf', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #Change .4
 
@@ -337,9 +338,9 @@ Change.04.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(Change04Gy), data=Data,
 
 #grab r squared, p value, and lambda from summary 
 
-r.Change.04.GY <- summary(Change.04.GY)$corBeta
-r.Change.04.GY <- format(r.Change.04.GY[2,1])
-r.Change.04.GY <-signif(as.numeric(r.Change.04.GY)^2, digits = 3)
+r.Change.04.GY <- R2(phy = pruned.tree,Change.04.GY)
+r.Change.04.GY <- format(r.Change.04.GY[3])
+r.Change.04.GY <-signif(as.numeric(r.Change.04.GY), digits = 3)
 ld.v.Change.04.GY<- summary(Change.04.GY)$modelStruct$corStruct
 ld.v.Change.04.GY <- signif(ld.v.Change.04.GY[1], digits = 2)
 p.v.Change.04.GY<-summary(Change.04.GY)$tTable
@@ -371,7 +372,7 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(Change04Gy))) +
        subtitle =bquote(p-value:.(p.v.Change.04.GY)~R^2:.(r.Change.04.GY)~Lambda:.(ld.v.Change.04.GY)))+
   guides(col=FALSE)
 
-ggsave(filename='RADChange04.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+ggsave(filename='S45RADChange04.pdf', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 
 
@@ -385,9 +386,9 @@ Change.10.GY.mal <- pglsSEyPagel(MalignancyPrevalence~log10(Change10Gy), data=Da
                              tree=pruned.tree,method="ML",se=SE)
 #grab r squared, p value, and lambda from summary 
 
-r.Change.10.GY.mal <- summary(Change.10.GY.mal)$corBeta
-r.Change.10.GY.mal <- format(r.Change.10.GY.mal[2,1])
-r.Change.10.GY.mal <-signif(as.numeric(r.Change.10.GY.mal)^2, digits = 2)
+r.Change.10.GY.mal <- R2(phy = pruned.tree,Change.10.GY.mal)
+r.Change.10.GY.mal <- format(r.Change.10.GY.mal[3])
+r.Change.10.GY.mal <-signif(as.numeric(r.Change.10.GY.mal), digits = 2)
 ld.v.Change.10.GY.mal<- summary(Change.10.GY.mal)$modelStruct$corStruct
 ld.v.Change.10.GY.mal <- signif(ld.v.Change.10.GY.mal[1], digits =2)
 p.v.Change.10.GY.mal<-summary(Change.10.GY.mal)$tTable
@@ -419,7 +420,7 @@ ggplot(Data, aes(y=MalignancyPrevalence*100, x=log10(Change10Gy))) +
        subtitle =bquote(p-value:.(p.v.Change.10.GY.mal)~R^2:.(r.Change.10.GY.mal)~Lambda:.(ld.v.Change.10.GY.mal)))+
   guides(col=FALSE)
 
-ggsave(filename='RADChange10mal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+ggsave(filename='S46RADChange10mal.pdf', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #Change 2
 
@@ -431,9 +432,9 @@ Change.2.GY.mal <- pglsSEyPagel(MalignancyPrevalence~log10(Change2Gy), data=Data
 
 #grab r squared, p value, and lambda from summary 
 
-r.Change.2.GY.mal <- summary(Change.2.GY.mal)$corBeta
-r.Change.2.GY.mal <- format(r.Change.2.GY.mal[2,1])
-r.Change.2.GY.mal <-signif(as.numeric(r.Change.2.GY.mal)^2, digits = 2)
+r.Change.2.GY.mal <- R2(phy = pruned.tree,Change.2.GY.mal)
+r.Change.2.GY.mal <- format(r.Change.2.GY.mal[3])
+r.Change.2.GY.mal <-signif(as.numeric(r.Change.2.GY.mal), digits = 2)
 ld.v.Change.2.GY.mal<- summary(Change.2.GY.mal)$modelStruct$corStruct
 ld.v.Change.2.GY.mal <- signif(ld.v.Change.2.GY.mal[1], digits = 2)
 p.v.Change.2.GY.mal<-summary(Change.2.GY.mal)$tTable
@@ -465,7 +466,7 @@ ggplot(Data, aes(y=MalignancyPrevalence*100, x=log10(Change2Gy))) +
        subtitle =bquote(p-value:.(p.v.Change.2.GY.mal)~R^2:.(r.Change.2.GY.mal)~Lambda:.(ld.v.Change.2.GY.mal)))+
   guides(col=FALSE)
 
-ggsave(filename='RADChange2mal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+ggsave(filename='S47RADChange2mal.pdf', width=9.5, height=7, limitsize=FALSE,bg="white")
 
 #Change .4
 
@@ -475,9 +476,9 @@ Change.04.GY.mal <- pglsSEyPagel(MalignancyPrevalence~log10(Change04Gy), data=Da
 
 #grab r squared, p value, and lambda from summary 
 
-r.Change.04.GY.mal <- summary(Change.04.GY.mal)$corBeta
-r.Change.04.GY.mal <- format(r.Change.04.GY.mal[2,1])
-r.Change.04.GY.mal <-signif(as.numeric(r.Change.04.GY.mal)^2, digits = 2)
+r.Change.04.GY.mal <- R2(phy = pruned.tree,Change.04.GY.mal)
+r.Change.04.GY.mal <- format(r.Change.04.GY.mal[3])
+r.Change.04.GY.mal <-signif(as.numeric(r.Change.04.GY.mal), digits = 2)
 ld.v.Change.04.GY.mal<- summary(Change.04.GY.mal)$modelStruct$corStruct
 ld.v.Change.04.GY.mal <- signif(ld.v.Change.04.GY.mal[1], digits = 2)
 p.v.Change.04.GY.mal<-summary(Change.04.GY.mal)$tTable
@@ -510,4 +511,4 @@ ggplot(Data, aes(y=MalignancyPrevalence*100, x=log10(Change04Gy))) +
        subtitle =bquote(p-value:.(p.v.Change.04.GY.mal)~R^2:.(r.Change.04.GY.mal)~Lambda:.(ld.v.Change.04.GY.mal)))+
   guides(col=FALSE)
 
-ggsave(filename='RADChange04mal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+ggsave(filename='S48RADChange04mal.pdf', width=9.5, height=7, limitsize=FALSE,bg="white")

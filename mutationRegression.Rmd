@@ -32,6 +32,7 @@ library(cowplot)
 library(ggrepel)
 library(ggsci)
 library(patchwork)
+library(rr2)
 ```
 
 ```{r}
@@ -120,9 +121,9 @@ mutation.neo<-pglsSEyPagel(NeoplasiaPrevalence~log10(Mean.mutation.rate..SBS.gen
 ```{r}
 summary(mutation.neo) 
 ###the code below extracts the stats from the above model to be used to construct the regression graph
-r.v.mutation.neo <- summary(mutation.neo)$corBeta
-r.v.mutation.neo <- format(r.v.mutation.neo[2,1])
-r.v.mutation.neo <-signif(as.numeric(r.v.mutation.neo)^2, digits= 2)
+r.v.mutation.neo <- R2(phy = pruned.tree,mutation.neo)
+r.v.mutation.neo <- format(r.v.mutation.neo[3])
+r.v.mutation.neo <-signif(as.numeric(r.v.mutation.neo), digits= 2)
 ld.v.mutation.neo<- summary(mutation.neo)$modelStruct$corStruct
 ld.v.mutation.neo <- signif(ld.v.mutation.neo[1], digits = 2)
 p.v.mutation.neo<-summary(mutation.neo)$tTable
@@ -156,7 +157,7 @@ mutation.neo.plot<-ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(Mean.muta
   labs(colour="Clade", size="Total Necropsies")
 mutation.neo.plot
 ##this line will save the graph to the folder you are using as your working directory
-ggsave(filename='mutation.neo.pdf', width=9.5, height=7, limitsize=FALSE,bg="white")
+#ggsave(filename='mutation.neo.pdf', width=9.5, height=7, limitsize=FALSE,bg="white")
 ```
 Construct the Regression Model  Malignancy  
 ```{r}
@@ -167,9 +168,9 @@ mutation.mal<-pglsSEyPagel(MalignancyPrevalence~log10(Mean.mutation.rate..SBS.ge
 ```{r}
 summary(mutation.mal) 
 ###the code below extracts the stats from the above model to be used to construct the regression graph
-r.v.mutation.mal <- summary(mutation.mal)$corBeta
-r.v.mutation.mal <- format(r.v.mutation.mal[2,1])
-r.v.mutation.mal <-signif(as.numeric(r.v.mutation.mal)^2, digits= 2)
+r.v.mutation.mal <- R2(phy = pruned.tree,mutation.mal)
+r.v.mutation.mal <- format(r.v.mutation.mal[3])
+r.v.mutation.mal <-signif(as.numeric(r.v.mutation.mal), digits= 2)
 ld.v.mutation.mal<- summary(mutation.mal)$modelStruct$corStruct
 ld.v.mutation.mal <- signif(ld.v.mutation.mal[1], digits = 3)
 p.v.mutation.mal<-summary(mutation.mal)$tTable
@@ -207,7 +208,7 @@ mutation.mal.plot<-ggplot(Data, aes(y=MalignancyPrevalence*100, x=log10(Mean.mut
   labs(colour="Clade", size="Total Necropsies")
 mutation.mal.plot
 ##this line will save the graph to the folder you are using as your working directory
-ggsave(filename='mutation.mal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
+ggsave(filename='S49mutation.mal.png', width=9.5, height=7, limitsize=FALSE,bg="white")
 ```
 
 

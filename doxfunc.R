@@ -91,9 +91,9 @@ ANVFold72.1 <- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVAUCFold72.1), data=Data
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.ANVFold72.1 <- summary(ANVFold72.1)$corBeta
-r.v.ANVFold72.1 <- format(r.v.ANVFold72.1[2,1])
-r.v.ANVFold72.1 <-signif(as.numeric(r.v.ANVFold72.1)^2, digits= 3)
+r.v.ANVFold72.1 <- R2(phy = pruned.tree,ANVFold72.1)
+r.v.ANVFold72.1 <- format(r.v.ANVFold72.1[3])
+r.v.ANVFold72.1 <-signif(as.numeric(r.v.ANVFold72.1), digits= 3)
 ld.v.ANVFold72.1<- summary(ANVFold72.1)$modelStruct$corStruct
 ld.v.ANVFold72.1 <- signif(ld.v.ANVFold72.1[1])
 p.v.ANVFold72.1<-summary(ANVFold72.1)$tTable
@@ -126,7 +126,7 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(ANVAUCFold72.1))) +
 
   guides(col=FALSE)
 
-ggsave(filename='anvfold721.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S50anvfold721.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 #fold 72.33
@@ -137,9 +137,9 @@ ANVFold72.33<- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVAUCFold72.33), data=Dat
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.ANVFold72.33 <- summary(ANVFold72.33)$corBeta
-r.v.ANVFold72.33 <- format(r.v.ANVFold72.33[2,1])
-r.v.ANVFold72.33 <-signif(as.numeric(r.v.ANVFold72.33)^2, digits= 3)
+r.v.ANVFold72.33 <- R2(phy = pruned.tree,ANVFold72.33)
+r.v.ANVFold72.33 <- format(r.v.ANVFold72.33[3])
+r.v.ANVFold72.33 <-signif(as.numeric(r.v.ANVFold72.33), digits= 3)
 ld.v.ANVFold72.33<- summary(ANVFold72.33)$modelStruct$corStruct
 ld.v.ANVFold72.33<- signif(ld.v.ANVFold72.33[1])
 p.v.ANVFold72.33<-summary(ANVFold72.33)$tTable
@@ -172,7 +172,7 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(ANVAUCFold72.33))) +
        subtitle =bquote(p-value:.(p.v.ANVFold72.33)~R^2:.(r.v.ANVFold72.33)~Lambda:.(ld.v.ANVFold72.33)))+
   guides(col=FALSE)
 
-ggsave(filename='anvfold72.33.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S51anvfold72.33.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 ##Model
@@ -181,9 +181,9 @@ ANVFold72.11<- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVAUCFold72.11), data=Dat
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.ANVFold72.11 <- summary(ANVFold72.11)$corBeta
-r.v.ANVFold72.11<- format(r.v.ANVFold72.11[2,1])
-r.v.ANVFold72.11 <-signif(as.numeric(r.v.ANVFold72.11)^2, digits= 3)
+r.v.ANVFold72.11 <- R2(phy = pruned.tree,ANVFold72.11)
+r.v.ANVFold72.11<- format(r.v.ANVFold72.11[3])
+r.v.ANVFold72.11 <-signif(as.numeric(r.v.ANVFold72.11), digits= 3)
 ld.v.ANVFold72.11<- summary(ANVFold72.11)$modelStruct$corStruct
 ld.v.ANVFold72.11<- signif(ld.v.ANVFold72.11[1], digits = 3)
 p.v.ANVFold72.11<-summary(ANVFold72.11)$tTable
@@ -217,7 +217,7 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(ANVAUCFold72.11))) +
        subtitle =bquote(p-value:.(p.v.ANVFold72.11)~R^2:.(r.v.ANVFold72.11)~Lambda:.(ld.v.ANVFold72.11)))+
   guides(col=FALSE)
 
-ggsave(filename='anvfold72.11.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S52anvfold72.11.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 
@@ -227,9 +227,9 @@ ANVDeath72.1 <- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVCellDeath72.1), data=D
                              tree=pruned.tree,method="ML",se=SE)
 #grab r squared, p value, and lambda from summary 
 
-r.v.ANVDeath72.1 <- summary(ANVDeath72.1)$corBeta
-r.v.ANVDeath72.1 <- format(r.v.ANVDeath72.1[2,1])
-r.v.ANVDeath72.1 <-signif(as.numeric(r.v.ANVDeath72.1)^2, digits= 3)
+r.v.ANVDeath72.1 <- R2(phy = pruned.tree,ANVDeath72.1)
+r.v.ANVDeath72.1 <- format(r.v.ANVDeath72.1[3])
+r.v.ANVDeath72.1 <-signif(as.numeric(r.v.ANVDeath72.1), digits= 3)
 ld.v.ANVDeath72.1<- summary(ANVDeath72.1)$modelStruct$corStruct
 ld.v.ANVDeath72.1 <- signif(ld.v.ANVDeath72.1[1])
 p.v.ANVDeath72.1<-summary(ANVDeath72.1)$tTable
@@ -262,7 +262,7 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(ANVCellDeath72.1))) +
        subtitle =bquote(p-value:.(p.v.ANVDeath72.1)~R^2:.(r.v.ANVDeath72.1)~Lambda:.(ANVDeath72.1)))+
   guides(col=FALSE)
 
-ggsave(filename='celldeath72.1.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S53celldeath72.1.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 
 #cell death 72.33
@@ -274,9 +274,9 @@ ANVDeath72.33<- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVCellDeath72.33), data=
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.ANVDeath72.33 <- summary(ANVDeath72.33)$corBeta
-r.v.ANVDeath72.33 <- format(r.v.ANVDeath72.33[2,1])
-r.v.ANVDeath72.33 <-signif(as.numeric(r.v.ANVDeath72.33)^2, digits= 3)
+r.v.ANVDeath72.33 <- R2(phy = pruned.tree,ANVDeath72.33)
+r.v.ANVDeath72.33 <- format(r.v.ANVDeath72.33[3])
+r.v.ANVDeath72.33 <-signif(as.numeric(r.v.ANVDeath72.33), digits= 3)
 ld.v.ANVDeath72.33<- summary(ANVDeath72.33)$modelStruct$corStruct
 ld.v.ANVDeath72.33<- signif(ld.v.ANVDeath72.33[1])
 p.v.ANVDeath72.33<-summary(ANVDeath72.33)$tTable
@@ -311,7 +311,7 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(ANVCellDeath72.33))) +
        subtitle =bquote(p-value:.(p.v.ANVDeath72.33)~R^2:.(r.v.ANVDeath72.33)~Lambda:.(ANVDeath72.33)))+
   guides(col=FALSE)
 
-ggsave(filename='celldeath72.33.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S54celldeath72.33.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 #cell death 72.11
 
@@ -321,9 +321,9 @@ ANVDeath72.11<- pglsSEyPagel(NeoplasiaPrevalence~log10(ANVCellDeath72.11), data=
 
 #grab r squared, p value, and lambda from summary 
 
-r.v.ANVDeath72.11 <- summary(ANVDeath72.11)$corBeta
-r.v.ANVDeath72.11<- format(r.v.ANVDeath72.11[2,1])
-r.v.ANVDeath72.11 <-signif(as.numeric(r.v.ANVDeath72.11)^2, digits= 3)
+r.v.ANVDeath72.11 <- R2(phy = pruned.tree,ANVDeath72.11)
+r.v.ANVDeath72.11<- format(r.v.ANVDeath72.11[3])
+r.v.ANVDeath72.11 <-signif(as.numeric(r.v.ANVDeath72.11), digits= 3)
 ld.v.ANVDeath72.11<- summary(ANVDeath72.11)$modelStruct$corStruct
 ld.v.ANVDeath72.11<- signif(ld.v.ANVDeath72.11[1], digits = 3)
 p.v.ANVDeath72.11<-summary(ANVDeath72.11)$tTable
@@ -356,6 +356,6 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(ANVCellDeath72.11))) +
        subtitle =bquote(p-value:.(p.v.ANVDeath72.11)~R^2:.(r.v.ANVDeath72.11)~Lambda:.(ANVDeath72.11)))+
   guides(col=FALSE)
 
-ggsave(filename='celldeath72.11.png', width=13, height=10, limitsize=FALSE,bg="white")
+ggsave(filename='S55celldeath72.11.pdf', width=13, height=10, limitsize=FALSE,bg="white")
 
 
