@@ -53,6 +53,9 @@ Main PGLS analysis of all life history variables
 ### min20mam.R
 PGLS Analysis of life history variables for mammals
 
+## propMaligMin20.R
+PGLS Analysis of list history relations with proportion of malignant neoplasms
+
 ### min20aves.R
 PGLS Analysis of life history variables for aves
 
