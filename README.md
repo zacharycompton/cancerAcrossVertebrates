@@ -4,6 +4,8 @@
 ```rscript checkLibrary.R```  
 You can also run this in RStudio
 
+## Individual level files are left out of the github. Some of these scripts require this data. 
+
 ### checkLibrary.R  
 Checks if user has libraries needed to run R scripts
 
