@@ -20,12 +20,6 @@ Same life history species data as excel file, just as a csv
 ### data-description-min20-2022.05.16.txt
 Data descrption for min20-2022.05.16.csv
 
-### allrecords.csv
-All individual records 
-
-### cleanPath.min20.062822.csv
-Individual records with species n >= 20
-
 ### fastslow.csv
 life history data sorted by slow and fast life history 
 
@@ -98,6 +92,12 @@ PGLS for doxirubicin treatment data
 ### kruskalwilcox.R
 Perform Kruskal and Wilcox test between clades
 
+### speciesCut.Rmd
+PGLS analysis with outlier species cut
+
+### tetrapodComp.R
+PGLS analysis of same groups as Bull et al
+
 ### arcsinMin20.Rmd || arcsinMin20.html
 arcsine tranformation of significant dependent variables in pgls analysis
 
@@ -113,6 +113,9 @@ Results of min20GEE.Rmd, min20All.R, and min20AgeControl.Rmd for model compariso
 Results of Min20GEE.Rmd
 
 ## Script for Visuals
+
+### superTree.R
+script for large super tree
 
 ### barTree.R
 Creates phylo tree with bars above species name
