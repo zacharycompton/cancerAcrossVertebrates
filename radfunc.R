@@ -64,8 +64,13 @@ pglsSEyPagel=function(model, data, tree, lambdaInterval=c(0,1),...){
 }
 
 #read and clean up csv
-Data<-read.csv(file="min20RAD_UPDATE.csv")
-View(Data)
+min1<-read.csv(file="min1.csv")
+radData<-read.csv(file="radUpdate.csv")
+min10<-filter(min1, RecordsWithDenominators >= 10)
+
+Data<-left_join(radData, min10, by = "common_name")
+
+Data <- Data[,c(1,2,3,4,13,14,16,20,30),drop=FALSE] 
 Data<-na.omit(Data)
 #read tree
 tree<-read.tree(file="min10radtree.nwk")
@@ -116,16 +121,15 @@ ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(AUC10Gy))) +
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
   xlab("(log 10) Cell Count AUC % of Untreated Control \n 10Gy Radiation") +
-  geom_point(aes(colour= Keep, size = TotalRecords)) +
+  geom_point(aes(colour= Keep, size = RecordsWithDenominators)) +
   geom_text_repel(aes(label=common_name))+
   scale_size(name   = "Total Necropsies",
-             breaks = c(20,150,250,394),
-             labels =  c(20,150,250,394))+
+             breaks = c(10,20,50,100),
+             labels =  c(10,20,50,100))+
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+
-  labs(title = "Neoplasia vs. AUC 10Gy Radiation",
-        subtitle =bquote(p-value:.(p.v.AUC.10.GY)~R^2:.(r.AUC.10.GY)~Lambda:.(ld.v.AUC.10.GY)))+
+  labs(title = "A")+
   guides(col=FALSE)
 
 ggsave(filename='S40RADAUC10.pdf', width=9.5, height=7, limitsize=FALSE,bg="white")
@@ -222,10 +226,18 @@ ggsave(filename='S42RADAUC04.pdf', width=9.5, height=7, limitsize=FALSE,bg="whit
 
 ##CHANGE 
 #read csv
-Data<-read.csv(file="min20RAD_UPDATE.csv")
-View(Data)
-#read tree
-tree<-read.tree(file="min10radtree.nwk")
+#read and clean up csv
+min1<-read.csv(file="min1.csv")
+radData<-read.csv(file="changeRad.csv")
+min10<-filter(min1, RecordsWithDenominators >= 10)
+
+Data<-left_join(radData, min10, by = "common_name")
+
+Data <- Data[,c(1,2,3,4,13,14,16,20,30),drop=FALSE] 
+Data<-na.omit(Data)
+
+tree<-read.tree("min10change.nwk")
+
 
 
 #prune tree and data 
@@ -243,7 +255,7 @@ SE<-setNames(Data$SE,Data$Species)[rownames(Data)]
 
 
 #10GY Change
-Change.10.GY <- pglsSEyPagel(NeoplasiaPrevalence~log10(Change10Gy), data=Data,
+Change.10.GY <- pglsSEyPagel(NeoplasiaPrevalence~(Change.10.GY), data=Data,
                           tree=pruned.tree,method="ML",se=SE)
 
 #grab r squared, p value, and lambda from summary 
@@ -257,25 +269,20 @@ p.v.Change.10.GY<-summary(Change.10.GY)$tTable
 p.v.Change.10.GY<-signif(p.v.Change.10.GY[2,4], digits = 2)
 
 #plot
-ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=log10(Change10Gy))) +
+ggplot(Data, aes(y=NeoplasiaPrevalence*100, x=(Change.10.GY))) +
   scale_color_manual(values=c("#631879FF"))+
-  scale_x_continuous(
-    limits = c(1.3,2),
-    breaks = c(1.3,1.6,1.8,1.90309,2),
-    labels = c(20,40,60,80,100)
-  )+
   geom_abline(intercept = coef(Change.10.GY)[1]*100, slope =  coef(Change.10.GY)[2]*100,
               color = 'grey',size = 1.2) +
   theme_cowplot(12)+
   theme(axis.title = element_text(size = 18))+
   ylab("Neoplasia Prevalence (%)") +
   xlab("% Cell Growth Over Time [AUC] Relative to Untreated at 10 Gy of Radiation") +
-  geom_point(aes(colour= Keep, size = TotalRecords)) +
+  geom_point(aes(colour= Keep, size = RecordsWithDenominators)) +
   labs(title = "A")+
   geom_text_repel(aes(label=common_name))+
   scale_size(name   = "Total Necropsies",
-             breaks = c(20,150,250,394),
-             labels =  c(20,150,250,394))+
+             breaks = c(10,20,50,150),
+             labels =  c(10,20,50,150))+
   theme(
     plot.title = element_text(size = 20, face = "bold")) +
   theme(legend.position = "bottom")+

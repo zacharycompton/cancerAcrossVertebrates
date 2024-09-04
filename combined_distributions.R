@@ -16,7 +16,9 @@ AgeRisk_Mammals <- filter(AgeRisk_Mammals, proportion_lifespan>= 0)
 AgeRisk_Amphibia <- filter(AgeRisk, is.element(Class, c("Amphibia")))
 AgeRisk_Amphibia <- filter(AgeRisk_Amphibia, proportion_lifespan >= 0)
 
+AgeRisk_AmphibiaMalignat <- filter(AgeRisk_Amphibia, Malignant== 1)
 
+AgeRisk_AmphibiaLarge <- filter(AgeRisk_Amphibia, proportion_lifespan >= 1)
 #Density plot for percentage of age of death for Sauropsids
 
 saur <- ggplot(AgeRisk_Sauropsida, aes(x=proportion_lifespan*100, y=..scaled..,fill=factor((Masspresent)))) + 

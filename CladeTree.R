@@ -11,7 +11,7 @@ library(cowplot)
 #read tree
 Data<-read.csv(file="min20-2022.05.16.csv")
 Data<- filter(Data, is.element(Clade, c("Mammalia")))
-Data <- Data[,c(6,7,9,10,17,13),drop=FALSE] 
+Data <- Data[,c(6,7,9,10,17),drop=FALSE] 
 tree<-read.tree(file="min20Fixed516.nwk")
 Data[Data < 0] <-NA
 Data <- na.omit(Data)
@@ -34,37 +34,39 @@ nrow(Data)
 
 
 ## match species from csv to the tree
-neoplasia=dplyr::filter(Data, row.names(Data) %in% pruned.tree$tip.label)
+Malignancy=dplyr::filter(Data, row.names(Data) %in% pruned.tree$tip.label)
 
 ## select trait
-neoplasia=neoplasia%>%dplyr::select(NeoplasiaPrevalence)
+Malignancy=Malignancy%>%dplyr::select(MalignancyPrevalence)
 
 ## change this into a vector
-neoplasia=as.matrix(neoplasia)[,1]
-neoplasia
+Malignancy=as.matrix(Malignancy)[,1]
+Malignancy
 
+maxNeo<-as.numeric(max(Malignancy))
+minNeo<-as.numeric(min(Malignancy))
 ## estimate ancestral states
-fit<-fastAnc(pruned.tree,neoplasia,vars=TRUE,CI=TRUE)
+fit<-fastAnc(pruned.tree,Malignancy,vars=TRUE,CI=TRUE)
 
 ## confidence intervals
 fit$CI[1,]
 
 ## projection of the reconstruction onto the edges of the tree
-Mobj<-contMap(pruned.tree,neoplasia,plot=FALSE,res=300, type = "phylogram",lwd = 2)
+Mobj<-contMap(pruned.tree,Malignancy,plot=FALSE,res=300, type = "phylogram",lwd = 2, lims = c(minNeo, maxNeo))
 
 
 ## invert color scale so red is highest trait value and blue is lowest
 Mobj<-setMap(Mobj,invert=TRUE)
-
+#plot(Mobj, ftype = "off", direction = "downwards", fsize=0)
 
 ## plot 
 m<-plot(Mobj,
-     fsize=c(1,0.8),leg.txt="neoplasia prevalence",lwd= 2.5,ftype="off")
+     fsize=0,leg.txt="Malignancy prevalence",lwd= 2.5,ftype="off")
 title(main="A", adj = .05, line = -1)
 
-plot(Mobj,
-     fsize=c(.4,0.2),leg.txt="neoplasia prevalence",lwd= 2.5)
-title(main="A", adj = .05, line = -1)
+# plot(Mobj,
+#      fsize=c(.4,0.2),leg.txt="Malignancy prevalence",lwd= 2.5)
+# title(main="A", adj = .05, line = -1)
 
 specData$Species <- gsub(" ", "_", specData$Species)
 
@@ -233,37 +235,37 @@ nrow(Data)
 #name.check(pruned.tree,Data)
 
 ## match species from csv to the tree
-neoplasia=dplyr::filter(Data, row.names(Data) %in% pruned.tree$tip.label)
+Malignancy=dplyr::filter(Data, row.names(Data) %in% pruned.tree$tip.label)
 
 ## select trait
-neoplasia=neoplasia%>%dplyr::select(NeoplasiaPrevalence)
+Malignancy=Malignancy%>%dplyr::select(MalignancyPrevalence)
 
 ## change this into a vector
-neoplasia=as.matrix(neoplasia)[,1]
-neoplasia
+Malignancy=as.matrix(Malignancy)[,1]
+Malignancy
 
 ## estimate ancestral states
-fit<-fastAnc(pruned.tree,neoplasia,vars=TRUE,CI=TRUE)
+fit<-fastAnc(pruned.tree,Malignancy,vars=TRUE,CI=TRUE)
 fit
 
 ## confidence intervals
 fit$CI[1,]
 
 ## projection of the reconstruction onto the edges of the tree
-Sobj<-contMap(pruned.tree,neoplasia,plot=FALSE,res=200, type = "fan")
+Sobj<-contMap(pruned.tree,Malignancy,plot=FALSE,res=200, type = "fan", lims = c(minNeo, maxNeo))
 
 ## invert color scale so red is highest trait value and blue is lowest
 Sobj<-setMap(Sobj,invert=TRUE)
 
 ## plot 
 s<-plot(Sobj,
-           fsize=c(1,0.8),leg.txt="neoplasia prevalence",lwd = 2.5, ftype="off")
+           fsize=c(0,1),leg.txt="Malignancy prevalence",lwd = 2.5, ftype="off")
 title(main="B", adj = .05, line = -1)
 
 
-plot(Sobj,
-     fsize=c(.4,0.2),leg.txt="neoplasia prevalence",lwd= 2.5)
-title(main="B", adj = .05, line = -1)
+# plot(Sobj,
+#      fsize=c(.4,0.2),leg.txt="Malignancy prevalence",lwd= 2.5)
+# title(main="B", adj = .05, line = -1)
 
 #order subset
 accipitriformes<-filter(specData, is.element(Orders, c("Accipitriformes")))
@@ -457,38 +459,38 @@ rownames(Data)<-Data$Species
 Data <- Data[,c(5,6),drop=FALSE] 
 nrow(Data)
 ## match species from csv to the tree
-neoplasia=dplyr::filter(Data, row.names(Data) %in% pruned.tree$tip.label)
+Malignancy=dplyr::filter(Data, row.names(Data) %in% pruned.tree$tip.label)
 
 ## select trait
-neoplasia=neoplasia%>%dplyr::select(NeoplasiaPrevalence)
+Malignancy=Malignancy%>%dplyr::select(MalignancyPrevalence)
 
 ## change this into a vector
-neoplasia=as.matrix(neoplasia)[,1]
-neoplasia
+Malignancy=as.matrix(Malignancy)[,1]
+Malignancy
 
 ## estimate ancestral states
-fit<-fastAnc(pruned.tree,neoplasia,vars=TRUE,CI=TRUE)
+fit<-fastAnc(pruned.tree,Malignancy,vars=TRUE,CI=TRUE)
 fit
 
 ## confidence intervals
 fit$CI[1,]
 
 ## projection of the reconstruction onto the edges of the tree
-Aobj<-contMap(pruned.tree,neoplasia,plot=FALSE,res=200, type = "fan")
+Aobj<-contMap(pruned.tree,Malignancy,plot=FALSE,res=200, type = "fan", lims = c(minNeo, maxNeo))
 
 ## invert color scale so red is highest trait value and blue is lowest
 Aobj<-setMap(Aobj,invert=TRUE)
 
 ## plot 
 s<-plot(Aobj,
-        fsize=c(1,0.8),leg.txt="neoplasia prevalence",lwd = 2.5,margin = 20, ftype="off")
+        fsize=c(0,1),leg.txt="Malignancy prevalence",lwd = 2.5,margin = 20, ftype="off")
 title(main="C", adj = .05, line = -1)
 
 
-
-plot(Aobj,
-     fsize=c(.4,0.2),leg.txt="neoplasia prevalence",lwd= 2.5)
-title(main="C", adj = .05, line = -1)
+# 
+# plot(Aobj,
+#      fsize=c(.4,0.2),leg.txt="Malignancy prevalence",lwd= 2.5)
+# title(main="C", adj = .05, line = -1)
 
 
 
@@ -557,13 +559,13 @@ cladelabels(text="Salamandridae",cex = .8,node=findMRCA(pruned.tree, Salamandrid
 # 
 # layout(matrix(c(1,1,1,2,2,3), 6,1, byrow = TRUE))
 # plot(Sobj,
-#      fsize=c(1,0.8),leg.txt="neoplasia prevalence")
+#      fsize=c(1,0.8),leg.txt="Malignancy prevalence")
 # title(main="A", cex.main=3, line = -2, adj=.05)
 # plot(Mobj,
-#     fsize=c(1,0.8),leg.txt="neoplasia prevalence")
+#     fsize=c(1,0.8),leg.txt="Malignancy prevalence")
 # title(main="B", cex.main=3, line = -2, adj=.05)
 # plot(Aobj,
-#     fsize=c(1,0.8),leg.txt="neoplasia prevalence")
+#     fsize=c(1,0.8),leg.txt="Malignancy prevalence")
 # title(main="C", cex.main=3, line = -2, adj=.05)
 # 
 # 
