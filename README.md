@@ -11,16 +11,16 @@ Checks if user has libraries needed to run R scripts
 
 ## Data
 
-###  min20-2022.05.16.xlsx 
+###  species-cancer-prevalence-data.xlsx 
 This is our species level life history data
 Contains data and data dictionary
 Minimum of 20 records per species
-
-###  min20-2022.05.16.csv
+min20-2022.05.16.xlsx is identical
+###  species-cancer-prevalence-data.csv
 Same life history species data as excel file, just as a csv
 
-### data-description-min20-2022.05.16.txt
-Data descrption for min20-2022.05.16.csv
+### data-description-species-cancer-prevalence-data.txt
+Data descrption for species-cancer-prevalence-data.csv
 
 ### fastslow.csv
 life history data sorted by slow and fast life history 
