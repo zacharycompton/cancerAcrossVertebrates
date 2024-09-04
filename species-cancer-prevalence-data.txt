@@ -1,0 +1,41 @@
+Variable name                Legend
+-------------                ------
+taxa_ID                      Zoo assigned taxonomic identifier
+Kingdom                      Taxonomic kingdom of the species
+Phylum                       Taxonomic phylum of the species
+Class                        Taxonomic class of the species
+Clade                        Taxonomic clade of the species
+Orders                       Taxonomic order of the species
+Family                       Taxonomic family of the species
+Genus                        Taxonomic genus of the species
+Species                      Binomial scientific name of the taxa
+common_name                  English common name for species
+RecordsWithDenominators      # of records for species where total sample size is known
+NeoplasiaWithDenominators    # of neoplasia per species where total sample size is known
+NeoplasiaPrevalence          Proportion of neoplasia found within the population of species (NeoplasiaWithDenominators/RecordsWithDenominators)
+MalignancyKnown              # of malignancy per species where total sample size is known
+Malignant                    # of malignancies found per species
+MalignancyPrevalence         Proportion of malignancy found within the population of species (MalignancyKnown/RecordsWithDenominators)
+PropMalignant                Proportion of malignancy to total neoplasia (MalignancyKnown/NeoplasiaWithDenominators)
+Benign                       # of benign tumors found per species
+BenignPrevalence             Proportion of benign tumors found within the population of species (Benign/RecordsWithDenominators)
+PropBenign                   Proportion of benign tumors to total neoplasia (Benign/NeoplasiaWithDenominators)
+RecordsFromAllSources        # of records per species from all sources
+NeoplasiaFromAllSources      # of neoplasia per species from all sources
+Necropsies                   # of necropsies per species
+#Sources                     # of sources
+female_maturity(months)      Age in months that females reach maturity
+male_maturity(months)        Age in months that males reach maturity
+Gestation(months)            Length of gestation period in months
+Weaning(months)              Months species receive nutrition from the mother
+Infancy(months)              Months species receive nutrition from the mother
+litter_size                  # of individual newborns in a litter
+litters_year                 # of litters birthed per year
+interbirth_interval          # of days between separate births
+birth_weight(g)              Weight at birth in grams
+weaning_weight(g)            Weight in grams at the time of weaning
+adult_weight(g)              Weight in grams of the average adult
+growth_rate(1/days)          Rate of growth calculated for weight gained per day
+max_longevity(months)        Longest lifespan measured in months
+metabolic_rate               Species' average energy consumption to maintain bodily function
+SE_simple                    Standard Error per species. 1/SQRT(RecordsWithDenominators)
